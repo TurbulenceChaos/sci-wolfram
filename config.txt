@@ -1,0 +1,4 @@
+WolframPlayer = /mnt/c/Program Files/Wolfram Research/Wolfram Engine/14.1/WolframPlayer.exe
+ExternalPNG = powershell.exe
+InlinePNG = imgcat
+ImgDPI = 100
