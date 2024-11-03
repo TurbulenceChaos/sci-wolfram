@@ -36,3 +36,8 @@
 
    ![wolfram-test](Images/WolframTest.gif)
 
+
+## Reference
+
+1. [Wolfram Community](https://community.wolfram.com/groups/-/m/t/2864001)
+2. [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)

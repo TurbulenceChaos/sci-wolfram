@@ -50,7 +50,7 @@ ExternalPNG = variables["ExternalPNG"];
 
 InlinePNG = variables["InlinePNG"];
 
-(* ImageResolution: PNG files DPI *)
+(* ImageDPI: PNG files DPI *)
 
 ImgDPI = ToExpression[variables["ImgDPI"]]
 
