@@ -9,7 +9,7 @@
 ## Getting Started
 
 1. Clone this repository.
-2. Edit the `config.txt` file. If you are using Linux system, here is an example configuration:
+2. Create a `config.txt` file in the same directory as the WolframDisplay.wl file. If you are using a Linux system, here is an example configuration (config-example.txt):
    | Variable      | Value         |
    | ------------- | ------------- |
    | WolframPlayer | wolframplayer |
