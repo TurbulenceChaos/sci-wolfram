@@ -95,7 +95,7 @@ WolframDisplay[display_, img_] :=
             ;
         FormulaBox = RowBox | SqrtBox | SuperscriptBox | FormBox;
         $Post =
-            If[img == "None",
+            If[display == "Text",
                 #
                 ,
                 With[{box = ToBoxes[#]},

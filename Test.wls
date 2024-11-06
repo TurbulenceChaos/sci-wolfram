@@ -2,9 +2,9 @@
 
 Parameters:
 `display`: Specifies how formulas and plots should be presented. 
-           Options include "InlinePNG" (using imgcat), "ExternalPNG" (opening images with IrfanView), or "WolframCDF" (converting expressions to CDF files and opening them with WolframPlayer);
+           Options include "Text" (text only for both formulas and plots), "InlinePNG" (using imgcat), "ExternalPNG" (opening images with IrfanView), and "WolframCDF" (converting expressions to CDF files and opening them with WolframPlayer);
 `img`: Defines the type of content to display. 
-       Options are "None" (text only for both formulas and plots), "Formula" (applicable to formulas), "Plot" (applicable to plots), or "FormulaAndPlot" (applies to both formulas and plots). *)
+       Options are "Formula" (applicable to formulas), "Plot" (applicable to plots), and "FormulaAndPlot" (applies to both formulas and plots). *)
 
 (* The default configuration is WolframDisplay["InlinePNG", "FormulaAndPlot"], which does not need to be explicitly stated. Other image display methods include WolframDisplay["WolframCDF", "FormulaAndPlot"], WolframDisplay["ExternalPNG", "FormulaAndPlot"], etc. *)
 
