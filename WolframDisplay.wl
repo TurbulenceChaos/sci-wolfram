@@ -56,16 +56,16 @@ ImgDPI = ToExpression[variables["ImgDPI"]]
 
 WolframCDF[g_] :=
     Module[
-        {fileName, box}
+        {fileName}
         ,
         (* Construct the file name for the CDF file *)
         fileName = FileNameJoin[{"tmp", StringReplace[DateString["ISODateTime"
             ], ":" -> "-"] <> ".cdf"}];
-        box = ToBoxes[g];
         (* Export expression as CDF and use WolframPlayer to open it*)
             
-        StartProcess[{WolframPlayer, Export[fileName, Notebook[{Cell 
-            @ BoxData @ box}, WindowSize -> Automatic], "CDF"]}];
+        While[Export[fileName, Notebook[{Cell @ BoxData @ ToBoxes[g]},
+             WindowSize -> Automatic], "CDF"], Print["..."] Pause[0.25]];
+        Run[WolframPlayer <> " " <> fileName];
         g
     ];
 
@@ -77,11 +77,11 @@ WolframPNG[g_, displayMethod_:"ExternalPNG"] :=
         fileName = FileNameJoin[{"tmp", StringReplace[DateString["ISODateTime"
             ], ":" -> "-"] <> ".png"}];
         (* Export expression as PNG *)
-        Export[fileName, g, ImageResolution -> ImgDPI];
-        While[!FileExistsQ[fileName], Pause[1]];
+        While[Export[fileName, g, ImageResolution -> ImgDPI], Print["..."
+            ] Pause[0.25]];
         Which[
             displayMethod == "ExternalPNG",
-                StartProcess[{ExternalPNG, fileName}]
+                Run[ExternalPNG <> " " <> fileName]
             ,
             displayMethod == "InlinePNG",
                 Run[InlinePNG <> " " <> fileName]
