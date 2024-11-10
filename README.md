@@ -33,7 +33,8 @@
 
 5. Run the `Test.wls` file.
 
-   ![wolfram-test](Images/WolframTest.mp4)
+   ![wolfram-test](Images/WolframTest.gif)
+
 
 ## Reference
 
