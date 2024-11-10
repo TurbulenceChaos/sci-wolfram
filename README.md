@@ -13,7 +13,7 @@
    | Variable      | Value         |
    | ------------- | ------------- |
    | WolframPlayer | wolframplayer |
-   | ExternalPNG   | xdg-open      |
+   | ExternalPNG   | code          |
    | InlinePNG     | imgcat        |
    | ImgDPI        | 100           |
 
