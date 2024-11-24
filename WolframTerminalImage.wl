@@ -5,13 +5,14 @@ BeginPackage["WolframTerminalImage`"];
 Begin["`Private`"];
 
 WolframTerminalImage[g_] :=
-    Module[{file},
+    Module[{file, plot},
         file = FileNameJoin[$TemporaryDirectory, "Wolfram", StringReplace[
             DateString["ISODateTime"], ":" -> "-"] <> ".png"];
-        Export[file, g];
+        plot = g;
+        Export[file, plot];
         Run["imgcat " <> file];
         Quiet @ DeleteFile @ file;
-        g;
+        plot;
     ];
 
 $Post =
