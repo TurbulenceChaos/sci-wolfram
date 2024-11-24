@@ -1,7 +1,6 @@
 # Display WolframScript graphics in VS Code terminal
 
 ## Prerequisites
-
 - `wolframscript`
 - `imgcat` (install with `pip install imgcat`)
 
@@ -19,6 +18,6 @@
    ![wolfram-test](Images/wolfram-test.gif)
 
 ## Reference
-
 1. [Wolfram Community](https://community.wolfram.com/groups/-/m/t/2864001)
+   
 2. [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
