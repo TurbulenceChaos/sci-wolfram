@@ -1,40 +1,22 @@
-# Displaying Graphics Inline or Using WolframPlayer for Wolfram Engine
+# Display WolframScript graphics in VS Code terminal
 
 ## Prerequisites
 
 - `wolframscript`
-- `wolframplayer`
 - `imgcat` (install with `pip install imgcat`)
 
 ## Getting Started
+1. Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VS Code. 
+   
+   ![vscode-terminal-enable-images](Images/vscode-terminal-enable-images.png)
 
-1. Clone this repository.
-2. Create a `config.txt` file in the same directory as the WolframDisplay.wl file. If you are using a Linux system, here is an example configuration (config-example.txt):
-   | Variable      | Value         |
-   | ------------- | ------------- |
-   | WolframPlayer | wolframplayer |
-   | ExternalPNG   | code          |
-   | InlinePNG     | imgcat        |
-   | ImgDPI        | 100           |
+2. Install the official Wolfram Language extension.
 
-3. (**This method may work in the VS Code terminal with a discrete graphics card**)
-   To show images inline using `imgcat`, use the VS Code terminal. 
-   First, open the VS Code settings panel and enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration`. 
+   ![vscode-official-wolfram-extension](Images/vscode-official-wolfram-extension.png)
 
-   ![vscode-terminal-enable-images](Images/VSCode-terminal-enable-images.png)
+3. Test the `Test.wl` script.
 
-   Then, open the VS Code terminal and type `imgcat Images/Sample.png` to test if the image is displayed inline.
-
-   ![vscode-terminal-imgcat-test](Images/VSCode-terminal-imgcat-test.png)
-
-4. Install the official Wolfram Language extension in VS Code.
-
-   ![vscode-official-wolfram-extension](Images/VSCode-official-wolfram-extension.png)
-
-5. Run the `Test.wls` file.
-
-   ![wolfram-test](Images/WolframTest.gif)
-
+   ![wolfram-test](Images/wolfram-test.gif)
 
 ## Reference
 

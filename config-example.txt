@@ -1,4 +1,0 @@
-WolframPlayer = wolframplayer
-ExternalPNG = code
-InlinePNG = imgcat
-ImgDPI = 100
