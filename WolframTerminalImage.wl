@@ -9,8 +9,7 @@ WolframTerminalImage[g_] :=
         file = FileNameJoin[$TemporaryDirectory, "Wolfram", StringReplace[
             DateString["ISODateTime"], ":" -> "-"] <> ".png"];
         expr = g;
-        box = ToBoxes[expr];
-        Export[file, Notebook[{Cell @ BoxData @ box}]];
+        Export[file, Notebook[{Cell @ BoxData @ ToBoxes @ expr}]];
         Run["imgcat " <> file];
         Quiet @ DeleteFile @ file;
         expr;
