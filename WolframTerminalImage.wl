@@ -18,7 +18,7 @@ WolframTerminalImage[g_] :=
 $Post =
     With[{box = ToBoxes[#], plotBox = DynamicBox | DynamicModuleBox |
          GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
-         | InterpretationBox},
+        },
         If[FreeQ[formulaBox | plotBox] @ box,
             #
             ,
