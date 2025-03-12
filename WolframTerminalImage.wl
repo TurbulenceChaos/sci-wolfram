@@ -2,16 +2,23 @@
 
 BeginPackage["WolframTerminalImage`"];
 
+wolframTerminalDeleteImage = "no";
+
+wolframTerminalImageResolution = 100;
+
 Begin["`Private`"];
 
 WolframTerminalImage[g_] :=
     Module[{file, expr},
-        file = FileNameJoin[$TemporaryDirectory, "Wolfram", StringReplace[
-            DateString["ISODateTime"], ":" -> "-"] <> ".png"];
+        file = FileNameJoin["tmp", "wolfram", CreateUUID["wolfram-"] 
+            <> ".png"];
         expr = g;
-        Export[file, Notebook[{Cell @ BoxData @ ToBoxes @ expr}]];
+        Export[file, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], ImageResolution
+             -> wolframTerminalImageResolution];
         Run["imgcat " <> file];
-        Quiet @ DeleteFile @ file;
+        If[wolframTerminalDeleteImage == "yes",
+            Quiet @ DeleteFile @ file
+        ];
         expr;
     ];
 
