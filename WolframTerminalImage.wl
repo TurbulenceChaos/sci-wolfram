@@ -6,6 +6,8 @@ wolframTerminalDeleteImage = "no";
 
 wolframTerminalImageResolution = 100;
 
+wolframTerminalType = "vscode";
+
 Begin["`Private`"];
 
 WolframTerminalImage[g_] :=
@@ -15,7 +17,11 @@ WolframTerminalImage[g_] :=
         expr = g;
         Export[file, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], ImageResolution
              -> wolframTerminalImageResolution];
-        Run["imgcat " <> file];
+        If[wolframTerminalType == "emacs",
+            Print["[[file:" <> file <> "]]"]
+            ,
+            Run["imgcat " <> file]
+        ];
         If[wolframTerminalDeleteImage == "yes",
             Quiet @ DeleteFile @ file
         ];
