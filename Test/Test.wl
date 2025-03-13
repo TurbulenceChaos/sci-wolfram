@@ -1,12 +1,26 @@
 Get["WolframTerminalImage`"];
 
-(* Enable or disable auto-deletion of Wolfram terminal images *)
+(* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
+
+wolframTerminalType = "vscode";
+
+(* Set the resolution (in DPI) for Wolfram terminal images *)
+
+wolframTerminalImageResolution = 100;
+
+(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images *)
 
 wolframTerminalDeleteImage = "no";
 
-(* Resolution of Wolfram terminal images *)
+(* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
 
-wolframTerminalImageResolution = 100;
+wolframTerminalPlay = "no";
+
+(* Specify the player application for Wolfram terminal CDF files *)
+
+(* Options: "wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
+
+wolframplayer = "wolframplayer";
 
 sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
   Cos[t]}, y[x, t], {x, t}]
