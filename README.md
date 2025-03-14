@@ -96,19 +96,26 @@ First, import the **Wolfram-Terminal-Image** package from [this repository](http
 #+begin_src jupyter-Wolfram-Language :results silent
   Get["~/.emacs.d/lisp-site/Wolfram-terminal-image/WolframTerminalImage.wl"]
 
-  (* Configure the terminal type: "vscode" or "emacs" *)
+  (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
+
   wolframTerminalType = "emacs";
 
-  (* Set image resolution in DPI *)
+  (* Set the resolution (in DPI) for Wolfram terminal images *)
+
   wolframTerminalImageResolution = 150;
 
-  (* Enable or disable automatic deletion of images *)
+  (* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images *)
+
   wolframTerminalDeleteImage = "no";
 
-  (* Enable or disable CDF playback *)
+  (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
+
   wolframTerminalPlay = "no";
 
-  (* Set the player application for CDF files *)
+  (* Specify the player application for Wolfram terminal CDF files *)
+
+  (* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
+
   wolframplayer = "wolframplayer";
 #+end_src
 ```
