@@ -89,7 +89,7 @@ For my Emacs configuration, check out: [SCI-emacs](https://github.com/Turbulence
 
 #### 2.2.2 Executing Jupyter Wolfram Language Code in Org-Mode
 
-First, import the **Wolfram-Terminal-Image** package from [this repository](https://github.com/TurbulenceChaos/Wolfram-terminal-image).
+First, import the WolframTerminalImage.wl package from [Wolfram-terminal-image](https://github.com/TurbulenceChaos/Wolfram-terminal-image).
 
 ```wolfram
 #+name: Wolfram-terminal-image
@@ -120,7 +120,7 @@ First, import the **Wolfram-Terminal-Image** package from [this repository](http
 #+end_src
 ```
 
-Next, test **Jupyter-Wolfram-Language** by solving and plotting a PDE.
+Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solution with a plot.
 
 ```wolfram
 #+name: Wolfram-test
