@@ -1,4 +1,4 @@
-# Display WolframScript Graphics in VS Code Terminal and Emacs Org-Mode
+# Wolfram-terminal-image
 
 **Author:** Peng Peng  \
 **Email:** [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)  \
