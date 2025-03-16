@@ -41,7 +41,7 @@
 
 ### 2.2 For Emacs
 
-For my Emacs configuration, check out: [SCI-emacs](https://github.com/TurbulenceChaos/SCI-emacs).
+![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
 
 #### 2.2.1 Emacs Configuration
 
@@ -134,9 +134,7 @@ Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solutio
 #+end_src
 ```
 
-Below is a demonstration:
-
-![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
+For my Emacs configuration, check out: [SCI-emacs](https://github.com/TurbulenceChaos/SCI-emacs).
 
 ## 3. Reference
 
