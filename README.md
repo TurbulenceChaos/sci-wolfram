@@ -65,6 +65,11 @@
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
 ;; Configure Org-Babel for Jupyter-Wolfram-Language
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (jupyter . t)))
+
 (setq org-babel-default-header-args:jupyter-Wolfram-Language '((:async . "yes")
                                                                (:kernel . "wolframlanguage14.1")
                                                                (:session . "jupyter-wolfram-language")
