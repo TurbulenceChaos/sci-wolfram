@@ -28,9 +28,9 @@ Begin["`Private`"];
 
 WolframTerminalImage[g_, playCDF_] :=
     Module[{file, filePNG, fileCDF, expr},
-        file = FileNameJoin["tmp", "wolfram", CreateUUID["wolfram-"]]
-            ;
-        filePNG = FileNameJoin[Directory[], file <> ".png"];
+        file = FileNameJoin[{"tmp", "wolfram", CreateUUID["wolfram-"]
+            }];
+        filePNG = FileNameJoin[{Directory[], file <> ".png"}];
         fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
         expr = g;
         Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], 
