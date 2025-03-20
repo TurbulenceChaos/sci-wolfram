@@ -27,7 +27,7 @@ wolframplayer = "wolframplayer";
 Begin["`Private`"];
 
 WolframTerminalImage[g_, playCDF_] :=
-    Module[{filePNG, fileCDF, expr},
+    Module[{dir, filePNG, fileCDF, expr},
         dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
         filePNG = FileNameJoin[{dir, CreateUUID["wolfram-"] <> ".png"
             }];
