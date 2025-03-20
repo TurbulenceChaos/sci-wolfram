@@ -43,8 +43,8 @@ WolframTerminalImage[g_, playCDF_] :=
             ImageResolution -> wolframTerminalImageResolution];
         Which[
             wolframTerminalType == "emacs",
-                Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth[
-                    Directory[]]] <> "]]"]
+                Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth
+                     @ Directory[]] <> "]]"]
             ,
             wolframTerminalType == "vscode",
                 Run["imgcat " <> filePNG];
