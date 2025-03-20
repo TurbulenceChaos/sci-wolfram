@@ -28,16 +28,23 @@ Begin["`Private`"];
 
 WolframTerminalImage[g_, playCDF_] :=
     Module[{file, filePNG, fileCDF, expr},
-        file = FileNameJoin[{"tmp", "wolfram", CreateUUID["wolfram-"]
+        dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
+        filePNG = FileNameJoin[{dir, CreateUUID["wolfram-"] <> ".png"
             }];
-        filePNG = FileNameJoin[{Directory[], file <> ".png"}];
         fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
         expr = g;
+        If[$VersionNumber < 14.1,
+            If[!DirectoryQ[dir],
+                CreateDirectory[dir, CreateIntermediateDirectories ->
+                     True]
+            ]
+        ];
         Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], 
             ImageResolution -> wolframTerminalImageResolution];
         Which[
             wolframTerminalType == "emacs",
-                Print["[[file:" <> file <> ".png]]"]
+                Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth[
+                    Directory[]]] <> "]]"]
             ,
             wolframTerminalType == "vscode",
                 Run["imgcat " <> filePNG];
