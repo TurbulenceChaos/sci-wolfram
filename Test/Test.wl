@@ -22,6 +22,8 @@ wolframTerminalPlay = "no";
 
 wolframplayer = "wolframplayer";
 
+(* To restore `$Post` to its original state, simply execute "$Post=." *)
+
 sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
   Cos[t]}, y[x, t], {x, t}]
 
