@@ -26,6 +26,15 @@ wolframplayer = "wolframplayer";
 
 Begin["`Private`"];
 
+(* TODO: The '%' operator works only in terminal mode *)
+
+WolframTerminalText[g_] :=
+    Module[{expr},
+        expr = g;
+        Print[expr];
+        expr;
+    ];
+
 WolframTerminalImage[g_, playCDF_] :=
     Module[{dir, filePNG, fileCDF, expr},
         dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
@@ -66,7 +75,11 @@ $Post =
          GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
         },
         If[FreeQ[formulaBox | plotBox][box],
-            #
+            If[MatchQ[#, Null],
+                #
+                ,
+                WolframTerminalText[#]
+            ]
             ,
             Which[
                 wolframTerminalPlay == "no",
