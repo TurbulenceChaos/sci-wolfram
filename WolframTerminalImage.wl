@@ -65,18 +65,14 @@ $Post =
     With[{box = ToBoxes[#], plotBox = DynamicBox | DynamicModuleBox |
          GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
         },
-        Which[
-            wolframTerminalPlay == "no",
-                If[FreeQ[formulaBox | plotBox][box],
-                    #
-                    ,
-                    WolframTerminalImage[#, playCDF = "no"]
-                ];
+        If[FreeQ[formulaBox | plotBox][box],
+            #
             ,
-            wolframTerminalPlay == "yes",
-                If[FreeQ[formulaBox | plotBox][box],
-                    #
-                    ,
+            Which[
+                wolframTerminalPlay == "no",
+                    WolframTerminalImage[#, playCDF = "no"]
+                ,
+                wolframTerminalPlay == "yes",
                     With[{
                         playCDF =
                             If[!FreeQ[formulaBox][box],
@@ -87,7 +83,7 @@ $Post =
                     },
                         WolframTerminalImage[#, playCDF]
                     ]
-                ];
+            ]
         ]
     ]&;
 
