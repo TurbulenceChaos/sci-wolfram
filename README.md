@@ -122,6 +122,8 @@ First, import the WolframTerminalImage.wl package from [Wolfram-terminal-image](
   (* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
 
   wolframplayer = "wolframplayer";
+
+  (* To restore `$Post` to its original state, simply execute "$Post=." *)
 #+end_src
 ```
 
