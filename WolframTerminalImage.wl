@@ -33,7 +33,7 @@ WolframTerminalImage[g_, playCDF_] :=
             }];
         fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
         expr = g;
-        If[$VersionNumber < 14.1,
+        If[$VersionNumber < 12.2,
             If[!DirectoryQ[dir],
                 CreateDirectory[dir, CreateIntermediateDirectories ->
                      True]
