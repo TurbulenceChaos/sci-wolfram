@@ -35,6 +35,12 @@ WolframTerminalText[g_] :=
         expr;
     ];
 
+WolframTerminalTeX[g_] :=
+    Module[{expr},
+        expr = g;
+        QuietEcho[TeXForm[expr]]
+    ];
+
 WolframTerminalImage[g_, playCDF_] :=
     Module[{dir, filePNG, fileCDF, expr},
         dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
@@ -72,7 +78,8 @@ WolframTerminalImage[g_, playCDF_] :=
 
 $Post =
     With[{box = ToBoxes[#], plotBox = DynamicBox | DynamicModuleBox |
-         GraphicsBox | Graphics3DBox, formulaBox = RowBox},
+         GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
+        },
         If[FreeQ[formulaBox | plotBox][box],
             If[MatchQ[#, Null],
                 #
@@ -81,19 +88,33 @@ $Post =
             ]
             ,
             Which[
-                wolframTerminalPlay == "no",
-                    WolframTerminalImage[#, playCDF = "no"]
+                wolframTerminalType == "emacs",
+                    If[!FreeQ[formulaBox][box],
+                        WolframTerminalTeX[#]
+                        ,
+                        If[wolframTerminalPlay == "no",
+                            WolframTerminalImage[#, playCDF = "no"]
+                            ,
+                            WolframTerminalImage[#, playCDF = "yes"]
+                        ]
+                    ]
                 ,
-                wolframTerminalPlay == "yes",
-                    With[{
-                        playCDF =
-                            If[!FreeQ[formulaBox][box],
-                                "no"
-                                ,
-                                "yes"
+                wolframTerminalType == "vscode",
+                    Which[
+                        wolframTerminalPlay == "no",
+                            WolframTerminalImage[#, playCDF = "no"]
+                        ,
+                        wolframTerminalPlay == "yes",
+                            With[{
+                                playCDF =
+                                    If[!FreeQ[formulaBox][box],
+                                        "no"
+                                        ,
+                                        "yes"
+                                    ]
+                            },
+                                WolframTerminalImage[#, playCDF]
                             ]
-                    },
-                        WolframTerminalImage[#, playCDF]
                     ]
             ]
         ]
