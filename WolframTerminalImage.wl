@@ -38,7 +38,9 @@ WolframTerminalText[g_] :=
 WolframTerminalTeX[g_] :=
     Module[{expr},
         expr = g;
-        QuietEcho[TeXForm[expr]]
+        Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
+            ];
+        expr;
     ];
 
 WolframTerminalImage[g_, playCDF_] :=

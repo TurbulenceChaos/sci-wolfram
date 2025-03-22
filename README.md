@@ -8,13 +8,15 @@
 
 ## Table of Contents
 
-1. [Prerequisites](#1-prerequisites)
-2. [Getting Started](#2-getting-started)
-   - [For VS Code](#21-for-vs-code)
-   - [For Emacs](#22-for-emacs)
-     - [Emacs Configuration](#221-emacs-configuration)
-     - [Jupyter Wolfram Language Example](#222-executing-jupyter-wolfram-language-code-in-org-mode)
-3. [Reference](#3-reference)
+- [Wolfram-terminal-image](#wolfram-terminal-image)
+  - [Table of Contents](#table-of-contents)
+  - [1. Prerequisites](#1-prerequisites)
+  - [2. Getting Started](#2-getting-started)
+    - [2.1 For VS Code](#21-for-vs-code)
+    - [2.2 For Emacs](#22-for-emacs)
+      - [2.2.1 Emacs Configuration](#221-emacs-configuration)
+      - [2.2.2 Executing Jupyter Wolfram Language Code in Org-Mode](#222-executing-jupyter-wolfram-language-code-in-org-mode)
+  - [3. Reference](#3-reference)
 
 ---
 
@@ -40,8 +42,22 @@
    ![Wolfram script test](Images/wolfram-test.gif)
 
 ### 2.2 For Emacs
+Convert formulas to LaTeX fragments (for pasting into Word or LaTeX) and figures to PNG format.
+
+1. Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
+   - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
+   - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
+   - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
+
+2. Configure Emacs to support Wolfram Language using the provided configuration.
+
+3. Test the setup by executing a sample Wolfram Language script in Org-Mode.
 
 ![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
+
+You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX fragments.
+  
+![Wolfram toggle latex formula](Images/wolfram-toggle-latex-formula.gif)
 
 #### 2.2.1 Emacs Configuration
 
@@ -79,17 +95,43 @@
                                                                (:eval . "never-export")))
 
 ;; Ensure inline images display correctly
-(defun replace-colon-brackets ()
-  "Replace ': [[file:' at the beginning of a line with '[[file:' in the current buffer."
+(defun clean-wolfram-results ()
+  "Clean up Wolfram Language results in org-mode.
+Specifically handles line prefixes and unwanted whitespace in equations."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (while (re-search-forward "^: \\\[\\[file:" nil t)
-      (replace-match "[[file:" nil nil))))
+    (while (search-forward ":results:" nil t)
+      (let ((start (point))
+            (end (progn (search-forward ":end:" nil t)
+                        (match-beginning 0))))
+        (save-restriction
+          (narrow-to-region start end)
+          
+          ;; Remove ': ' at beginning of lines
+          (goto-char (point-min))
+          (while (re-search-forward "^: " nil t)
+            (replace-match "" nil nil))
+          
+          ;; Remove '> ' at beginning of lines 
+          (goto-char (point-min))
+          (while (re-search-forward "^> " nil t)
+            (replace-match "  " nil nil))
+            
+          ;; Fix broken equation lines
+          (goto-char (point-min))
+          (while (re-search-forward "\\\\cos\\\\\n *\n" nil t)
+            (replace-match "\\\\cos\\\\  \n" nil nil))
+            
+          ;; Create a new line after :results: if needed
+          (goto-char (point-min))
+          (unless (looking-at "\n")
+            (insert "\n")))))))
 
 (add-hook 'org-babel-after-execute-hook
           '(lambda ()
-             (replace-colon-brackets)
+             (clean-wolfram-results)
+             (call-interactively 'org-latex-preview)
              (org-display-inline-images)))
 ```
 
