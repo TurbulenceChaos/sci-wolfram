@@ -97,7 +97,7 @@ You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX f
 ;; Ensure inline images display correctly
 (defun clean-wolfram-results ()
   "Clean up Wolfram Language results in org-mode.
-Specifically handles line prefixes and unwanted whitespace in equations."
+Handles line prefixes, unwanted whitespace in equations, and trailing backslashes."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -118,10 +118,15 @@ Specifically handles line prefixes and unwanted whitespace in equations."
           (while (re-search-forward "^> " nil t)
             (replace-match "  " nil nil))
             
-          ;; Fix broken equation lines
+          ;; Remove trailing backslashes at the end of lines
           (goto-char (point-min))
-          (while (re-search-forward "\\\\cos\\\\\n *\n" nil t)
-            (replace-match "\\\\cos\\\\  \n" nil nil))
+          (while (re-search-forward "\\\\\\s-*$" nil t)
+            (replace-match "" nil nil))
+            
+          ;; Remove blank lines
+          (goto-char (point-min))
+          (while (re-search-forward "\n\\s-*\n" nil t)
+            (replace-match "\n" nil nil))
             
           ;; Create a new line after :results: if needed
           (goto-char (point-min))
