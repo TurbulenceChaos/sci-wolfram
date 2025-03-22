@@ -72,8 +72,7 @@ WolframTerminalImage[g_, playCDF_] :=
 
 $Post =
     With[{box = ToBoxes[#], plotBox = DynamicBox | DynamicModuleBox |
-         GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
-        },
+         GraphicsBox | Graphics3DBox, formulaBox = RowBox},
         If[FreeQ[formulaBox | plotBox][box],
             If[MatchQ[#, Null],
                 #
