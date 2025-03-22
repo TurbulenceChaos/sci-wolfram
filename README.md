@@ -44,15 +44,6 @@
 ### 2.2 For Emacs
 Convert formulas to LaTeX fragments (for pasting into Word or LaTeX) and figures to PNG format.
 
-1. Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
-   - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
-   - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
-   - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
-
-2. Configure Emacs to support Wolfram Language using the provided configuration.
-
-3. Test the setup by executing a sample Wolfram Language script in Org-Mode.
-
 ![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
 
 You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX fragments.
@@ -60,6 +51,11 @@ You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX f
 ![Wolfram toggle latex formula](Images/wolfram-toggle-latex-formula.gif)
 
 #### 2.2.1 Emacs Configuration
+Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
+
+   - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
+   - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
+   - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 
 ```emacs-lisp
 ;; Load dependencies for Emacs-Jupyter
