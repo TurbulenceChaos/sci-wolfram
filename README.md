@@ -91,6 +91,8 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
                                                                (:eval . "never-export")))
 
 ;; Ensure inline images display correctly
+(setq org-babel-min-lines-for-block-output 1000)
+
 (defun clean-wolfram-results ()
   "Clean up Wolfram Language results in org-mode.
 Removes unwanted formatting while preserving necessary LaTeX formatting."
