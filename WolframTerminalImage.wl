@@ -38,8 +38,8 @@ WolframTerminalText[g_] :=
 WolframTerminalTeX[g_] :=
     Module[{expr},
         expr = g;
-        Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
-            ];
+        Print["\n\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> 
+            "\n\\end{equation*}\n"];
         expr;
     ];
 
