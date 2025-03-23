@@ -93,7 +93,7 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
 ;; Ensure inline images display correctly
 (defun clean-wolfram-results ()
   "Clean up Wolfram Language results in org-mode.
-Handles line prefixes, unwanted whitespace in equations, and trailing backslashes."
+Removes unwanted formatting while preserving necessary LaTeX formatting."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -114,10 +114,10 @@ Handles line prefixes, unwanted whitespace in equations, and trailing backslashe
           (while (re-search-forward "^> " nil t)
             (replace-match "  " nil nil))
             
-          ;; Remove trailing backslashes at the end of lines
+          ;; Remove SINGLE backslashes at end of lines (not double backslashes)
           (goto-char (point-min))
-          (while (re-search-forward "\\\\\\s-*$" nil t)
-            (replace-match "" nil nil))
+          (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+            (replace-match "\\1" nil nil))
             
           ;; Remove blank lines
           (goto-char (point-min))
