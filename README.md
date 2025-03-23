@@ -134,7 +134,7 @@ Removes unwanted formatting while preserving necessary LaTeX formatting."
 (add-hook 'org-babel-after-execute-hook
           '(lambda ()
              (clean-wolfram-results)
-             (call-interactively 'org-latex-preview)
+             (org-latex-preview)
              (org-display-inline-images)))
 ```
 
