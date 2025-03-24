@@ -39,13 +39,17 @@
 
 3. Run the `Test.wl` script to verify your setup.
 
+   Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
+
    ![Wolfram script test](Images/wolfram-test.gif)
 
 ### 2.2 For Emacs
 Convert formulas to LaTeX fragments (for pasting into Word or LaTeX) and figures to PNG format.
 
 You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX fragments.
-  
+
+Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
+
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 #### 2.2.1 Emacs Configuration
