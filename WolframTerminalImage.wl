@@ -22,105 +22,126 @@ wolframTerminalPlay = "no";
 
 (* Options: "wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
 
-wolframplayer = "wolframplayer";
+wolframTerminalPlayer = "wolframplayer";
 
 Begin["`Private`"];
 
 (* TODO: The '%' operator works only in terminal mode *)
 
-WolframTerminalText[g_] :=
-    Module[{expr},
-        expr = g;
-        Print[expr];
-        expr;
-    ];
+(* Initialize output counter *)
+n = 1;
 
-WolframTerminalTeX[g_] :=
-    Module[{expr},
-        expr = g;
-        Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
-            ];
-        expr;
-    ];
+(* Function to display plain text output *)
+WolframTerminalText[expr_] := Module[{},
+  (* Print the output number counter *)
+  Print[StringForm["Out[`1`]=", n++]];
+  
+  (* Print the expression itself *)
+  Print[expr];
+  
+  (* Return the original expression *)
+  expr;
+];
 
-WolframTerminalImage[g_, playCDF_] :=
-    Module[{dir, filePNG, fileCDF, expr},
-        dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
-        filePNG = FileNameJoin[{dir, CreateUUID["wolfram-"] <> ".png"
-            }];
-        fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
-        expr = g;
-        If[$VersionNumber < 12.2,
-            If[!DirectoryQ[dir],
-                CreateDirectory[dir, CreateIntermediateDirectories ->
-                     True]
-            ]
-        ];
-        Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], 
-            ImageResolution -> wolframTerminalImageResolution];
-        Which[
-            wolframTerminalType == "emacs",
-                Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth
-                     @ Directory[]] <> "]]"]
-            ,
-            wolframTerminalType == "vscode",
-                Run["imgcat " <> filePNG];
-                If[wolframTerminalDeleteImage == "yes",
-                    Quiet @ DeleteFile @ filePNG
-                ];
-        ];
-        If[playCDF == "yes",
-            Export[fileCDF, Notebook[{Cell @ BoxData @ ToBoxes @ expr
-                }]];
-            StartProcess[{wolframplayer, FileNameTake[fileCDF]}, ProcessDirectory
-                 -> DirectoryName[fileCDF]];
-        ];
-        expr;
-    ];
+(* Function to display LaTeX output *)
+WolframTerminalTeX[expr_] := Module[{},
+  (* Print the output number counter *)
+  Print[StringForm["Out[`1`]=", n++]];
+  
+  (* Convert expression to LaTeX and wrap in equation environment *)
+  Print[
+    "\\begin{equation*}\n" <> 
+    ToString[TeXForm[expr]] <> 
+    "\n\\end{equation*}"
+  ];
+  
+  (* Return the original expression *)
+  expr;
+];
 
-$Post =
-    With[{box = ToBoxes[#], plotBox = DynamicBox | DynamicModuleBox |
-         GraphicsBox | Graphics3DBox, formulaBox = RowBox | SqrtBox | SuperscriptBox
-        },
-        If[FreeQ[formulaBox | plotBox][box],
-            If[MatchQ[#, Null],
-                #
-                ,
-                WolframTerminalText[#]
-            ]
-            ,
-            Which[
-                wolframTerminalType == "emacs",
-                    If[!FreeQ[formulaBox][box],
-                        WolframTerminalTeX[#]
-                        ,
-                        If[wolframTerminalPlay == "no",
-                            WolframTerminalImage[#, playCDF = "no"]
-                            ,
-                            WolframTerminalImage[#, playCDF = "yes"]
-                        ]
+WolframTerminalImage[expr_, playCDF_] := Module[{
+    dir, filePNG, fileCDF
+  },
+  
+  (* Set up directory and file paths *)
+  dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
+  filePNG = FileNameJoin[{dir, CreateUUID["wolfram-"] <> ".png"}];
+  fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
+  
+  (* Create directory if needed (for older Wolfram versions) *)
+  If[$VersionNumber < 12.2,
+    If[!DirectoryQ[dir],
+      CreateDirectory[dir, CreateIntermediateDirectories -> True]
+    ]
+  ];
+  
+  (* Export expression as PNG *)
+  Export[
+    filePNG, 
+    Notebook[{Cell @ BoxData @ ToBoxes @ expr}], 
+    ImageResolution -> wolframTerminalImageResolution
+  ];
+  
+  (* Handle display based on terminal type *)
+  Switch[wolframTerminalType,
+    "emacs", 
+      Print[StringForm["Out[`1`]=", n++]];
+      Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth @ Directory[]] <> "]]"],
+    
+    "vscode",
+      Run["imgcat " <> filePNG];
+      If[wolframTerminalDeleteImage == "yes",
+        Quiet @ DeleteFile @ filePNG
+      ]
+  ];
+  
+  (* Handle CDF export and playback if requested *)
+  If[playCDF == "yes",
+    Export[fileCDF, Notebook[{Cell @ BoxData @ ToBoxes @ expr}]];
+    StartProcess[
+      {wolframTerminalPlayer, FileNameTake[fileCDF]}, 
+      ProcessDirectory -> DirectoryName[fileCDF]
+    ]
+  ];
+  
+  (* Return the original expression *)
+  expr;
+];
+
+$Post = Module[{box, isFormula, isPlot},
+    (* Convert input to box representation *)
+    box = ToBoxes[#];
+
+    (* Check content type *)
+    isFormula = !FreeQ[box, RowBox | SqrtBox | SuperscriptBox];
+    isPlot = !FreeQ[box, DynamicBox | DynamicModuleBox | GraphicsBox | Graphics3DBox];
+    
+    (* Handle different output formats based on content type and terminal *)
+    Which[
+        (* Plain text - neither formula nor plot *)
+        !isFormula && !isPlot,
+            Switch[wolframTerminalType,
+                "emacs", If[MatchQ[#, Null], #, WolframTerminalText[#]],
+                "vscode", #
+            ],
+
+        (* Formula or plot content *)
+        True,
+            Switch[wolframTerminalType,
+                "emacs", 
+                    If[isFormula, 
+                        WolframTerminalTeX[#], 
+                        WolframTerminalImage[#, playCDF = wolframTerminalPlay]
+                    ],
+                "vscode",
+                    If[wolframTerminalPlay == "no",
+                        WolframTerminalImage[#, playCDF = "no"],
+                        (* wolframTerminalPlay == "yes" *)
+                        WolframTerminalImage[#, playCDF = If[isFormula, "no", "yes"]]
                     ]
-                ,
-                wolframTerminalType == "vscode",
-                    Which[
-                        wolframTerminalPlay == "no",
-                            WolframTerminalImage[#, playCDF = "no"]
-                        ,
-                        wolframTerminalPlay == "yes",
-                            With[{
-                                playCDF =
-                                    If[!FreeQ[formulaBox][box],
-                                        "no"
-                                        ,
-                                        "yes"
-                                    ]
-                            },
-                                WolframTerminalImage[#, playCDF]
-                            ]
-                    ]
             ]
-        ]
-    ]&;
+    ]
+]&;
 
 End[];
 

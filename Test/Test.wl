@@ -2,7 +2,7 @@ Get["WolframTerminalImage`"];
 
 (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 
-wolframTerminalType = "vscode";
+wolframTerminalType = "emacs";
 
 (* Set the resolution (in DPI) for Wolfram terminal images *)
 
@@ -18,9 +18,9 @@ wolframTerminalPlay = "no";
 
 (* Specify the player application for Wolfram terminal CDF files *)
 
-(* Options: "wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
+(* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
 
-wolframplayer = "wolframplayer";
+wolframTerminalPlayer = "wolframplayer.exe";
 
 (* To restore `$Post` to its original state, simply execute "$Post=." *)
 

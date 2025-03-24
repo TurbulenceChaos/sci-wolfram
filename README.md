@@ -57,8 +57,12 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
    - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
    - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 
+You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and the test file [Test.org](Test/Test.org) in the Test folder.
+
 ```emacs-lisp
 ;; Load dependencies for Emacs-Jupyter
+;; https://github.com/WolframResearch/WolframLanguageForJupyter
+;; https://github.com/emacs-jupyter/jupyter
 (add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/websocket-1.15")
 (require 'websocket)
 
@@ -72,6 +76,7 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
 (require 'jupyter)
 
 ;; Configure Wolfram Mode
+;; https://github.com/xahlee/xah-wolfram-mode
 (add-to-list 'load-path "~/.emacs.d/lisp-site/xah-wolfram-mode")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
@@ -95,7 +100,8 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
 
 (defun clean-wolfram-results ()
   "Clean up Wolfram Language results in org-mode.
-Removes unwanted formatting while preserving necessary LaTeX formatting."
+Removes unwanted formatting while preserving necessary LaTeX formatting.
+Keeps ': ' prefix only for lines starting with 'Out['."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -106,26 +112,36 @@ Removes unwanted formatting while preserving necessary LaTeX formatting."
         (save-restriction
           (narrow-to-region start end)
           
-          ;; Remove ': ' at beginning of lines
+          ;; First mark 'Out[' lines to preserve them
+          (goto-char (point-min))
+          (while (re-search-forward "^: Out\\[" nil t)
+            (add-text-properties (line-beginning-position) (line-end-position)
+                                 '(preserve-prefix t)))
+          
+          ;; Remove ': ' at beginning of lines except those marked
           (goto-char (point-min))
           (while (re-search-forward "^: " nil t)
-            (replace-match "" nil nil))
+            (unless (get-text-property (line-beginning-position) 'preserve-prefix)
+              (replace-match "" nil nil)))
+          
+          ;; Remove text properties we added
+          (remove-text-properties (point-min) (point-max) '(preserve-prefix nil))
           
           ;; Remove '> ' at beginning of lines 
           (goto-char (point-min))
           (while (re-search-forward "^> " nil t)
             (replace-match "  " nil nil))
-            
+          
           ;; Remove SINGLE backslashes at end of lines (not double backslashes)
           (goto-char (point-min))
           (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
             (replace-match "\\1" nil nil))
-            
+          
           ;; Remove blank lines
           (goto-char (point-min))
           (while (re-search-forward "\n\\s-*\n" nil t)
             (replace-match "\n" nil nil))
-            
+          
           ;; Create a new line after :results: if needed
           (goto-char (point-min))
           (unless (looking-at "\n")
@@ -139,13 +155,12 @@ Removes unwanted formatting while preserving necessary LaTeX formatting."
 ```
 
 #### 2.2.2 Executing Jupyter Wolfram Language Code in Org-Mode
-
-First, import the WolframTerminalImage.wl package from [Wolfram-terminal-image](https://github.com/TurbulenceChaos/Wolfram-terminal-image).
+First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
 
 ```wolfram
-#+name: Wolfram-terminal-image
+#+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
-  Get["~/.emacs.d/lisp-site/Wolfram-terminal-image/WolframTerminalImage.wl"]
+  Get["/path/to/WolframTerminalImage.wl"]
 
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 
@@ -154,10 +169,6 @@ First, import the WolframTerminalImage.wl package from [Wolfram-terminal-image](
   (* Set the resolution (in DPI) for Wolfram terminal images *)
 
   wolframTerminalImageResolution = 150;
-
-  (* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images *)
-
-  wolframTerminalDeleteImage = "no";
 
   (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
 
@@ -179,11 +190,13 @@ Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solutio
 #+name: Wolfram-test
 #+begin_src jupyter-Wolfram-Language
   sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
-    Cos[t]}, y[x, t], {x, t}]
+     Cos[t]}, y[x, t], {x, t}]
 
   sol2 = sol1[[1, 1, 2]]
 
-  Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+  Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]  
+
+  MatrixForm[Array[Subscript[a, ##] &, {2, 2, 2}]]
 #+end_src
 ```
 
