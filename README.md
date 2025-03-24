@@ -176,7 +176,7 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 
   (* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
 
-  wolframplayer = "wolframplayer";
+  wolframTerminalPlayer = "wolframplayer";
 
   (* To restore `$Post` to its original state, simply execute "$Post=." *)
 #+end_src

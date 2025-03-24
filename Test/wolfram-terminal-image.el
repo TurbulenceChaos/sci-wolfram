@@ -95,3 +95,6 @@ Keeps ': ' prefix only for lines starting with 'Out['."
              (clean-wolfram-results)
              (org-latex-preview)
              (org-display-inline-images)))
+
+
+(provide 'wolfram-terminal-image)
