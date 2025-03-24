@@ -20,7 +20,7 @@ wolframTerminalPlay = "no";
 
 (* Specify the player application for Wolfram terminal CDF files *)
 
-(* Options: "wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
+(* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
 
 wolframTerminalPlayer = "wolframplayer";
 
