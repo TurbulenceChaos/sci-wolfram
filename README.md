@@ -44,11 +44,9 @@
 ### 2.2 For Emacs
 Convert formulas to LaTeX fragments (for pasting into Word or LaTeX) and figures to PNG format.
 
-![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
-
 You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX fragments.
   
-![Wolfram toggle latex formula](Images/wolfram-toggle-latex-formula.gif)
+![Jupyter-Wolfram output](https://github.com/TurbulenceChaos/SCI-emacs/blob/main/Test/Test-emacs-jupyter-wolfram-language.gif?raw=true)
 
 #### 2.2.1 Emacs Configuration
 Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
