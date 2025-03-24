@@ -129,9 +129,9 @@ $Post = Module[{box, isFormula, isPlot},
         True,
             Switch[wolframTerminalType,
                 "emacs", 
-                    If[isFormula, 
-                        WolframTerminalTeX[#], 
-                        WolframTerminalImage[#, playCDF = wolframTerminalPlay]
+                    If[isPlot, 
+                        WolframTerminalImage[#, playCDF = wolframTerminalPlay],
+                        WolframTerminalTeX[#]
                     ],
                 "vscode",
                     If[wolframTerminalPlay == "no",
