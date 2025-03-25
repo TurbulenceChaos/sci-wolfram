@@ -44,9 +44,8 @@
    ![Wolfram script test](Images/wolfram-test.gif)
 
 ### 2.2 For Emacs
-Convert formulas to LaTeX fragments (for pasting into Word or LaTeX) and figures to PNG format.
-
-You can place the cursor on the formula and type `C-c C-x C-l` to toggle LaTeX fragments.
+For Emacs Org mode, formulas are converted into LaTeX fragments, making them easy to paste into Word or LaTeX, while plots are exported as PNG images. 
+You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments. 
 
 Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
@@ -55,9 +54,9 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 #### 2.2.1 Emacs Configuration
 Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
 
-   - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
-   - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
-   - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
+- [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
+- [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
+- [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 
 You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and the test file [Test.org](Test/Test.org) in the Test folder.
 
