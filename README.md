@@ -172,6 +172,10 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 
   wolframTerminalImageResolution = 150;
 
+  (* Specify the formula type for emacs (options: "latex", "image") *)
+
+  wolframTerminalFormulaType = "latex";
+
   (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
 
   wolframTerminalPlay = "no";

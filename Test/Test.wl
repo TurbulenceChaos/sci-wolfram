@@ -8,7 +8,7 @@ wolframTerminalType = "vscode";
 
 wolframTerminalImageResolution = 100;
 
-(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images *)
+(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images for vscode*)
 
 wolframTerminalDeleteImage = "no";
 

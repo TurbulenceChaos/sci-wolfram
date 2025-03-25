@@ -16,6 +16,10 @@
 
   wolframTerminalImageResolution = 150;
 
+  (* Specify the formula type for emacs (options: "latex", "image") *)
+
+  wolframTerminalFormulaType = "latex";
+
   (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
 
   wolframTerminalPlay = "no";
@@ -53,7 +57,7 @@
 \frac{1}{2} \left(2 \cos \left(t-\frac{x}{2}\right)-\cos (x)+1\right)
 \end{equation*}
 : Out[3]=
-[[file:tmp/wolfram/wolfram-09f10349-b8c0-4daf-ae2b-6b4d7f91e288.png]]
+[[file:tmp/wolfram/wolfram-dd2286a1-7b3f-43ba-8412-eb959523e3eb.png]]
 : Out[4]=
 \begin{equation*}
 \left(
