@@ -31,6 +31,7 @@ wolframTerminalPlayer = "wolframplayer";
 Begin["`Private`"];
 
 (* TODO: The '%' operator works only in terminal mode *)
+(* TODO: Use $PrePrint to print output counter *)
 
 (* Initialize output counter *)
 n = 1;
