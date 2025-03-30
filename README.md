@@ -2,7 +2,7 @@
 
 **Author:** Peng Peng  \
 **Email:** [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)  \
-**GitHub:** [TurbulenceChaos](https://github.com/TurbulenceChaos)
+**GitHub:** [TurbulenceChaos/Wolfram-terminal-image](https://github.com/TurbulenceChaos/Wolfram-terminal-image)
 
 ---
 
