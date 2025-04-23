@@ -64,15 +64,12 @@ You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-termi
 ;; Load dependencies for Emacs-Jupyter
 ;; https://github.com/WolframResearch/WolframLanguageForJupyter
 ;; https://github.com/emacs-jupyter/jupyter
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/websocket-1.15")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/websocket")
 (require 'websocket)
-
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/simple-httpd-1.5.1")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/simple-httpd")
 (require 'simple-httpd)
-
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/zmq-1.0.2")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/zmq")
 (require 'zmq)
-
 (add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter")
 (require 'jupyter)
 
@@ -161,7 +158,9 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 ```wolfram
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
-  Get["/path/to/WolframTerminalImage.wl"]
+  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
+
+  Get["/path/to/WolframTerminalImage.wl"];
 
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 

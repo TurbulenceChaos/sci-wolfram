@@ -1,3 +1,5 @@
+(* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
+
 Get["WolframTerminalImage`"];
 
 (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
@@ -8,7 +10,7 @@ wolframTerminalType = "vscode";
 
 wolframTerminalImageResolution = 100;
 
-(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images for vscode*)
+(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images for vscode *)
 
 wolframTerminalDeleteImage = "no";
 

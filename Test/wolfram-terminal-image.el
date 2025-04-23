@@ -1,20 +1,17 @@
 ;;; Emacs wolfram-terminal-image setup 
 ;; Author: Peng Peng - 2025
 ;; Email: 211110103110@stu.just.edu.cn
-;; GitHub: https://github.com/TurbulenceChaos
+;; GitHub: https://github.com/TurbulenceChaos/Wolfram-terminal-image
 
 ;; Load dependencies for Emacs-Jupyter
 ;; https://github.com/WolframResearch/WolframLanguageForJupyter
 ;; https://github.com/emacs-jupyter/jupyter
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/websocket-1.15")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/websocket")
 (require 'websocket)
-
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/simple-httpd-1.5.1")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/simple-httpd")
 (require 'simple-httpd)
-
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter/.eldev/30.1/packages/zmq-1.0.2")
+(add-to-list 'load-path "~/.emacs.d/lisp-site/zmq")
 (require 'zmq)
-
 (add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter")
 (require 'jupyter)
 
