@@ -6,6 +6,8 @@
 * Test Emacs-jupyter wolfram language
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
+  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
+
   Get["../WolframTerminalImage.wl"]
 
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
