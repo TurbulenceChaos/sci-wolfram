@@ -7,7 +7,6 @@
 ---
 
 ## Table of Contents
-
 - [Wolfram-terminal-image](#wolfram-terminal-image)
   - [Table of Contents](#table-of-contents)
   - [1. Prerequisites](#1-prerequisites)
@@ -52,7 +51,7 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 #### 2.2.1 Emacs Configuration
-Ensure you have the necessary dependencies installed for Emacs-Jupyter integration.
+Ensure you have the necessary dependencies installed.
 
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
@@ -61,25 +60,24 @@ Ensure you have the necessary dependencies installed for Emacs-Jupyter integrati
 You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and the test file [Test.org](Test/Test.org) in the Test folder.
 
 ```emacs-lisp
-;; Load dependencies for Emacs-Jupyter
-;; https://github.com/WolframResearch/WolframLanguageForJupyter
-;; https://github.com/emacs-jupyter/jupyter
-(add-to-list 'load-path "~/.emacs.d/lisp-site/websocket")
-(require 'websocket)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/simple-httpd")
-(require 'simple-httpd)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/zmq")
-(require 'zmq)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter")
-(require 'jupyter)
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
 
-;; Configure Wolfram Mode
+;; 1. Add wolfram language to jupyter
+;; https://github.com/WolframResearch/WolframLanguageForJupyter
+
+;; 2. Install emacs-jupyter
+;; https://github.com/emacs-jupyter/jupyter
+(package-install 'jupyter)
+
+;; 3. Install wolfram-mode
 ;; https://github.com/xahlee/xah-wolfram-mode
-(add-to-list 'load-path "~/.emacs.d/lisp-site/xah-wolfram-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
-;; Configure Org-Babel for Jupyter-Wolfram-Language
+;; 4. Add jupyter-Wolfram-Language to org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -93,7 +91,7 @@ You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-termi
                                                                (:comments . "link")
                                                                (:eval . "never-export")))
 
-;; Ensure inline images display correctly
+;; 5. Clean jupyter-wolfram-language results
 (setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()
@@ -145,10 +143,10 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 ```wolfram
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
-  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-
-  Get["/path/to/WolframTerminalImage.wl"];
-
+  (* Get["/path/to/WolframTerminalImage.wl"]; *)
+  
+  Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
+  
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 
   wolframTerminalType = "emacs";

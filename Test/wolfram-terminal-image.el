@@ -3,25 +3,24 @@
 ;; Email: 211110103110@stu.just.edu.cn
 ;; GitHub: https://github.com/TurbulenceChaos/Wolfram-terminal-image
 
-;; Load dependencies for Emacs-Jupyter
-;; https://github.com/WolframResearch/WolframLanguageForJupyter
-;; https://github.com/emacs-jupyter/jupyter
-(add-to-list 'load-path "~/.emacs.d/lisp-site/websocket")
-(require 'websocket)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/simple-httpd")
-(require 'simple-httpd)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/zmq")
-(require 'zmq)
-(add-to-list 'load-path "~/.emacs.d/lisp-site/jupyter")
-(require 'jupyter)
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
 
-;; Configure Wolfram Mode
+;; Add wolfram language to jupyter
+;; https://github.com/WolframResearch/WolframLanguageForJupyter
+
+;; Install emacs-jupyter
+;; https://github.com/emacs-jupyter/jupyter
+(package-install 'jupyter)
+
+;; Install wolfram-mode
 ;; https://github.com/xahlee/xah-wolfram-mode
-(add-to-list 'load-path "~/.emacs.d/lisp-site/xah-wolfram-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
-;; Configure Org-Babel for Jupyter-Wolfram-Language
+;; Add jupyter-Wolfram-Language to org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -35,7 +34,7 @@
                                                                (:comments . "link")
                                                                (:eval . "never-export")))
 
-;; Ensure inline images display correctly
+;; Clean jupyter-wolfram-language results
 (setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()

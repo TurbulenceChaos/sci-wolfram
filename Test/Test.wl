@@ -1,6 +1,6 @@
-(* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-
-Get["WolframTerminalImage`"];
+(* Get["/path/to/WolframTerminalImage.wl"]; *)
+  
+Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
 
 (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 
