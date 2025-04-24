@@ -24,7 +24,7 @@ Display wolfram script graphics in vscode terminal and emacs org-mode using [Wol
 ## Prerequisites
 - **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
 - **`imgcat`** – Install using `pip install imgcat` to display images in vscode terminal.
-- **`Wolfram Player`** (optional) – Needed for view and interact with `.cdf` files.
+- **`Wolfram Player`** (optional) – Needed for viewing and interacting with `.cdf` files.
 
 ## For VS Code
 
