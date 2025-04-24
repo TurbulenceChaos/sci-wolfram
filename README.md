@@ -7,57 +7,66 @@
 ---
 
 ## Table of Contents
-- [Wolfram-terminal-image](#wolfram-terminal-image)
-  - [Table of Contents](#table-of-contents)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Getting Started](#2-getting-started)
-    - [2.1 For VS Code](#21-for-vs-code)
-    - [2.2 For Emacs](#22-for-emacs)
-      - [2.2.1 Emacs Configuration](#221-emacs-configuration)
-      - [2.2.2 Executing Jupyter Wolfram Language Code in Org-Mode](#222-executing-jupyter-wolfram-language-code-in-org-mode)
-  - [3. Reference](#3-reference)
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [For VS Code](#for-vs-code)
+- [For Emacs](#for-emacs)
+  - [Emacs Configuration](#emacs-configuration)
+  - [Executing Jupyter Wolfram Language Code in Org-Mode](#executing-jupyter-wolfram-language-code-in-org-mode)
+- [Reference](#reference)
 
 ---
+## Introduction
+Display wolfram script graphics in vscode terminal and emacs org-mode.
 
-## 1. Prerequisites
-- **`wolframscript`** – Required for executing Wolfram Language scripts.
-- **`imgcat`** – Install using `pip install imgcat` to display images in the vscode terminal.
-- **`wolframplayer`** (optional) – Needed for playing `.cdf` files.
+## Prerequisites
+- **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
+- **`imgcat`** – Install using `pip install imgcat` to display images in vscode terminal.
+- **`Wolfram Player`** (optional) – Needed for view and interact with `.cdf` files.
 
-## 2. Getting Started
+## For VS Code
 
-### 2.1 For VS Code
-
-1. Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in VS Code settings.
+1. Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in VS Code settings. Make sure your system is using a discrete graphics card.
 
    ![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
 
-2. Install the official **Wolfram Language extension**.
+2. Install the official **[wolfram language extension](https://github.com/WolframResearch/vscode-wolfram)** from vscode extension marketplace.
 
    ![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
 
-3. Run the `Test.wl` script to verify your setup.
+3. Run the [`Test.wl`](Test/Test.wl) script to verify your setup.
+   ```Mathematica
+   Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
+
+   sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
+     Cos[t]}, y[x, t], {x, t}]
+
+   sol2 = sol1[[1, 1, 2]]
+
+   Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+   ```
 
    Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
 
    ![Wolfram script test](Images/wolfram-test.gif)
 
-### 2.2 For Emacs
-For Emacs Org mode, formulas are converted into LaTeX fragments, making them easy to paste into Word or LaTeX, while plots are exported as PNG images. 
-You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments. 
+## For Emacs org-mode
+For emacs org-mode, formulas are converted into LaTeX fragments by default, making them easy to paste into Microsoft Word or LaTeX, while plots are exported as PNG images. 
+
+You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview. 
 
 Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
-#### 2.2.1 Emacs Configuration
+### Emacs configuration
 Ensure you have the necessary dependencies installed.
 
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 
-You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and the test file [Test.org](Test/Test.org) in the Test folder.
+You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Test.org](Test/Test.org) in Test folder.
 
 ```emacs-lisp
 (require 'package)
@@ -137,10 +146,10 @@ You can find the Emacs setup file [wolfram-terminal-image.el](Test/wolfram-termi
              (org-display-inline-images)))
 ```
 
-#### 2.2.2 Executing Jupyter Wolfram Language Code in Org-Mode
+### Executing Jupyter-wolfram-language code
 First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
 
-```wolfram
+```Mathematica
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
   (* Get["/path/to/WolframTerminalImage.wl"]; *)
@@ -175,7 +184,7 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 
 Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solution with a plot.
 
-```wolfram
+```Mathematica
 #+name: Wolfram-test
 #+begin_src jupyter-Wolfram-Language
   sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
@@ -189,9 +198,9 @@ Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solutio
 #+end_src
 ```
 
-For my Emacs configuration, check out: [SCI-emacs](https://github.com/TurbulenceChaos/SCI-emacs).
+For my emacs configuration, check out: [SCI-emacs](https://github.com/TurbulenceChaos/SCI-emacs).
 
-## 3. Reference
+## Reference
 
 1. [Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 2. [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
