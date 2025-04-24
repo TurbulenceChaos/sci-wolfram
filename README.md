@@ -7,17 +7,19 @@
 ---
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Prerequisites](#prerequisites)
-- [For VS Code](#for-vs-code)
-- [For Emacs](#for-emacs)
-  - [Emacs Configuration](#emacs-configuration)
-  - [Executing Jupyter Wolfram Language Code in Org-Mode](#executing-jupyter-wolfram-language-code-in-org-mode)
-- [Reference](#reference)
+- [Wolfram-terminal-image](#wolfram-terminal-image)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [For VS Code](#for-vs-code)
+  - [For Emacs org-mode](#for-emacs-org-mode)
+    - [Emacs configuration](#emacs-configuration)
+    - [Executing jupyter-wolfram-language code](#executing-jupyter-wolfram-language-code)
+  - [Reference](#reference)
 
 ---
 ## Introduction
-Display wolfram script graphics in vscode terminal and emacs org-mode.
+Display wolfram script graphics in vscode terminal and emacs org-mode using [`Wolfram-terminal-image`](https://github.com/TurbulenceChaos/Wolfram-terminal-image) package.
 
 ## Prerequisites
 - **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
@@ -146,7 +148,7 @@ You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Te
              (org-display-inline-images)))
 ```
 
-### Executing Jupyter-wolfram-language code
+### Executing jupyter-wolfram-language code
 First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
 
 ```Mathematica
