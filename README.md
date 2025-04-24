@@ -19,7 +19,7 @@
 
 ---
 ## Introduction
-Display wolfram script graphics in vscode terminal and emacs org-mode using [`Wolfram-terminal-image`](https://github.com/TurbulenceChaos/Wolfram-terminal-image) package.
+Display wolfram script graphics in vscode terminal and emacs org-mode using [Wolfram-terminal-image](https://github.com/TurbulenceChaos/Wolfram-terminal-image) package.
 
 ## Prerequisites
 - **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
@@ -32,11 +32,11 @@ Display wolfram script graphics in vscode terminal and emacs org-mode using [`Wo
 
    ![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
 
-2. Install the official **[wolfram language extension](https://github.com/WolframResearch/vscode-wolfram)** from vscode extension marketplace.
+2. Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
 
    ![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
 
-3. Run the [`Test.wl`](Test/Test.wl) script to verify your setup.
+3. Run [Test.wl](Test/Test.wl) script to verify your setup.
    ```Mathematica
    Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
 
