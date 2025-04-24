@@ -38,58 +38,45 @@
 ;; Ensure inline images display correctly
 (setq org-babel-min-lines-for-block-output 1000)
 
-(defun clean-wolfram-results ()
-  "Clean up Wolfram Language results in org-mode.
-Removes unwanted formatting while preserving necessary LaTeX formatting.
-Keeps ': ' prefix only for lines starting with 'Out['."
+(defun clean-jupyter-wolfram-language-results ()
+  "Clean jupyter-Wolfram-Language results in org-mode."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (while (search-forward ":results:" nil t)
-      (let ((start (point))
-            (end (progn (search-forward ":end:" nil t)
-                        (match-beginning 0))))
+    (while (search-forward "#+begin_src jupyter-Wolfram-Language" nil t)
+      (let ((start (search-forward ":results:" nil t))
+            (end   (search-forward ":end:" nil t)))
         (save-restriction
           (narrow-to-region start end)
-          
-          ;; First mark 'Out[' lines to preserve them
-          (goto-char (point-min))
-          (while (re-search-forward "^: Out\\[" nil t)
-            (add-text-properties (line-beginning-position) (line-end-position)
-                                 '(preserve-prefix t)))
-          
-          ;; Remove ': ' at beginning of lines except those marked
+
+          ;; Remove ': ' at beginning
           (goto-char (point-min))
           (while (re-search-forward "^: " nil t)
-            (unless (get-text-property (line-beginning-position) 'preserve-prefix)
-              (replace-match "" nil nil)))
-          
-          ;; Remove text properties we added
-          (remove-text-properties (point-min) (point-max) '(preserve-prefix nil))
-          
-          ;; Remove '> ' at beginning of lines 
-          (goto-char (point-min))
-          (while (re-search-forward "^> " nil t)
-            (replace-match "  " nil nil))
-          
-          ;; Remove SINGLE backslashes at end of lines (not double backslashes)
-          (goto-char (point-min))
-          (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-            (replace-match "\\1" nil nil))
-          
+	    (replace-match "" nil nil))
+
           ;; Remove blank lines
           (goto-char (point-min))
           (while (re-search-forward "\n\\s-*\n" nil t)
             (replace-match "\n" nil nil))
           
-          ;; Create a new line after :results: if needed
+	  ;; Remove '>' at beginning
           (goto-char (point-min))
-          (unless (looking-at "\n")
-            (insert "\n")))))))
+          (while (re-search-forward "^> " nil t)
+            (replace-match " " nil nil))
+
+          ;; Remove '\' at end
+          (goto-char (point-min))
+          (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+            (replace-match "\\1" nil nil))
+
+	  ;; Change 'Out[]' to ': Out[]'
+	  (goto-char (point-min))
+          (while (re-search-forward "^Out" nil t)
+	    (replace-match ": Out" nil nil)))))))
 
 (add-hook 'org-babel-after-execute-hook
           '(lambda ()
-             (clean-wolfram-results)
+             (clean-jupyter-wolfram-language-results)
              (org-latex-preview)
              (org-display-inline-images)))
 
