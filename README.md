@@ -21,6 +21,14 @@
 ## Introduction
 Display wolfram script graphics in vscode terminal and emacs org-mode using [Wolfram-terminal-image](https://github.com/TurbulenceChaos/Wolfram-terminal-image) package.
 
+Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
+
+![Wolfram script test](Images/wolfram-test.gif)
+
+Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
+
+![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
+
 ## Prerequisites
 - **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
 - **`imgcat`** – Install using `pip install imgcat` to display images in vscode terminal.
@@ -48,18 +56,10 @@ Display wolfram script graphics in vscode terminal and emacs org-mode using [Wol
    Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
    ```
 
-   Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
-
-   ![Wolfram script test](Images/wolfram-test.gif)
-
 ## For Emacs Org-Mode
 For emacs org-mode, formulas are converted into LaTeX fragments by default, making them easy to paste into Microsoft Word or LaTeX, while plots are exported as PNG images. 
 
 You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview. 
-
-Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
-
-![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 ### Emacs configuration
 Ensure you have the necessary dependencies installed.
