@@ -12,7 +12,7 @@
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [For VS Code](#for-vs-code)
-  - [For Emacs org-mode](#for-emacs-org-mode)
+  - [For Emacs Org-Mode](#for-emacs-org-mode)
     - [Emacs configuration](#emacs-configuration)
     - [Executing jupyter-wolfram-language code](#executing-jupyter-wolfram-language-code)
   - [Reference](#reference)
@@ -52,7 +52,7 @@ Display wolfram script graphics in vscode terminal and emacs org-mode using [Wol
 
    ![Wolfram script test](Images/wolfram-test.gif)
 
-## For Emacs org-mode
+## For Emacs Org-Mode
 For emacs org-mode, formulas are converted into LaTeX fragments by default, making them easy to paste into Microsoft Word or LaTeX, while plots are exported as PNG images. 
 
 You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview. 
