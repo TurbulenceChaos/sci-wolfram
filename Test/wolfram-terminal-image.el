@@ -38,46 +38,43 @@
 (setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()
-  "Clean jupyter-Wolfram-Language results in org-mode."
+  "Clean up jupyter-Wolfram-Language results."
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (search-forward "#+begin_src jupyter-Wolfram-Language" nil t)
-      (let ((start (search-forward ":results:" nil t))
-            (end   (search-forward ":end:" nil t)))
-        (save-restriction
-          (narrow-to-region start end)
+  (when (org-in-src-block-p)
+    (let ((lang (org-element-property :language (org-element-at-point))))
+      (when (string= lang "jupyter-Wolfram-Language")
+	(let ((result-start (org-babel-where-is-src-block-result)))
+	  (save-excursion
+	    (when (and result-start
+		       (goto-char result-start))
+	      (let ((start (re-search-forward "^:results:" nil t))
+		    (end   (re-search-forward "^:end:" nil t)))
+		(save-restriction
+		  (narrow-to-region start end)
+		  ;; Remove ': ' at beginning
+		  (goto-char (point-min))
+		  (while (re-search-forward "^: " nil t)
+		    (replace-match "" nil nil))
 
-          ;; Remove ': ' at beginning
-          (goto-char (point-min))
-          (while (re-search-forward "^: " nil t)
-	    (replace-match "" nil nil))
+		  ;; Remove blank lines
+		  (goto-char (point-min))
+		  (while (re-search-forward "\n\\s-*\n" nil t)
+		    (replace-match "\n" nil nil))
+		  
+		  ;; Remove '>' at beginning
+		  (goto-char (point-min))
+		  (while (re-search-forward "^> " nil t)
+		    (replace-match " " nil nil))
 
-          ;; Remove blank lines
-          (goto-char (point-min))
-          (while (re-search-forward "\n\\s-*\n" nil t)
-            (replace-match "\n" nil nil))
-          
-	  ;; Remove '>' at beginning
-          (goto-char (point-min))
-          (while (re-search-forward "^> " nil t)
-            (replace-match " " nil nil))
+		  ;; Remove '\' at end
+		  (goto-char (point-min))
+		  (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+		    (replace-match "\\1" nil nil))
 
-          ;; Remove '\' at end
-          (goto-char (point-min))
-          (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-            (replace-match "\\1" nil nil))
-
-	  ;; Change 'Out[]' to ': Out[]'
-	  (goto-char (point-min))
-          (while (re-search-forward "^Out" nil t)
-	    (replace-match ": Out" nil nil)))))))
-
-(add-hook 'org-babel-after-execute-hook
-          '(lambda ()
-             (clean-jupyter-wolfram-language-results)
-             (org-latex-preview)
-             (org-display-inline-images)))
+		  ;; Change 'Out[]' to ': Out[]'
+		  (goto-char (point-min))
+		  (while (re-search-forward "^Out" nil t)
+		    (replace-match ": Out" nil nil)))))))))))
 
 
 (provide 'wolfram-terminal-image)
