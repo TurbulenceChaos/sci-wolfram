@@ -81,6 +81,7 @@ You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Te
 ;; 2. Install emacs-jupyter
 ;; https://github.com/emacs-jupyter/jupyter
 (package-install 'jupyter)
+(require 'jupyter)
 
 ;; 3. Install wolfram-mode
 ;; https://github.com/xahlee/xah-wolfram-mode
@@ -187,7 +188,7 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 #+end_src
 ```
 
-Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solution with a plot.
+Next, test jupyter-Wolfram-Language by solving a PDE and visualizing the solution with a plot.
 
 ```Mathematica
 #+name: Wolfram-test
