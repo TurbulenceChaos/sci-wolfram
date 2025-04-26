@@ -200,7 +200,7 @@ Next, test Jupyter-Wolfram-Language by solving a PDE and visualizing the solutio
 #+end_src
 ```
 
-For my emacs configuration, check out: [SCI-emacs](https://github.com/TurbulenceChaos/SCI-emacs).
+For my emacs configuration, check out: [Sci-Emacs](https://github.com/TurbulenceChaos/Sci-Emacs).
 
 ## Reference
 
