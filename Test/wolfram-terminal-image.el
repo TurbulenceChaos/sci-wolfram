@@ -77,9 +77,12 @@
 		  (while (re-search-forward "^Out" nil t)
 		    (replace-match ": Out" nil nil)))))))))))
 
-;; 5. Add hook to process the wolfram language results
-(add-hook 'org-babel-after-execute-hook
-          '(lambda ()
-             (clean-jupyter-wolfram-language-results)
-             (org-latex-preview)
-             (org-display-inline-images)))
+;; 5. Add hook to process jupyter-wolfram-language data
+(defun process-jupyter-wolfram-language-data ()
+  "Process jupyter-wolfram-language data, display inline images, and preview latex after executing org block."
+  (when (org-babel-where-is-src-block-result)
+    (clean-jupyter-wolfram-language-results)
+    (org-display-inline-images)
+    (org-latex-preview)))
+
+(add-hook 'org-babel-after-execute-hook #'process-jupyter-wolfram-language-data)
