@@ -84,8 +84,8 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 ;; 2. Install wolfram-mode for syntax highlighting, code completing via `TAB`, and code formatting
 ;; https://github.com/xahlee/xah-wolfram-mode
 ;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
-;; otherwise you should manually download the package and add it to `load-path` by using 
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")  
+;; otherwise you should manually download the package and add it to `load-path` by using
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
 (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
@@ -146,15 +146,15 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 		  (while (re-search-forward "^Out" nil t)
 		    (replace-match ": Out" nil nil)))))))))))
 
-;; 5. Add hook to process jupyter-wolfram-language data
-(defun process-jupyter-wolfram-language-data ()
-  "Process jupyter-wolfram-language data, display inline images, and preview latex after executing org block."
+;; Display org-babel images
+(defun org-babel-display-images ()
+  "Display inline images after executing org block."
   (when (org-babel-where-is-src-block-result)
     (clean-jupyter-wolfram-language-results)
     (org-display-inline-images)
     (org-latex-preview)))
 
-(add-hook 'org-babel-after-execute-hook #'process-jupyter-wolfram-language-data)
+(add-hook 'org-babel-after-execute-hook #'org-babel-display-images)
 ```
 
 ### Executing jupyter-Wolfram-Language code in org-mode
