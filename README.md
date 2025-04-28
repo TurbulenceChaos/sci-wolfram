@@ -36,7 +36,7 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 
 ## For VS Code
 
-1. Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VS Code settings. Make sure your system is using a discrete graphics card.
+1. Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in vscode settings. Make sure your system is using a discrete graphics card.
 
    ![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
 
@@ -59,7 +59,7 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 ## For Emacs Org-Mode
 For emacs org-mode, formulas are converted into LaTeX fragments by default, making them easy to paste into Microsoft Word or LaTeX, while plots are exported as PNG images. 
 
-You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview. 
+You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview.
 
 ### Emacs configuration
 Ensure you have the necessary dependencies installed.
