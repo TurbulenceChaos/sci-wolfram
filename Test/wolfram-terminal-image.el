@@ -7,20 +7,21 @@
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
-;; Add wolfram language to jupyter
-;; https://github.com/WolframResearch/WolframLanguageForJupyter
-
-;; Install emacs-jupyter
+;; 1. Install emacs-jupyter
 ;; https://github.com/emacs-jupyter/jupyter
 (package-install 'jupyter)
+(require 'jupyter)
 
-;; Install wolfram-mode
+;; 2. Install wolfram-mode for syntax highlighting, code completing via `TAB`, and code formatting
 ;; https://github.com/xahlee/xah-wolfram-mode
-(add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
+;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
+;; otherwise you should manually download the package and add it to `load-path` by using 
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")  
+(package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
-;; Add jupyter-Wolfram-Language to org-babel
+;; 3. Add jupyter-Wolfram-Language to org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -34,7 +35,7 @@
                                                                (:comments . "link")
                                                                (:eval . "never-export")))
 
-;; Clean jupyter-wolfram-language results
+;; 4. Clean jupyter-wolfram-language results
 (setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()
@@ -76,5 +77,9 @@
 		  (while (re-search-forward "^Out" nil t)
 		    (replace-match ": Out" nil nil)))))))))))
 
-
-(provide 'wolfram-terminal-image)
+;; 5. Add hook to process the wolfram language results
+(add-hook 'org-babel-after-execute-hook
+          '(lambda ()
+             (clean-jupyter-wolfram-language-results)
+             (org-latex-preview)
+             (org-display-inline-images)))

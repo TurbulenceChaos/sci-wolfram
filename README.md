@@ -14,7 +14,7 @@
   - [For VS Code](#for-vs-code)
   - [For Emacs Org-Mode](#for-emacs-org-mode)
     - [Emacs configuration](#emacs-configuration)
-    - [Executing jupyter-Wolfram-Language code](#executing-jupyter-wolfram-language-code)
+    - [Executing jupyter-Wolfram-Language code in org-mode](#executing-jupyter-wolfram-language-code-in-org-mode)
   - [Reference](#reference)
 
 ---
@@ -63,33 +63,34 @@ You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fr
 
 ### Emacs configuration
 Ensure you have the necessary dependencies installed.
-
+- [Jupyter](https://jupyter.org/install)
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
+- LaTeX (optional) - Install using `sudo apt install texlive-full` to preview latex in emacs org-mode; otherwise you should set `wolframTerminalFormulaType="image"` in wolfram scripts to convert formulas to `.png` files.
 
-You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Test.org](Test/Test.org) in Test folder.
+You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and test file [Test.org](Test/Test.org) in the _Test_ folder.
 
 ```emacs-lisp
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
-;; 1. Add wolfram language to jupyter
-;; https://github.com/WolframResearch/WolframLanguageForJupyter
-
-;; 2. Install emacs-jupyter
+;; 1. Install emacs-jupyter
 ;; https://github.com/emacs-jupyter/jupyter
 (package-install 'jupyter)
 (require 'jupyter)
 
-;; 3. Install wolfram-mode
+;; 2. Install wolfram-mode for syntax highlighting, code completing via `TAB`, and code formatting
 ;; https://github.com/xahlee/xah-wolfram-mode
-(add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
+;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
+;; otherwise you should manually download the package and add it to `load-path` by using 
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")  
+(package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")
 (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
-;; 4. Add jupyter-Wolfram-Language to org-babel
+;; 3. Add jupyter-Wolfram-Language to org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -103,7 +104,7 @@ You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Te
                                                                (:comments . "link")
                                                                (:eval . "never-export")))
 
-;; 5. Clean jupyter-wolfram-language results
+;; 4. Clean jupyter-wolfram-language results
 (setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()
@@ -145,6 +146,7 @@ You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Te
 		  (while (re-search-forward "^Out" nil t)
 		    (replace-match ": Out" nil nil)))))))))))
 
+;; 5. Add hook to process the wolfram language results
 (add-hook 'org-babel-after-execute-hook
           '(lambda ()
              (clean-jupyter-wolfram-language-results)
@@ -152,7 +154,7 @@ You can find [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and [Te
              (org-display-inline-images)))
 ```
 
-### Executing jupyter-Wolfram-Language code
+### Executing jupyter-Wolfram-Language code in org-mode
 First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
 
 ```Mathematica
