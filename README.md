@@ -30,13 +30,13 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 ## Prerequisites
-- **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
-- **`imgcat`** – Install using `pip install imgcat` to display images in vscode terminal.
-- **`Wolfram Player`** (optional) – Needed for viewing and interacting with `.cdf` files.
+- `wolframscript`, `Wolfram Engine` or `Mathematica` – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
+- `imgcat` – Install using `pip install imgcat` to display images in vscode terminal.
+- `Wolfram Player` (optional) – Needed for viewing and interacting with `.cdf` files.
 
 ## For VS Code
 
-1. Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in VS Code settings. Make sure your system is using a discrete graphics card.
+1. Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VS Code settings. Make sure your system is using a discrete graphics card.
 
    ![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
 
