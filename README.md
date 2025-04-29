@@ -67,7 +67,7 @@ Ensure you have the necessary dependencies installed.
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
-- LaTeX (optional) - Install using `sudo apt install texlive-full` to preview latex in emacs org-mode; otherwise you should set `wolframTerminalFormulaType="image"` in wolfram scripts to convert formulas to `.png` files.
+- LaTeX (optional) - Install using `sudo apt install texlive-full` to preview latex in emacs org-mode; otherwise you should set `wolframTerminalFormulaType="image"` in wolfram scripts to convert formulas to `.png` files, and set `(setq wolfram-terminal-formula-type=latex nil)` in emacs-lisp.
 
 You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) and test file [Test.org](Test/Test.org) in the _Test_ folder.
 
@@ -107,40 +107,53 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 ;; 4. Clean jupyter-wolfram-language results
 (setq org-babel-min-lines-for-block-output 1000)
 
+(defcustom wolfram-terminal-formula-type=latex t
+  "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
+when set to nil, wolfram-terminal-formula-type='image'."
+  :type 'boolean
+  :group 'wolfram-terminal-image)
+
 (defun clean-jupyter-wolfram-language-results ()
   "Clean up jupyter-Wolfram-Language results."
-  (let ((result-start (org-babel-where-is-src-block-result)))
+  (let ((result-beg (org-babel-where-is-src-block-result)))
     (save-excursion
-      (when (and result-start
-		 (goto-char result-start))
-	(let ((start (re-search-forward "^:results:" nil t))
+      (when (and result-beg
+		 (goto-char result-beg))
+	(let ((beg (re-search-forward "^:results:" nil t))
 	      (end   (re-search-forward "^:end:" nil t)))
 	  (save-restriction
-	    (narrow-to-region start end)
+	    (narrow-to-region beg end)
 	    ;; Remove ': ' at beginning
 	    (goto-char (point-min))
 	    (while (re-search-forward "^: " nil t)
 	      (replace-match "" nil nil))
 
-	    ;; Remove blank lines
-	    (goto-char (point-min))
-	    (while (re-search-forward "\n\\s-*\n" nil t)
-	      (replace-match "\n" nil nil))
-	    
-	    ;; Remove '>' at beginning
-	    (goto-char (point-min))
-	    (while (re-search-forward "^> " nil t)
-	      (replace-match " " nil nil))
-
-	    ;; Remove '\' at end
-	    (goto-char (point-min))
-	    (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-	      (replace-match "\\1" nil nil))
-
 	    ;; Change 'Out[]' to ': Out[]'
 	    (goto-char (point-min))
 	    (while (re-search-forward "^Out" nil t)
-	      (replace-match ": Out" nil nil))))))))
+	      (replace-match ": Out" nil nil))
+
+	    (when wolfram-terminal-formula-type=latex
+	      (goto-char (point-min))
+	      (let ((latex-beg 0) (latex-end 0))
+		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
+		  (setq latex-end (re-search-forward "^\\\\end{equation\\*}" nil t))
+		  ;; (save-restriction
+		  (narrow-to-region latex-beg latex-end)
+		  ;; Remove blank lines
+		  (goto-char (point-min))
+		  (while (re-search-forward "\n\\s-*\n" nil t)
+		    (replace-match "\n" nil nil))
+		  
+		  ;; Remove '>' at beginning
+		  (goto-char (point-min))
+		  (while (re-search-forward "^> " nil t)
+		    (replace-match " " nil nil))
+
+		  ;; Remove '\' at end
+		  (goto-char (point-min))
+		  (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+		    (replace-match "\\1" nil nil)))))))))))
 
 ;; Display inline images and latex fragments in org-babel result
 ;; https://github.com/doomemacs/doomemacs/blob/303dd28db808b42a2397c0f4b9fdd71e606026ff/modules/lang/org/config.el#L297
@@ -179,7 +192,8 @@ DOC is the docstring."
     (let ((lang (org-element-property :language (org-element-at-point))))
       (when (string= lang "jupyter-Wolfram-Language")
 	(clean-jupyter-wolfram-language-results)
-	(+org-redisplay-latex-fragments-in-babel-result-h)))
+	(when wolfram-terminal-formula-type=latex
+	  (+org-redisplay-latex-fragments-in-babel-result-h))))
     (+org-redisplay-inline-images-in-babel-result-h)))
 
 (add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
