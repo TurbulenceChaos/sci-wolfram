@@ -1,51 +1,52 @@
-;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode
-;; Author: Peng Peng - 2025
-;; Email: 211110103110@stu.just.edu.cn
-;; GitHub: https://github.com/TurbulenceChaos/Wolfram-terminal-image
+;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t; -*-
+;; Copyright (C) 2025 Peng Peng
+;; Author: Peng Peng <211110103110@stu.just.edu.cn>
+;; Version: 0.0.7
+;; Package-Requires: ((emacs "28.1"))
+;; Keywords: languages processes tools 
+;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
+
+;;; This file is NOT part of GNU Emacs
+
+;;; License
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
+
+;; Display wolfram script graphics in emacs org-mode.
+
+;;; Installation:
+
+;; Please check README
+;; See https://github.com/TurbulenceChaos/Wolfram-terminal-image for more information.
+
 ;;; Code:
 
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
-(package-initialize)
-
-;; 1. Install emacs-jupyter
-;; https://github.com/emacs-jupyter/jupyter
-(package-install 'jupyter)
+(require 'org)
+(require 'org-element)
 (require 'jupyter)
-
-;; 2. Install wolfram-mode for syntax highlight, code format and completion
-;; https://github.com/xahlee/xah-wolfram-mode
-;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
-;; otherwise you can manually download the package and add it to `load-path`
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
-(package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")
-(require 'xah-wolfram-mode)
-(defalias 'wolfram-language-mode 'xah-wolfram-mode)
-
-;; 3. Add jupyter-Wolfram-Language to org-babel
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (jupyter . t)))
-
-(setq org-babel-default-header-args:jupyter-Wolfram-Language '((:async . "yes")
-                                                               (:kernel . "wolframlanguage14.1")
-                                                               (:session . "jupyter-wolfram-language")
-                                                               (:results . "value drawer")
-                                                               (:display . "text")
-                                                               (:comments . "link")
-                                                               (:eval . "never-export")))
-
-;; 4. Clean jupyter-wolfram-language results
-(setq org-babel-min-lines-for-block-output 1000)
 
 (defcustom wolfram-terminal-formula-type=latex t
   "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
 when set to nil, wolfram-terminal-formula-type='image'."
   :type 'boolean
   :group 'wolfram-terminal-image)
+
+(setq org-babel-min-lines-for-block-output 1000)
 
 (defun clean-jupyter-wolfram-language-results ()
   "Clean up jupyter-Wolfram-Language results."
@@ -89,7 +90,6 @@ when set to nil, wolfram-terminal-formula-type='image'."
 		    (replace-match "\\1" nil nil)))))))))))
 
 ;; Display inline images and latex fragments in org-babel result
-;; https://github.com/doomemacs/doomemacs/blob/303dd28db808b42a2397c0f4b9fdd71e606026ff/modules/lang/org/config.el#L297
 (defmacro +org-define-babel-result-display-fn (name action doc)
   "Define a function to display elements in org-babel result.
 NAME is the function name suffix.
@@ -98,7 +98,7 @@ DOC is the docstring."
   `(defun ,(intern (format "+org-redisplay-%s-in-babel-result-h" name)) ()
      ,doc
      (unless (or
-              ;; ...but not while Emacs is exporting an org buffer
+              ;; ...but not while emacs is exporting an org buffer
               (bound-and-true-p org-export-current-backend)
               ;; ...and not while tangling org buffers
               (string-match-p "^ \\*temp" (buffer-name)))
@@ -119,6 +119,7 @@ DOC is the docstring."
  (org-display-inline-images)
  "Redisplay inline images after executing org-babel.")
 
+;;;###autoload
 (defun org-display-images-in-babel-result ()
   "Display images after executing org-babel."
   (when (org-babel-where-is-src-block-result)
@@ -129,8 +130,10 @@ DOC is the docstring."
 	  (+org-redisplay-latex-fragments-in-babel-result-h))))
     (+org-redisplay-inline-images-in-babel-result-h)))
 
+;;;###autoload
 (add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
 
 
 (provide 'wolfram-terminal-image)
+
 ;;; wolfram-terminal-image.el ends here
