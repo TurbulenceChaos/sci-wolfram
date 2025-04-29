@@ -142,10 +142,10 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 	    (while (re-search-forward "^Out" nil t)
 	      (replace-match ": Out" nil nil))))))))
 
-;; Redisplay images and latex fragments in org-babel result
+;; Display inline images and latex fragments in org-babel result
 ;; https://github.com/doomemacs/doomemacs/blob/303dd28db808b42a2397c0f4b9fdd71e606026ff/modules/lang/org/config.el#L297
 (defmacro +org-define-babel-result-display-fn (name action doc)
-  "Define a function to display elements in babel results.
+  "Define a function to display elements in org-babel result.
 NAME is the function name suffix.
 ACTION is the display function to call.
 DOC is the docstring."
