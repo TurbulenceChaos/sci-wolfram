@@ -46,7 +46,9 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 
 3. Run [Test.wl](Test/Test.wl) script to verify your setup.
    ```Mathematica
-   Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
+   (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
+
+   Get["/path/to/WolframTerminalImage.wl"];
 
    sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
      Cos[t]}, y[x, t], {x, t}]
@@ -205,9 +207,9 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 ```Mathematica
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
-  (* Get["~/.emacs.d/site-lisp/Wolfram-terminal-image/WolframTerminalImage.wl"]; *)
+  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
   
-  Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
+  Get["~/.emacs.d/site-lisp/Wolfram-terminal-image/WolframTerminalImage.wl"];
   
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 
