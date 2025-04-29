@@ -12,10 +12,10 @@
 (package-install 'jupyter)
 (require 'jupyter)
 
-;; 2. Install wolfram-mode for syntax highlighting, code completing via `TAB`, and code formatting
+;; 2. Install wolfram-mode for syntax highlight, code format and completion
 ;; https://github.com/xahlee/xah-wolfram-mode
 ;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
-;; otherwise you should manually download the package and add it to `load-path` by using
+;; otherwise you can manually download the package and add it to `load-path`
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/xah-wolfram-mode")
 (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")
 (require 'xah-wolfram-mode)
@@ -40,49 +40,47 @@
 
 (defun clean-jupyter-wolfram-language-results ()
   "Clean up jupyter-Wolfram-Language results."
-  (interactive)
-  (when (org-in-src-block-p)
-    (let ((lang (org-element-property :language (org-element-at-point))))
-      (when (string= lang "jupyter-Wolfram-Language")
-	(let ((result-start (org-babel-where-is-src-block-result)))
-	  (save-excursion
-	    (when (and result-start
-		       (goto-char result-start))
-	      (let ((start (re-search-forward "^:results:" nil t))
-		    (end   (re-search-forward "^:end:" nil t)))
-		(save-restriction
-		  (narrow-to-region start end)
-		  ;; Remove ': ' at beginning
-		  (goto-char (point-min))
-		  (while (re-search-forward "^: " nil t)
-		    (replace-match "" nil nil))
+  (let ((result-start (org-babel-where-is-src-block-result)))
+    (save-excursion
+      (when (and result-start
+		 (goto-char result-start))
+	(let ((start (re-search-forward "^:results:" nil t))
+	      (end   (re-search-forward "^:end:" nil t)))
+	  (save-restriction
+	    (narrow-to-region start end)
+	    ;; Remove ': ' at beginning
+	    (goto-char (point-min))
+	    (while (re-search-forward "^: " nil t)
+	      (replace-match "" nil nil))
 
-		  ;; Remove blank lines
-		  (goto-char (point-min))
-		  (while (re-search-forward "\n\\s-*\n" nil t)
-		    (replace-match "\n" nil nil))
-		  
-		  ;; Remove '>' at beginning
-		  (goto-char (point-min))
-		  (while (re-search-forward "^> " nil t)
-		    (replace-match " " nil nil))
+	    ;; Remove blank lines
+	    (goto-char (point-min))
+	    (while (re-search-forward "\n\\s-*\n" nil t)
+	      (replace-match "\n" nil nil))
+	    
+	    ;; Remove '>' at beginning
+	    (goto-char (point-min))
+	    (while (re-search-forward "^> " nil t)
+	      (replace-match " " nil nil))
 
-		  ;; Remove '\' at end
-		  (goto-char (point-min))
-		  (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-		    (replace-match "\\1" nil nil))
+	    ;; Remove '\' at end
+	    (goto-char (point-min))
+	    (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+	      (replace-match "\\1" nil nil))
 
-		  ;; Change 'Out[]' to ': Out[]'
-		  (goto-char (point-min))
-		  (while (re-search-forward "^Out" nil t)
-		    (replace-match ": Out" nil nil)))))))))))
+	    ;; Change 'Out[]' to ': Out[]'
+	    (goto-char (point-min))
+	    (while (re-search-forward "^Out" nil t)
+	      (replace-match ": Out" nil nil))))))))
 
 ;; Display org-babel images
 (defun org-babel-display-images ()
-  "Display inline images after executing org block."
+  "Display images after executing org block."
   (when (org-babel-where-is-src-block-result)
-    (clean-jupyter-wolfram-language-results)
-    (org-display-inline-images)
-    (org-latex-preview)))
+    (let ((lang (org-element-property :language (org-element-at-point))))
+      (when (string= lang "jupyter-Wolfram-Language")
+	(clean-jupyter-wolfram-language-results)
+	(org-latex-preview)))
+    (org-display-inline-images)))
 
 (add-hook 'org-babel-after-execute-hook #'org-babel-display-images)
