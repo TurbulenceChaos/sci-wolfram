@@ -115,6 +115,10 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 ;; 4. Install wolfram-terminal-image for processing jupyter-wolfram-language results
 (unless (package-installed-p 'wolfram-terminal-image)
   (package-vc-install "https://github.com/TurbulenceChaos/Wolfram-terminal-image.git"))
+
+;; t (default) for converting wolfram formula to latex;
+;; otherwise nil for converting wolfram formula to image
+(setq wolfram-terminal-formula-type=latex t)
 ```
 
 ### Executing jupyter-Wolfram-Language code in org-mode
