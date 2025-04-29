@@ -1,7 +1,10 @@
-;;; Emacs wolfram-terminal-image setup 
+;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode
 ;; Author: Peng Peng - 2025
 ;; Email: 211110103110@stu.just.edu.cn
 ;; GitHub: https://github.com/TurbulenceChaos/Wolfram-terminal-image
+
+;;; Commentary:
+;;; Code:
 
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")))
@@ -127,3 +130,7 @@ DOC is the docstring."
     (+org-redisplay-inline-images-in-babel-result-h)))
 
 (add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
+
+
+(provide 'wolfram-terminal-image)
+;;; wolfram-terminal-image.el ends here
