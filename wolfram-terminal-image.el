@@ -3,7 +3,7 @@
 
 ;; Copyright (C) 2025 Peng Peng
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
-;; Package-Version: 0.0.7
+;; Package-Version: 0.0.8
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: languages processes tools 
 ;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
