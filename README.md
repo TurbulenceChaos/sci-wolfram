@@ -180,15 +180,15 @@ DOC is the docstring."
 (+org-define-babel-result-display-fn
  "latex-fragments"
  (org-latex-preview)
- "Redisplay latex fragments after executing org-block.")
+ "Redisplay latex fragments after executing org-babel.")
 
 (+org-define-babel-result-display-fn
  "inline-images"
  (org-display-inline-images)
- "Redisplay inline images after executing org-block.")
+ "Redisplay inline images after executing org-babel.")
 
 (defun org-display-images-in-babel-result ()
-  "Display images after executing org block."
+  "Display images after executing org-babel."
   (when (org-babel-where-is-src-block-result)
     (let ((lang (org-element-property :language (org-element-at-point))))
       (when (string= lang "jupyter-Wolfram-Language")
