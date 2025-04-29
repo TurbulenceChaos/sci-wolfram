@@ -81,7 +81,7 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 (package-install 'jupyter)
 (require 'jupyter)
 
-;; 2. Install wolfram-mode for syntax highlight, code format and completion 
+;; 2. Install wolfram-mode for syntax highlight, code format and completion
 ;; https://github.com/xahlee/xah-wolfram-mode
 ;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
 ;; otherwise you can manually download the package and add it to `load-path`
@@ -142,17 +142,47 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 	    (while (re-search-forward "^Out" nil t)
 	      (replace-match ": Out" nil nil))))))))
 
-;; Display org-babel images
-(defun org-babel-display-images ()
-  "Display images after executing org block."
+;; Redisplay images and latex fragments in org-babel result
+;; https://github.com/doomemacs/doomemacs/blob/303dd28db808b42a2397c0f4b9fdd71e606026ff/modules/lang/org/config.el#L297
+(defmacro +org-define-babel-result-display-fn (name action doc)
+  "Define a function to display elements in babel results.
+NAME is the function name suffix.
+ACTION is the display function to call.
+DOC is the docstring."
+  `(defun ,(intern (format "+org-redisplay-%s-in-babel-result-h" name)) ()
+     ,doc
+     (unless (or
+              ;; ...but not while Emacs is exporting an org buffer
+              (bound-and-true-p org-export-current-backend)
+              ;; ...and not while tangling org buffers
+              (string-match-p "^ \\*temp" (buffer-name)))
+       (save-excursion
+         (let* ((beg (org-babel-where-is-src-block-result))
+                (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
+           (save-restriction
+             (narrow-to-region (min beg end) (max beg end))
+             ,action))))))
+
+(+org-define-babel-result-display-fn
+ "latex-fragments"
+ (org-latex-preview)
+ "Redisplay latex fragments after executing org-block.")
+
+(+org-define-babel-result-display-fn
+ "inline-images"
+ (org-display-inline-images)
+ "Redisplay inline images after executing org-block.")
+
+(defun org-display-images-in-babel-result ()
+  "Display org-sliced-images after executing org block."
   (when (org-babel-where-is-src-block-result)
     (let ((lang (org-element-property :language (org-element-at-point))))
       (when (string= lang "jupyter-Wolfram-Language")
 	(clean-jupyter-wolfram-language-results)
-	(org-latex-preview)))
-    (org-display-inline-images)))
+	(+org-redisplay-latex-fragments-in-babel-result-h)))
+    (+org-redisplay-inline-images-in-babel-result-h)))
 
-(add-hook 'org-babel-after-execute-hook #'org-babel-display-images)
+(add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
 ```
 
 ### Executing jupyter-Wolfram-Language code in org-mode
