@@ -1,4 +1,4 @@
-(* Get["/path/to/WolframTerminalImage.wl"]; *)
+(* Get["~/.emacs.d/site-lisp/Wolfram-teminal-image/WolframTerminalImage.wl"]; *)
   
 Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"];
 
