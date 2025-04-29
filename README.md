@@ -125,7 +125,7 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 #+begin_src jupyter-Wolfram-Language :results silent
   (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
   
-  Get["~/.emacs.d/site-lisp/Wolfram-terminal-image/WolframTerminalImage.wl"];
+  Get["~/.emacs.d/elpa/Wolfram-terminal-image/WolframTerminalImage.wl"];
   
   (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
 

@@ -1,7 +1,8 @@
-;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t; -*-
+;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2025 Peng Peng
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
-;; Version: 0.0.7
+;; Package-Version: 0.0.7
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: languages processes tools 
 ;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
