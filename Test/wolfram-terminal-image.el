@@ -117,7 +117,7 @@ DOC is the docstring."
  "Redisplay inline images after executing org-block.")
 
 (defun org-display-images-in-babel-result ()
-  "Display org-sliced-images after executing org block."
+  "Display images after executing org block."
   (when (org-babel-where-is-src-block-result)
     (let ((lang (org-element-property :language (org-element-at-point))))
       (when (string= lang "jupyter-Wolfram-Language")
