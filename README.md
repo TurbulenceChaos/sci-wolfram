@@ -119,6 +119,9 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 ;; t (default) for converting wolfram formula to latex;
 ;; otherwise nil for converting wolfram formula to image
 (setq wolfram-terminal-formula-type=latex t)
+
+;; minimum number of lines for block output
+(setq org-babel-min-lines-for-block-output 1000)
 ```
 
 ### Executing jupyter-Wolfram-Language code in org-mode
