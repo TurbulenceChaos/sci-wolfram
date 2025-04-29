@@ -69,7 +69,6 @@ when set to nil, wolfram-terminal-formula-type='image'."
 	      (let ((latex-beg 0) (latex-end 0))
 		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
 		  (setq latex-end (re-search-forward "^\\\\end{equation\\*}" nil t))
-		  ;; (save-restriction
 		  (narrow-to-region latex-beg latex-end)
 		  ;; Remove blank lines
 		  (goto-char (point-min))
