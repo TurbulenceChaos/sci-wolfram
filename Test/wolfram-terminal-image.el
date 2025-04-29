@@ -59,10 +59,10 @@ when set to nil, wolfram-terminal-formula-type='image'."
 	    (while (re-search-forward "^: " nil t)
 	      (replace-match "" nil nil))
 
-	    ;; Change 'Out[]' to ': Out[]'
+	    ;; Change 'Out[number]' to ': Out[number]'
 	    (goto-char (point-min))
-	    (while (re-search-forward "^Out" nil t)
-	      (replace-match ": Out" nil nil))
+	    (while (re-search-forward "^Out\\[\\([0-9]+\\)\\]" nil t)
+	      (replace-match ": Out[\\1]" nil nil))
 
 	    (when wolfram-terminal-formula-type=latex
 	      (goto-char (point-min))
