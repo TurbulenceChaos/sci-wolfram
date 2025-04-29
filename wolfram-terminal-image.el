@@ -4,7 +4,7 @@
 ;; Copyright (C) 2025 Peng Peng
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Version: 0.0.8
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29+"))
 ;; Keywords: languages processes tools 
 ;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
 
@@ -40,7 +40,6 @@
 
 (require 'org)
 (require 'org-element)
-(require 'jupyter)
 
 (defcustom wolfram-terminal-formula-type=latex t
   "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
