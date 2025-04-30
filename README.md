@@ -71,8 +71,6 @@ Ensure you have the necessary dependencies installed.
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 - LaTeX (optional) - Install using `sudo apt install texlive-full` to preview latex in emacs org-mode; otherwise you should set `wolframTerminalFormulaType="image"` in wolfram scripts to convert formulas to `.png` files, and set `(setq wolfram-terminal-formula-type=latex nil)` in emacs-lisp.
 
-The [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) package and a test file [Test.org](Test/Test.org) are available in the `Test` folder.
-
 ```emacs-lisp
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -125,6 +123,8 @@ The [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) package and a te
 ```
 
 ### Executing jupyter-Wolfram-Language code in org-mode
+See [Test.org](Test/Test.org).
+
 First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
 
 ```Mathematica
@@ -160,7 +160,7 @@ First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/W
 #+end_src
 ```
 
-Next, test jupyter-Wolfram-Language by solving a PDE and visualizing the solution with a plot.
+Next, execute jupyter-Wolfram-Language by solving a partial differential equation and ploting the result.
 
 ```Mathematica
 #+name: Wolfram-test
@@ -179,6 +179,5 @@ Next, test jupyter-Wolfram-Language by solving a PDE and visualizing the solutio
 For my emacs configuration, check out: [Sci-Emacs](https://github.com/TurbulenceChaos/Sci-Emacs).
 
 ## Reference
-
 1. [Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 2. [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
