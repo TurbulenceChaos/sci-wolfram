@@ -95,7 +95,7 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 ;; https://github.com/xahlee/xah-wolfram-mode
 (unless (package-installed-p 'xah-wolfram-mode)
   (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git"))
-(require 'xah-wolfram-mode)
+;; (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
 ;; 3. Add jupyter-Wolfram-Language to org-babel
