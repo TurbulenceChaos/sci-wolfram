@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t -*-
-;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode
+;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2025 Peng Peng
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
