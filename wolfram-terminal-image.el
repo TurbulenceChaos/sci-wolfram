@@ -50,7 +50,10 @@ when set to nil, wolfram-terminal-formula-type='image'."
   :type 'boolean
   :group 'wolfram-terminal-image)
 
-(setq org-babel-min-lines-for-block-output 100)
+;; minimum number of lines for block output
+(if wolfram-terminal-formula-type=latex
+    (setq org-babel-min-lines-for-block-output 100)
+  (setq org-babel-min-lines-for-block-output 20))
 
 (defun clean-jupyter-wolfram-language-results ()
   "Clean up jupyter-Wolfram-Language results."

@@ -118,10 +118,8 @@ The [wolfram-terminal-image.el](Test/wolfram-terminal-image.el) package and a te
 
 ;; t (default) for converting wolfram formula to latex;
 ;; otherwise nil for converting wolfram formula to image
-(setq wolfram-terminal-formula-type=latex t)
-
-;; minimum number of lines for block output
-(if wolfram-terminal-formula-type=latex
+(if (setq wolfram-terminal-formula-type=latex t)
+    ;; minimum number of lines for block output
     (setq org-babel-min-lines-for-block-output 100)
   (setq org-babel-min-lines-for-block-output 20))
 ```
