@@ -122,7 +122,7 @@ You can find the configuration file [wolfram-terminal-image.el](Test/wolfram-ter
 
 ;; minimum number of lines for block output
 (if wolfram-terminal-formula-type=latex
-    (setq org-babel-min-lines-for-block-output 1000)
+    (setq org-babel-min-lines-for-block-output 100)
   (setq org-babel-min-lines-for-block-output 20))
 ```
 

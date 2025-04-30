@@ -1,6 +1,5 @@
-;;; -*- lexical-binding: t; -*-
-;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode
-
+;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t; -*-
+ 
 ;; Copyright (C) 2025 Peng Peng
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Version: 0.0.8
@@ -41,13 +40,17 @@
 (require 'org)
 (require 'org-element)
 
+(defgroup wolfram-terminal-image nil
+  "Configure wolfram-terminal-image."
+  :group 'org)
+
 (defcustom wolfram-terminal-formula-type=latex t
   "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
 when set to nil, wolfram-terminal-formula-type='image'."
   :type 'boolean
   :group 'wolfram-terminal-image)
 
-(setq org-babel-min-lines-for-block-output 1000)
+(setq org-babel-min-lines-for-block-output 100)
 
 (defun clean-jupyter-wolfram-language-results ()
   "Clean up jupyter-Wolfram-Language results."
