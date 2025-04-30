@@ -77,21 +77,22 @@ when set to nil, wolfram-terminal-formula-type='image'."
 	      (let ((latex-beg 0) (latex-end 0))
 		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
 		  (setq latex-end (re-search-forward "^\\\\end{equation\\*}" nil t))
-		  (narrow-to-region latex-beg latex-end)
-		  ;; Remove blank lines
-		  (goto-char (point-min))
-		  (while (re-search-forward "\n\\s-*\n" nil t)
-		    (replace-match "\n" nil nil))
-		  
-		  ;; Remove '>' at beginning
-		  (goto-char (point-min))
-		  (while (re-search-forward "^> " nil t)
-		    (replace-match " " nil nil))
+		  (save-restriction
+		    (narrow-to-region latex-beg latex-end)
+		    ;; Remove blank lines
+		    (goto-char (point-min))
+		    (while (re-search-forward "\n\\s-*\n" nil t)
+		      (replace-match "\n" nil nil))
+		    
+		    ;; Remove '>' at beginning
+		    (goto-char (point-min))
+		    (while (re-search-forward "^> " nil t)
+		      (replace-match " " nil nil))
 
-		  ;; Remove '\' at end
-		  (goto-char (point-min))
-		  (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-		    (replace-match "\\1" nil nil)))))))))))
+		    ;; Remove '\' at end
+		    (goto-char (point-min))
+		    (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
+		      (replace-match "\\1" nil nil))))))))))))
 
 ;; Display inline images and latex fragments in org-babel result
 (defmacro +org-define-babel-result-display-fn (name action doc)
