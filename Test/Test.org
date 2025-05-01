@@ -1,9 +1,8 @@
-#+Title: Test
+#+Title: Testing Wolfram Terminal Image Package
 #+Author: Peng Peng
 #+Email: 211110103110@stu.just.edu.cn
 #+GitHub: https://github.com/TurbulenceChaos
 
-* Test Emacs-jupyter wolfram language
 #+name: Import-Wolfram-terminal-image-package
 #+begin_src jupyter-Wolfram-Language :results silent
   (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
