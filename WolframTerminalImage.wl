@@ -127,10 +127,10 @@ $Post =
                   WolframTerminalTeX[#]
                 ],
               "image",
-                WolframTerminalImage[#, playCDF = If[isFormula, "no", wolframTerminalPlay]]
+                WolframTerminalImage[#, playCDF = If[isPlot, wolframTerminalPlay, "no"]]
             ],
           "vscode",
-            WolframTerminalImage[#, playCDF = If[isFormula, "no",wolframTerminalPlay]]
+            WolframTerminalImage[#, playCDF = If[isPlot, wolframTerminalPlay, "no"]]
         ]
     ]
   ]&;
