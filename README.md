@@ -92,7 +92,8 @@ Ensure you have the necessary dependencies installed.
 ;; 2. Install wolfram-mode for syntax highlight, code format and completion
 ;; https://github.com/xahlee/xah-wolfram-mode
 (unless (package-installed-p 'xah-wolfram-mode)
-  (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git"))
+  (let ((package-check-signature nil))
+    (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")))
 ;; (require 'xah-wolfram-mode)
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
@@ -112,7 +113,8 @@ Ensure you have the necessary dependencies installed.
 
 ;; 4. Install wolfram-terminal-image for processing jupyter-wolfram-language results
 (unless (package-installed-p 'wolfram-terminal-image)
-  (package-vc-install "https://github.com/TurbulenceChaos/Wolfram-terminal-image.git"))
+  (let ((package-check-signature nil))
+    (package-vc-install "https://github.com/TurbulenceChaos/Wolfram-terminal-image.git")))
 
 ;; t (default) for converting wolfram formula to latex;
 ;; otherwise nil for converting wolfram formula to image
