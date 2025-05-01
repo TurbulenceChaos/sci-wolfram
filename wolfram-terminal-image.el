@@ -1,6 +1,7 @@
 ;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
-
+;;
 ;; Copyright (C) 2025 Peng Peng
+;;
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Version: 0.0.8
 ;; Package-Requires: ((emacs "29+"))
@@ -17,10 +18,10 @@
 ;; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 ;; copies of the Software, and to permit persons to whom the Software is
 ;; furnished to do so, subject to the following conditions:
-
+;;
 ;; The above copyright notice and this permission notice shall be included in all
 ;; copies or substantial portions of the Software.
-
+;;
 ;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 ;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 ;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,12 +31,13 @@
 ;; SOFTWARE.
 
 ;;; Commentary:
-
+;;
 ;; Display wolfram script graphics in emacs org-mode.
+;;
+;; Installation:
+;;
+;; Please check README.md.
 
-;;; Installation:
-
-;; Please check README
 ;; See https://github.com/TurbulenceChaos/Wolfram-terminal-image for more information.
 
 ;;; Code:
