@@ -30,9 +30,9 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 ## Prerequisites
-- `wolframscript`, `Wolfram Engine` or `Mathematica` – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
-- `imgcat` – Install using `pip install imgcat` to display images in vscode terminal.
-- `Wolfram Player` (optional) – Needed for viewing and interacting with `.cdf` files.
+- **`wolframscript`**, **`Wolfram Engine`** or **`Mathematica`** – Required for executing wolfram language scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
+- **`imgcat`** – Install using `pip install imgcat` to display images in vscode terminal.
+- **`Wolfram Player`** (optional) – Needed for viewing and interacting with `.cdf` files.
 
 ## For VS Code
 
@@ -46,8 +46,6 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 
 3. Run [Test.wl](Test/Test.wl) script to verify your setup.
    ```Mathematica
-   (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-
    Get["/path/to/WolframTerminalImage.wl"];
 
    sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
@@ -117,57 +115,6 @@ Ensure you have the necessary dependencies installed.
 
 ### Executing jupyter-Wolfram-Language code in org-mode
 See [Test.org](Test/Test.org).
-
-First, import the [WolframTerminalImage.wl](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/WolframTerminalImage.wl) package.
-
-```Mathematica
-#+name: Import-Wolfram-terminal-image-package
-#+begin_src jupyter-Wolfram-Language :results silent
-  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-  
-  Get["~/.emacs.d/elpa/Wolfram-terminal-image/WolframTerminalImage.wl"];
-  
-  (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
-
-  wolframTerminalType = "emacs";
-
-  (* Set the resolution (in DPI) for Wolfram terminal images *)
-
-  wolframTerminalImageResolution = 150;
-
-  (* Specify the formula type for emacs (options: "latex", "image") *)
-
-  wolframTerminalFormulaType = "latex";
-
-  (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
-
-  wolframTerminalPlay = "no";
-
-  (* Specify the player application for Wolfram terminal CDF files *)
-
-  (* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
-
-  wolframTerminalPlayer = "wolframplayer";
-
-  (* To restore `$Post` to its original state, simply execute "$Post=." *)
-#+end_src
-```
-
-Next, execute jupyter-Wolfram-Language by solving a partial differential equation and ploting the result.
-
-```Mathematica
-#+name: Wolfram-test
-#+begin_src jupyter-Wolfram-Language
-  sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
-     Cos[t]}, y[x, t], {x, t}]
-
-  sol2 = sol1[[1, 1, 2]]
-
-  Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
-
-  MatrixForm[Array[Subscript[a, ##] &, {2, 2, 2}]]
-#+end_src
-```
 
 For my emacs configuration, check out: [Sci-Emacs](https://github.com/TurbulenceChaos/Sci-Emacs).
 
