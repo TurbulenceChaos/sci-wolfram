@@ -80,8 +80,6 @@ Ensure you have the necessary dependencies installed.
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-;; 1. Install emacs-jupyter
-;; https://github.com/emacs-jupyter/jupyter
 (unless (package-installed-p 'jupyter)
   (package-install 'jupyter))
 
@@ -89,15 +87,11 @@ Ensure you have the necessary dependencies installed.
 ;; otherwise you can manually download the package and add it to `load-path`
 ;; (add-to-list 'load-path "/path/to/package/")
 
-;; 2. Install wolfram-mode for syntax highlight, code format and completion
-;; https://github.com/xahlee/xah-wolfram-mode
 (unless (package-installed-p 'xah-wolfram-mode)
-  (let ((package-check-signature nil))
-    (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git")))
-;; (require 'xah-wolfram-mode)
+  (package-vc-install "https://github.com/xahlee/xah-wolfram-mode.git"))
+
 (defalias 'wolfram-language-mode 'xah-wolfram-mode)
 
-;; 3. Add jupyter-Wolfram-Language to org-babel
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -111,15 +105,12 @@ Ensure you have the necessary dependencies installed.
                                                                (:comments . "link")
                                                                (:eval . "never-export")))
 
-;; 4. Install wolfram-terminal-image for processing jupyter-wolfram-language results
-(unless (package-installed-p 'wolfram-terminal-image)
-  (let ((package-check-signature nil))
-    (package-vc-install "https://github.com/TurbulenceChaos/Wolfram-terminal-image.git")))
+(unless (package-installed-p 'Wolfram-terminal-image)
+  (package-vc-install "https://github.com/TurbulenceChaos/Wolfram-terminal-image.git"))
 
 ;; t (default) for converting wolfram formula to latex;
 ;; otherwise nil for converting wolfram formula to image
 (if (setq wolfram-terminal-formula-type=latex t)
-    ;; minimum number of lines for block output
     (setq org-babel-min-lines-for-block-output 100)
   (setq org-babel-min-lines-for-block-output 20))
 ```
