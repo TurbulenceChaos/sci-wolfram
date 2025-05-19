@@ -12,7 +12,7 @@
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [For VS Code](#for-vs-code)
-  - [For Emacs Org-Mode](#for-emacs-org-mode)
+  - [For Emacs Org-mode](#for-emacs-org-mode)
     - [Emacs configuration](#emacs-configuration)
     - [Executing jupyter-Wolfram-Language code in org-mode](#executing-jupyter-wolfram-language-code-in-org-mode)
   - [Reference](#reference)
@@ -56,7 +56,7 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
    Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
    ```
 
-## For Emacs Org-Mode
+## For Emacs Org-mode
 For emacs org-mode, formulas are converted into LaTeX fragments by default, making it easy to paste them into Microsoft Word or LaTeX documents.
 
 You can place the cursor on a formula and press `C-c C-x C-l` to toggle LaTeX fragments preview.
@@ -81,8 +81,8 @@ Ensure you have the necessary dependencies installed.
 (unless (package-installed-p 'jupyter)
   (package-install 'jupyter))
 
-;; For emacs 29+, you can use `package-vc-install` to install packages directly from github;
-;; otherwise you can manually download the package and add it to `load-path`
+;; For emacs 29+, you can use `package-vc-install` to install packages from github;
+;; or you can manually download the package and add it to `load-path`
 ;; (add-to-list 'load-path "/path/to/package/")
 
 (unless (package-installed-p 'xah-wolfram-mode)
