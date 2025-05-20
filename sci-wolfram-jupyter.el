@@ -1,12 +1,11 @@
-;;; wolfram-terminal-image.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
+;;; sci-wolfram-jupyter.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025 Peng Peng
-;;
+;; Created: 2021-05-20
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
-;; Package-Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages processes tools 
-;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
+;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram-jupyter
 
 ;; This file is not part of GNU Emacs
 
@@ -38,22 +37,22 @@
 ;;
 ;; Please check README.md.
 
-;; See https://github.com/TurbulenceChaos/Wolfram-terminal-image for more information.
+;; See https://github.com/TurbulenceChaos/sci-wolfram-jupyter for more information.
 
 ;;; Code:
 
 (require 'org)
 (require 'org-element)
 
-(defgroup wolfram-terminal-image nil
-  "Configure wolfram-terminal-image."
+(defgroup sci-wolfram-jupyter nil
+  "Configure sci-wolfram-jupyter."
   :group 'org)
 
 (defcustom wolfram-terminal-formula-type=latex t
   "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
 when set to nil, wolfram-terminal-formula-type='image'."
   :type 'boolean
-  :group 'wolfram-terminal-image)
+  :group 'sci-wolfram-jupyter)
 
 ;; minimum number of lines for block output
 (if wolfram-terminal-formula-type=latex
@@ -147,6 +146,6 @@ DOC is the docstring."
 (add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
 
 
-(provide 'wolfram-terminal-image)
+(provide 'sci-wolfram-jupyter)
 
-;;; wolfram-terminal-image.el ends here
+;;; sci-wolfram-jupyter.el ends here
