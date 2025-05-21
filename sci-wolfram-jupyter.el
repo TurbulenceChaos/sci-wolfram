@@ -43,24 +43,24 @@
 
 (require 'org)
 (require 'org-element)
+(require 'jupyter)
+(require 'sci-wolfram)
 
-(defgroup sci-wolfram-jupyter nil
-  "Configure sci-wolfram-jupyter."
-  :group 'org)
+(defalias 'wolfram-language-mode 'sci-wolfram-mode)
+;; diaply image and latex
+(defcustom sci-wolfram-jupyter-formula-type "image"
+  "Jupyter formula type. Options are \"image\" and \"latex\"."
+  :type '(choice (const "image") (const "latex"))
+  :group 'sci-wolfram-mode)
 
-(defcustom wolfram-terminal-formula-type=latex t
-  "A boolean option.  When set to t, wolfram-terminal-formula-type='latex';
-when set to nil, wolfram-terminal-formula-type='image'."
-  :type 'boolean
-  :group 'sci-wolfram-jupyter)
+(cond
+ ((string= sci-wolfram-jupyter-formula-type "latex")
+  (setq org-babel-min-lines-for-block-output 100))
+ ((string= sci-wolfram-jupyter-formula-type "image")
+  (setq org-babel-min-lines-for-block-output 20)))
 
-;; minimum number of lines for block output
-(if wolfram-terminal-formula-type=latex
-    (setq org-babel-min-lines-for-block-output 100)
-  (setq org-babel-min-lines-for-block-output 20))
-
-(defun clean-jupyter-wolfram-language-results ()
-  "Clean up jupyter-Wolfram-Language results."
+(defun sci-wolfram-jupyter-clean-results ()
+  "Clean jupyter-Wolfram-Language results."
   (let ((result-beg (org-babel-where-is-src-block-result)))
     (save-excursion
       (when (and result-beg
@@ -79,7 +79,7 @@ when set to nil, wolfram-terminal-formula-type='image'."
 	    (while (re-search-forward "^Out\\[\\([0-9]+\\)\\]" nil t)
 	      (replace-match ": Out[\\1]" nil nil))
 
-	    (when wolfram-terminal-formula-type=latex
+	    (when (string= sci-wolfram-jupyter-formula-type "latex")
 	      (goto-char (point-min))
 	      (let ((latex-beg 0) (latex-end 0))
 		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
@@ -101,13 +101,9 @@ when set to nil, wolfram-terminal-formula-type='image'."
 		    (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
 		      (replace-match "\\1" nil nil))))))))))))
 
-;; Display inline images and latex fragments in org-babel result
-(defmacro +org-define-babel-result-display-fn (name action doc)
-  "Define a function to display elements in org-babel result.
-NAME is the function name suffix.
-ACTION is the display function to call.
-DOC is the docstring."
-  `(defun ,(intern (format "+org-redisplay-%s-in-babel-result-h" name)) ()
+(defmacro sci-wolfram-jupyter-display-marco (name body doc)
+  "Use marco to define a function to display latex and image after executing jupyter-Wolfram-Language block."
+  `(defun ,(intern (format "sci-wolfram-jupyter-display-%s" name)) ()
      ,doc
      (unless (or
               ;; ...but not while emacs is exporting an org buffer
@@ -119,31 +115,52 @@ DOC is the docstring."
                 (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
            (save-restriction
              (narrow-to-region (min beg end) (max beg end))
-             ,action))))))
+             ,body))))))
 
-(+org-define-babel-result-display-fn
- "latex-fragments"
+(sci-wolfram-jupyter-display-marco
+ "latex"
  (org-latex-preview)
- "Redisplay latex fragments after executing org-babel.")
+ "Display latex after executing jupyter-Wolfram-Language block.")
 
-(+org-define-babel-result-display-fn
- "inline-images"
+(sci-wolfram-jupyter-display-marco
+ "images"
  (org-display-inline-images)
- "Redisplay inline images after executing org-babel.")
+ "Display image after executing jupyter-Wolfram-Language block.")
 
 ;;;###autoload
-(defun org-display-images-in-babel-result ()
-  "Display images after executing org-babel."
-  (when (org-babel-where-is-src-block-result)
-    (let ((lang (org-element-property :language (org-element-at-point))))
-      (when (string= lang "jupyter-Wolfram-Language")
-	(clean-jupyter-wolfram-language-results)
-	(when wolfram-terminal-formula-type=latex
-	  (+org-redisplay-latex-fragments-in-babel-result-h))))
-    (+org-redisplay-inline-images-in-babel-result-h)))
+(defalias 'wolfram-language-mode 'sci-wolfram-mode)
 
 ;;;###autoload
-(add-hook 'org-babel-after-execute-hook #'org-display-images-in-babel-result)
+(defun sci-wolfram-jupyter-display ()
+  "Display latex and image after executing jupyter-Wolfram-Language block."
+  (let ((lang (org-element-property :language (org-element-at-point))))
+    (when (string= lang "jupyter-Wolfram-Language")
+      (when (org-babel-where-is-src-block-result)
+	(sci-wolfram-jupyter-clean-results)
+	(when (string= sci-wolfram-jupyter-formula-type "latex")
+	  (sci-wolfram-jupyter-display-latex)))
+      (sci-wolfram-jupyter-display-images))))
+
+;;;###autoload
+(add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
+
+;; completion
+;;;###autoload
+(defun sci-wolfram-jupyter-completion ()
+  (when (string= (org-element-property :language (org-element-at-point)) "jupyter-Wolfram-Language")
+    ;; completion
+    (add-hook 'completion-at-point-functions
+              #'sci-wolfram-completion-at-point nil t)
+    ;; set F6 to use sci-wolfram-leader-map
+    (let ((map (current-local-map)))
+      (when map
+        (define-key map (kbd "<f6>") sci-wolfram-major-leader-key)))))
+
+;;;###autoload
+(add-hook 'jupyter-org-interaction-mode-hook
+          (lambda ()
+	    (add-hook 'post-command-hook
+		      #'sci-wolfram-jupyter-completion nil t)))
 
 
 (provide 'sci-wolfram-jupyter)

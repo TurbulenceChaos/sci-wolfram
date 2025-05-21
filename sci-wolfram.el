@@ -71,9 +71,10 @@
 (defun sci-wolfram-eval-buffer ()
   "Execute the current file with WolframScript and print all expressions."
   (interactive)
-  (when (or (not buffer-file-name)
-            (not (eq major-mode 'sci-wolfram-mode)))
+  (when (not buffer-file-name)
     (user-error "Buffer is not a file. Save it first"))
+  (when (not (eq major-mode 'sci-wolfram-mode))
+    (user-error "Buffer is not a wolfram script."))
   (when (buffer-modified-p) (save-buffer))
   (let ((xoutbuf (get-buffer-create "*sci-wolfram-eval output*" t)))
     (save-current-buffer (set-buffer xoutbuf) (erase-buffer))
@@ -90,9 +91,10 @@
 (defun sci-wolfram-buffer-to-pdf ()
   "Execute the current file with WolframScript and convert it to PDF."
   (interactive)
-  (when (or (not buffer-file-name)
-            (not (eq major-mode 'sci-wolfram-mode)))
+  (when (not buffer-file-name)
     (user-error "Buffer is not a file. Save it first"))
+  (when (not (eq major-mode 'sci-wolfram-mode))
+    (user-error "Buffer is not a wolfram script."))
   (when (buffer-modified-p)
     (save-buffer))
   (let* ((xoutbuf (get-buffer-create "*sci-wolfram-eval output*"))
@@ -187,22 +189,6 @@
     :server-id 'wolfram-lsp))
   (add-hook 'lsp-mode-hook #'sci-wolfram-setup-completion))
 
-;; jupyter
-(defun sci-wolfram-jupyter-setup ()
-  (when (string= (org-element-property :language (org-element-at-point)) "jupyter-Wolfram-Language")
-    ;; completion
-    (add-hook 'completion-at-point-functions
-              #'sci-wolfram-completion-at-point nil t)
-    ;; set F6 to use sci-wolfram-leader-map
-    (let ((map (current-local-map)))
-      (when map
-        (define-key map (kbd "<f6>") wolfram-one-leader-map)))))
-
-(add-hook 'jupyter-org-interaction-mode-hook
-          (lambda ()
-	    (add-hook 'post-command-hook
-		      #'sci-wolfram-jupyter-setup nil t)))
-
 ;; syntax table
 (defvar sci-wolfram-mode-syntax-table nil "Syntax table for `sci-wolfram-mode'.")
 
@@ -295,12 +281,6 @@
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
-;;;###autoload
-(defalias 'wolfram-language-mode 'sci-wolfram-mode)
 
 
 (provide 'sci-wolfram)
