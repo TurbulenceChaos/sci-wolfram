@@ -53,7 +53,7 @@
 ;; - [o] add usr symbols;
 ;; - [ ] Codeformatter (when eglot=nil, reference: xah-wolfram-eval-region, format-all-region);
 ;; - [ ] sci-wolfram-jupyter insert package (reference: jupyter-insert);
-;; - [ ] completion-at-point (when eglot=nil)
+;; - [o] completion-at-point (when eglot=nil)
 ;; - [o] emacs-jupyter org block completion-at-point;
 ;; - [o] emacs-jupyter org-block doc and completion with TAB;
 ;; - [ ] wolfram repl, send line, region, buffer;
@@ -151,10 +151,41 @@
             sci-wolfram-all-symbols
             :exclusive 'no))))
 
-(add-hook 'sci-wolfram-mode-hook
-          (lambda ()
-            (add-hook 'completion-at-point-functions
-                      #'sci-wolfram-completion-at-point nil t)))
+(defun sci-wolfram-setup-completion ()
+  "Setup Wolfram completion if no LSP server is active."
+  (if (or (bound-and-true-p eglot--managed-mode)
+          (and (fboundp 'lsp-workspaces)
+               (lsp-workspaces)))
+      (remove-hook 'completion-at-point-functions
+                   #'sci-wolfram-completion-at-point t)
+    (add-hook 'completion-at-point-functions
+              #'sci-wolfram-completion-at-point nil t)))
+
+(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-setup-completion)
+
+;; lsp server
+(defcustom sci-wolfram-kernel ""
+  "Path to WolframKernel executable."
+  :type 'string
+  :group 'sci-wolfram-mode)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+ 	       `(sci-wolfram-mode . (,sci-wolfram-kernel
+				     "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
+				     "Needs[\"LSPServer`\"]; LSPServer`StartServer[]")))
+  (add-hook 'eglot-managed-mode-hook #'sci-wolfram-setup-completion))
+
+(with-eval-after-load 'lsp-mode
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     `(,sci-wolfram-kernel
+                       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
+                       "-run" "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
+    :major-modes '(sci-wolfram-mode)
+    :server-id 'wolfram-lsp))
+  (add-hook 'lsp-mode-hook #'sci-wolfram-setup-completion))
 
 ;; jupyter
 (defun sci-wolfram-jupyter-setup ()
@@ -264,6 +295,10 @@
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
 ;;;###autoload
 (defalias 'wolfram-language-mode 'sci-wolfram-mode)
 
