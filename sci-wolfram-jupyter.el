@@ -44,7 +44,6 @@
 (require 'org)
 (require 'org-element)
 (require 'jupyter)
-(require 'ob-jupyter)
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
 
