@@ -145,22 +145,22 @@
 (add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
 
 ;; completion
-;;;###autoload
-(defun sci-wolfram-jupyter-completion ()
-  (when (string= (org-element-property :language (org-element-at-point)) "jupyter-Wolfram-Language")
-    ;; completion
-    (add-hook 'completion-at-point-functions
-              #'sci-wolfram-completion-at-point nil t)
-    ;; set F6 to use sci-wolfram-leader-map
-    (let ((map (current-local-map)))
-      (when map
-        (define-key map (kbd "<f6>") sci-wolfram-major-leader-key)))))
+(with-eval-after-load 'jupyter-org-client
+  (jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
+  (jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language))
+
+(defun sci-wolfram-jupyter-completion-at-point ()
+  (jupyter-org-with-src-block-client
+   (when (string= (org-element-property :language (org-element-at-point)) "jupyter-Wolfram-Language")
+     (sci-wolfram-completion-at-point))))
 
 ;;;###autoload
-(add-hook 'jupyter-org-interaction-mode-hook
-          (lambda ()
-	    (add-hook 'post-command-hook
-		      #'sci-wolfram-jupyter-completion nil t)))
+(defun sci-wolfram-jupyter-setup-completion ()
+  (add-hook 'completion-at-point-functions
+            #'sci-wolfram-jupyter-completion-at-point nil t))
+
+;;;###autoload
+(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion)
 
 
 (provide 'sci-wolfram-jupyter)
