@@ -44,6 +44,7 @@
 (require 'org)
 (require 'org-element)
 (require 'jupyter)
+(require 'jupyter-org-client)
 (require 'sci-wolfram)
 
 (defalias 'wolfram-language-mode 'sci-wolfram-mode)
@@ -145,9 +146,8 @@
 (add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
 
 ;; completion
-(with-eval-after-load 'jupyter-org-client
-  (jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
-  (jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language))
+(jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
 
 (defun sci-wolfram-jupyter-completion-at-point ()
   (jupyter-org-with-src-block-client
@@ -160,10 +160,7 @@
             #'sci-wolfram-jupyter-completion-at-point nil t))
 
 ;;;###autoload
-(with-eval-after-load 'jupyter-org-client
-  (jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
-  (jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
-  (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion))
+(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion)
 
 
 (provide 'sci-wolfram-jupyter)
