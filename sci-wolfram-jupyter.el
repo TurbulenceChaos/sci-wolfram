@@ -1,7 +1,7 @@
 ;;; sci-wolfram-jupyter.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025 Peng Peng
-;; Created: 2021-05-20
+;; Created: 2025-05-20
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages processes tools 
@@ -47,18 +47,11 @@
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
 
-(defalias 'wolfram-language-mode 'sci-wolfram-mode)
 ;; diaply image and latex
 (defcustom sci-wolfram-jupyter-formula-type "image"
   "Jupyter formula type. Options are \"image\" and \"latex\"."
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
-
-(cond
- ((string= sci-wolfram-jupyter-formula-type "latex")
-  (setq org-babel-min-lines-for-block-output 100))
- ((string= sci-wolfram-jupyter-formula-type "image")
-  (setq org-babel-min-lines-for-block-output 20)))
 
 (defun sci-wolfram-jupyter-clean-results ()
   "Clean jupyter-Wolfram-Language results."

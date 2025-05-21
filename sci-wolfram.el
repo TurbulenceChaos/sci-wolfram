@@ -3,7 +3,7 @@
 ;; Copyright (C) 2025 Peng Peng
 ;;
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
-;; Created: 2021-05-20
+;; Created: 2025-05-20
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, Wolfram Language, Mathematica
 ;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
