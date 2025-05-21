@@ -44,6 +44,7 @@
 (require 'org)
 (require 'org-element)
 (require 'jupyter)
+(require 'ob-jupyter)
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
 
@@ -139,8 +140,8 @@
       (when (org-babel-where-is-src-block-result)
 	(sci-wolfram-jupyter-clean-results)
 	(when (string= sci-wolfram-jupyter-formula-type "latex")
-	  (sci-wolfram-jupyter-display-latex)))
-      (sci-wolfram-jupyter-display-images))))
+	  (sci-wolfram-jupyter-display-latex))))
+    (sci-wolfram-jupyter-display-images)))
 
 ;;;###autoload
 (add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
