@@ -160,7 +160,10 @@
             #'sci-wolfram-jupyter-completion-at-point nil t))
 
 ;;;###autoload
-(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion)
+(with-eval-after-load 'jupyter-org-client
+  (jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
+  (jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
+  (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion))
 
 
 (provide 'sci-wolfram-jupyter)
