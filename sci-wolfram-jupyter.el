@@ -43,6 +43,7 @@
 
 (require 'org)
 (require 'org-element)
+(require 'org-src)
 (require 'jupyter)
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
@@ -121,9 +122,6 @@
  (org-display-inline-images)
  "Display image after executing jupyter-Wolfram-Language block.")
 
-;; ;;;###autoload
-;; (defalias 'wolfram-language-mode 'sci-wolfram-mode)
-
 ;;;###autoload
 (defun sci-wolfram-jupyter-display ()
   "Display latex and image after executing jupyter-Wolfram-Language block."
@@ -154,6 +152,11 @@
 
 ;;;###autoload
 (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion)
+
+;;;###autoload
+(with-eval-after-load 'org
+  (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
+  (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
 
 
 (provide 'sci-wolfram-jupyter)
