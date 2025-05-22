@@ -153,8 +153,8 @@
             sci-wolfram-all-symbols
             :exclusive 'no))))
 
-(defun sci-wolfram-setup-completion ()
-  "Setup Wolfram completion if no LSP server is active."
+(defun sci-wolfram-mode-setup-completion ()
+  "Setup completion and lsp integration for sci-wolfram-mode."
   (if (or (bound-and-true-p eglot--managed-mode)
           (and (fboundp 'lsp-workspaces)
                (lsp-workspaces)))
@@ -163,31 +163,37 @@
     (add-hook 'completion-at-point-functions
               #'sci-wolfram-completion-at-point nil t)))
 
-(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-setup-completion)
+(add-hook 'sci-wolfram-mode-hook
+	  (lambda ()
+	    (if sci-wolfram-kernel
+		(progn
+		  (add-hook 'eglot-managed-mode-hook #'sci-wolfram-mode-setup-completion nil t)
+		  (add-hook 'lsp-mode-hook #'sci-wolfram-mode-setup-completion nil t))
+	      (message "Warning: `sci-wolfram-kernel' not set. Set it to WolframKernel path for lsp support."))
+	    (sci-wolfram-mode-setup-completion)))
 
 ;; lsp server
-(defcustom sci-wolfram-kernel ""
+(defcustom sci-wolfram-kernel nil
   "Path to WolframKernel executable."
   :type 'string
   :group 'sci-wolfram-mode)
 
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs
- 	       `(sci-wolfram-mode . (,sci-wolfram-kernel
-				     "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-				     "Needs[\"LSPServer`\"]; LSPServer`StartServer[]")))
-  (add-hook 'eglot-managed-mode-hook #'sci-wolfram-setup-completion))
+(when sci-wolfram-kernel
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+ 		 `(sci-wolfram-mode . (,sci-wolfram-kernel
+				       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
+				       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))))
 
-(with-eval-after-load 'lsp-mode
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection
-                     `(,sci-wolfram-kernel
-                       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
-                       "-run" "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
-    :major-modes '(sci-wolfram-mode)
-    :server-id 'wolfram-lsp))
-  (add-hook 'lsp-mode-hook #'sci-wolfram-setup-completion))
+  (with-eval-after-load 'lsp-mode
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection
+                       `(,sci-wolfram-kernel
+			 "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
+			 "-run" "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
+      :major-modes '(sci-wolfram-mode)
+      :server-id 'wolfram-lsp))))
 
 ;; syntax table
 (defvar sci-wolfram-mode-syntax-table nil "Syntax table for `sci-wolfram-mode'.")
@@ -261,7 +267,11 @@
 (setq sci-wolfram-mode-map (make-sparse-keymap))
 (define-prefix-command 'sci-wolfram-leader-map)
 
-(define-key sci-wolfram-mode-map (kbd (if (boundp 'sci-wolfram-major-leader-key) sci-wolfram-major-leader-key "<f6>")) sci-wolfram-leader-map)
+(define-key sci-wolfram-mode-map
+	    (kbd (if (boundp 'sci-wolfram-major-leader-key)
+		     sci-wolfram-major-leader-key
+		   "<f6>"))
+	    sci-wolfram-leader-map)
 (define-key sci-wolfram-leader-map (kbd "SPC") #'sci-wolfram-complete-symbol)
 (define-key sci-wolfram-leader-map (kbd "h") #'sci-wolfram-doc-lookup)
 (define-key sci-wolfram-leader-map (kbd "b") #'sci-wolfram-eval-buffer)
@@ -281,6 +291,10 @@
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
 
 
 (provide 'sci-wolfram)

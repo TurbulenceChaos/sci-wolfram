@@ -121,8 +121,8 @@
  (org-display-inline-images)
  "Display image after executing jupyter-Wolfram-Language block.")
 
-;;;###autoload
-(defalias 'wolfram-language-mode 'sci-wolfram-mode)
+;; ;;;###autoload
+;; (defalias 'wolfram-language-mode 'sci-wolfram-mode)
 
 ;;;###autoload
 (defun sci-wolfram-jupyter-display ()
