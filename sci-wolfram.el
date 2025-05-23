@@ -56,8 +56,8 @@
 ;; - [o] completion-at-point (when eglot=nil)
 ;; - [o] emacs-jupyter org block completion-at-point;
 ;; - [o] emacs-jupyter org-block doc and completion with TAB;
-;; - [ ] wolfram repl, send line, region, buffer;
-;; - [ ] display images and latex in wolfram repl (reference: imaxima);
+;; - [o] jupyter repl, send line, region, buffer ;
+;; - [o] display images in jupyter repl (https://github.com/linux-xhyang/WolframLanguageForJupyter/commit/2a4ed08556a3f87e4b134b48d5b0bc44bc81fb8b?w=1);
 ;; - [ ] eval line, region, buffer (display images and latex in tmp buffer, reference: EPrint);
 
 (defvar sci-wolfram-tmp-dir-path nil "Path to tmp dir used by sci-wolfram-mode commands.")
@@ -86,7 +86,7 @@
 (defvar sci-wolfram-play nil "Play wolfram notebook")
 (defvar sci-wolfram-player nil "Path to Wolfram Player")
 
-(setq sci-wolfram-pdf-script (concat (file-name-directory load-file-name) "sci-wolfram-pdf.wl"))
+(setq sci-wolfram-pdf-script (concat (file-name-directory (or load-file-name buffer-file-name)) "sci-wolfram-pdf.wl"))
 
 (defun sci-wolfram-buffer-to-pdf ()
   "Execute the current file with WolframScript and convert it to PDF."
@@ -165,35 +165,51 @@
 
 (add-hook 'sci-wolfram-mode-hook
 	  (lambda ()
-	    (if sci-wolfram-kernel
-		(progn
-		  (add-hook 'eglot-managed-mode-hook #'sci-wolfram-mode-setup-completion nil t)
-		  (add-hook 'lsp-mode-hook #'sci-wolfram-mode-setup-completion nil t))
-	      (message "Warning: `sci-wolfram-kernel' not set. Set it to WolframKernel path for lsp support."))
+	    (add-hook 'eglot-managed-mode-hook #'sci-wolfram-mode-setup-completion nil t)
+	    (add-hook 'lsp-mode-hook #'sci-wolfram-mode-setup-completion nil t)
 	    (sci-wolfram-mode-setup-completion)))
 
 ;; lsp server
-(defcustom sci-wolfram-kernel nil
+(defcustom sci-wolfram-kernel
+  (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'"))
   "Path to WolframKernel executable."
   :type 'string
   :group 'sci-wolfram-mode)
 
-(when sci-wolfram-kernel
-  (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
- 		 `(sci-wolfram-mode . (,sci-wolfram-kernel
-				       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-				       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))))
+(defun sci-wolfram-setup-lsp-server ()
+  "Set up wolfram lsp server by removing local version if needed."
+  (let ((lsp-server-path
+	 (string-trim-right
+	  (shell-command-to-string
+	   "wolframscript -code 'LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], LSPServerPath, \"False\"]'"))))
+    (if (not (string= lsp-server-path "False"))
+	(if (yes-or-no-p
+	     (format "Found locally installed LSPServer in \"%s\".
+In order to use the built-in LSPServer, the local version should be removed.
+Use PacletUninstall[\"LSPServer\"] to remove it?"
+		     lsp-server-path))
+            (if (= 0 (shell-command "wolframscript -code 'PacletUninstall[\"LSPServer\"]'"))
+		(message "Local LSPServer successfully removed.")
+              (message "Failed to remove local LSPServer."))
+	  (message "Local LSPServer retained. Built-in version may not work properly.")))))
 
-  (with-eval-after-load 'lsp-mode
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-stdio-connection
-                       `(,sci-wolfram-kernel
-			 "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
-			 "-run" "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
-      :major-modes '(sci-wolfram-mode)
-      :server-id 'wolfram-lsp))))
+(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-setup-lsp-server)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+ 	       `(sci-wolfram-mode . (,sci-wolfram-kernel
+				     "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
+				     "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))))
+
+(with-eval-after-load 'lsp-mode
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     `(,sci-wolfram-kernel
+		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
+		       "-run" "PacletUninstall[\"LSPServer\"]; Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
+    :major-modes '(sci-wolfram-mode)
+    :server-id 'wolfram-lsp)))
 
 ;; syntax table
 (defvar sci-wolfram-mode-syntax-table nil "Syntax table for `sci-wolfram-mode'.")
@@ -251,16 +267,21 @@
 
 (setq
  sci-wolfram-font-lock-keywords
- `((,(regexp-opt sci-wolfram-funs1 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-funs2 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-funs2-5 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-funs3 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-funs3-5 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-funs4 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-usr-funs 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt sci-wolfram-dollar-names 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt sci-wolfram-special-char 'symbols) . font-lock-constant-face)
-   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-warning-face)))
+ `(
+   (,(regexp-opt BuiltinFunctions-1 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt BuiltinFunctions-2 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt BuiltinFunctions-3 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt BuiltinFunctions-4 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt sci-wolfram-usr-functions 'symbols) . font-lock-function-name-face)
+   (,(regexp-opt Constants 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt SystemLongNames 'symbols) . font-lock-constant-face)
+   ("\\b[a-z]+[0-9]*_+" . 'sci-wolfram-var-name)
+   ("#[0-9]" . 'sci-wolfram-var-name)
+   ("#+" . 'sci-wolfram-var-name)
+   ("\\b[a-z][A-Za-z0-9]*" . font-lock-variable-name-face)
+   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-warning-face)
+   ))
 
 ;; keybinding
 (defvar sci-wolfram-mode-map nil "Keybinding for `sci-wolfram-mode'")
