@@ -136,22 +136,26 @@
 ;;;###autoload
 (add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
 
-;; completion
+;; sci-wolfram tools
 (jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
 (jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> f") #'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> e") #'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
 
 (defun sci-wolfram-jupyter-completion-at-point ()
   (jupyter-org-with-src-block-client
-   (when (string= (org-element-property :language (org-element-at-point)) "jupyter-Wolfram-Language")
+   (when (string= (org-element-property :language (org-element-at-point))
+		  "jupyter-Wolfram-Language")
      (sci-wolfram-completion-at-point))))
 
 ;;;###autoload
-(defun sci-wolfram-jupyter-setup-completion ()
+(defun sci-wolfram-jupyter-add-completion ()
   (add-hook 'completion-at-point-functions
             #'sci-wolfram-jupyter-completion-at-point nil t))
 
 ;;;###autoload
-(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-setup-completion)
+(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
 
 ;;;###autoload
 (with-eval-after-load 'org

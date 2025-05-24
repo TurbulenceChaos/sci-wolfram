@@ -426,8 +426,9 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 	    sci-wolfram-leader-map)
 (define-key sci-wolfram-leader-map (kbd "SPC") #'sci-wolfram-complete-symbol)
 (define-key sci-wolfram-leader-map (kbd "h") #'sci-wolfram-doc-lookup)
-(define-key sci-wolfram-leader-map (kbd "b") #'sci-wolfram-eval-buffer)
-(define-key sci-wolfram-leader-map (kbd "p") #'sci-wolfram-buffer-to-pdf)
+(define-key sci-wolfram-leader-map (kbd "f") #'sci-wolfram-format-region-or-buffer)
+(define-key sci-wolfram-leader-map (kbd "e") #'sci-wolfram-eval-region-or-buffer)
+(define-key sci-wolfram-leader-map (kbd "c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
 
 (defvar sci-wolfram-mode-hook nil "Hook for function `sci-wolfram-mode'.")
 
