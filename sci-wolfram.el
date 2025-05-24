@@ -57,7 +57,7 @@
 ;; - [o] emacs-jupyter org block completion-at-point;
 ;; - [o] emacs-jupyter org-block doc and completion with TAB;
 ;; - [o] jupyter repl, send line, region, buffer ;
-;; - [o] display images in jupyter repl (https://github.com/linux-xhyang/WolframLanguageForJupyter/commit/2a4ed08556a3f87e4b134b48d5b0bc44bc81fb8b?w=1);
+;; - [o] display wolfram images in jupyter repl;
 ;; - [ ] eval line, region, buffer (display images and latex in tmp buffer, reference: EPrint);
 
 (defmacro sci-wolfram-region-or-buffer-function (name-1 name-2 body doc)
@@ -131,7 +131,8 @@
  "format"
  ""
  (sci-wolfram-format Begin End buffer-type file tmpfile)
- "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html) to format wolfram region or buffer code.")
+ "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html)
+to format wolfram region or buffer code.")
 
 ;; eval region or buffer
 (defun sci-wolfram-eval (state buffer-type file tmpfile)
@@ -164,10 +165,20 @@
  (sci-wolfram-eval state buffer-type file tmpfile)
  "Use `wolframscript' to eval wolfram region or buffer code.")
 
-;; convert region or buffer to pdf and notebook
-;; use wolframplayer to view notebook
-(defvar sci-wolfram-play nil "Play wolfram notebook")
-(defvar sci-wolfram-player nil "Path to Wolfram Player")
+;; convert region or buffer to pdf and Mathematica notebook
+;; use `wolframplayer' to view notebook if `sci-wolfram-play' = t
+(defcustom sci-wolfram-play nil
+  "Play Mathematica notebook."
+  :type 'boolean
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-player
+  (string-trim-right
+   (shell-command-to-string
+    "wolframscript -code 'FileNameJoin[$InstallationDirectory,\"Executables\",\"wolframplayer\"] <> Switch[$OperatingSystem,\"Unix\",\"\",\"Windows\",\".exe\"]'"))
+  "Path to Wolfram Player."
+  :type 'string
+  :group 'sci-wolfram-mode)
 
 (setq sci-wolfram-pdf-script (expand-file-name
 			      "sci-wolfram-pdf.wl"
@@ -213,10 +224,10 @@
 				  (insert (format "Delete %s" tmpfile))
 				  (if (string= buffer-type "not-file")
 				      (insert (format "\n\nDelete %s" file)))
-				  (if (and sci-wolfram-play sci-wolfram-player)
+				  (if sci-wolfram-play
 				      (insert (format "\n\nUse wolframplayer to view %s" notebook))))
 
-				(if (and sci-wolfram-play sci-wolfram-player)
+				(if sci-wolfram-play
 				    (call-process-shell-command command-wolframplayer))
 				
 				(let ((right-window (or (window-in-direction 'right) (split-window-right))))
