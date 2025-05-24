@@ -76,10 +76,14 @@
 	     (if (region-active-p)
 		 "region"
 	       "buffer"))
+	    (buffer-type (if buffer-file-name
+			     "file"
+			   "not-file"))
 	    (code (buffer-substring-no-properties Begin End))
-	    (file (if buffer-file-name
+	    (file (if (string= buffer-type "file")
 		      buffer-file-name
 		    ;; for sci-wolfram-jupyter to edit source code block
+		    ;; buffer is not a file
 		    (let ((dir (concat temporary-file-directory "sci-wolfram")))
 		      (unless (file-directory-p dir)
 			(make-directory dir t))
@@ -102,9 +106,9 @@
 	 (user-error "Buffer is not a wolfram script!"))
        ;; send region or buffer to tmp file
        (with-temp-file tmpfile (insert code))
-       ;; (sci-wolfram-format Begin End tmpfile)
-       ;; (sci-wolfram-eval state file tmpfile)
-       ;; (sci-wolfram-to-pdf-and-notebook state file tmpfile dir)
+       ;; (sci-wolfram-format Begin End buffer-type file tmpfile)
+       ;; (sci-wolfram-eval state buffer-type file tmpfile)
+       ;; (sci-wolfram-to-pdf-and-notebook state buffer-type file tmpfile dir)
        ,body)))
 
 ;; format region or buffer
@@ -112,23 +116,25 @@
       (expand-file-name "sci-wolfram-format.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-format (Begin End tmpfile)
+(defun sci-wolfram-format (Begin End buffer-type file tmpfile)
   (let ((formatted-code
-	 (shell-command-to-string
-	  (format "wolframscript -script %s %s" sci-wolfram-format-script tmpfile))))
+	 (string-trim-right
+	  (shell-command-to-string
+	   (format "wolframscript -script %s %s" sci-wolfram-format-script tmpfile)))))
     (delete-region Begin End)
-    (goto-char Begin)
-    (insert (concat formatted-code "\n"))))
+    (insert (concat formatted-code "\n"))
+    (if (string= buffer-type "not-file")
+	(delete-file file))
+    (delete-file tmpfile)))
 
 (sci-wolfram-region-or-buffer-function
  "format"
  ""
- (sci-wolfram-format Begin End tmpfile)
+ (sci-wolfram-format Begin End buffer-type file tmpfile)
  "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html) to format wolfram region or buffer code.")
 
-
 ;; eval region or buffer
-(defun sci-wolfram-eval (state file tmpfile)
+(defun sci-wolfram-eval (state buffer-type file tmpfile)
   "Execute the current file with WolframScript and print all expressions."
   (let ((outbuf (get-buffer-create "*sci-wolfram-eval output*" t))
         (command (format "wolframscript -print all -file %s" tmpfile)))
@@ -143,15 +149,19 @@
       (set-process-sentinel proc
 			    (lambda (process event)
 			      (when (string-match "finished\\|exited" event)
+				(if (string= buffer-type "not-file")
+				    (delete-file file))
 				(delete-file tmpfile)
 				(with-current-buffer outbuf
-				  (insert (format "\nDelete %s" tmpfile)))))))
+				  (insert (format "\nDelete %s" tmpfile))
+				  (if (string= buffer-type "not-file")
+				      (insert (format "\n\nDelete %s" file))))))))
     (display-buffer outbuf)))
 
 (sci-wolfram-region-or-buffer-function
  "eval"
  ""
- (sci-wolfram-eval state file tmpfile)
+ (sci-wolfram-eval state buffer-type file tmpfile)
  "Use `wolframscript' to eval wolfram region or buffer code.")
 
 ;; convert region or buffer to pdf and notebook
@@ -163,7 +173,7 @@
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-to-pdf-and-notebook (state file tmpfile dir)
+(defun sci-wolfram-to-pdf-and-notebook (state buffer-type file tmpfile dir)
   "Execute the current file with WolframScript and convert it to PDF."
   (let* ((outbuf (get-buffer-create "*sci-wolfram-eval output*"))
 	 (file-no-dir (file-name-nondirectory file)) 
@@ -192,12 +202,17 @@
 			      (when (string-match "finished\\|exited" event)
 				(rename-file (concat dir tmppdf) (concat dir pdf) t)
 				(rename-file (concat dir tmpnotebook) (concat dir notebook) t)
+
+				(if (string= buffer-type "not-file")
+				    (delete-file file))
 				(delete-file tmpfile)
 				
 				(with-current-buffer outbuf
 				  (insert (format "Rename %s to %s\n\n" tmppdf pdf))
 				  (insert (format "Rename %s to %s\n\n" tmpnotebook notebook))
 				  (insert (format "Delete %s" tmpfile))
+				  (if (string= buffer-type "not-file")
+				      (insert (format "\n\nDelete %s" file)))
 				  (if (and sci-wolfram-play sci-wolfram-player)
 				      (insert (format "\n\nUse wolframplayer to view %s" notebook))))
 
@@ -212,7 +227,7 @@
 (sci-wolfram-region-or-buffer-function
  "convert"
  "-to-pdf-and-notebook"
- (sci-wolfram-to-pdf-and-notebook state file tmpfile dir)
+ (sci-wolfram-to-pdf-and-notebook state buffer-type file tmpfile dir)
  "Convert wolfram region or buffer code to pdf and Mathematica notebook.
 Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view the notebook.")
 
@@ -253,21 +268,17 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 	    sci-wolfram-all-symbols
 	    :exclusive 'no))))
 
-(defun sci-wolfram-mode-setup-completion ()
-  "Setup completion and lsp integration for sci-wolfram-mode."
-  (if (or (bound-and-true-p eglot--managed-mode)
-          (and (fboundp 'lsp-workspaces)
-	       (lsp-workspaces)))
-      (remove-hook 'completion-at-point-functions
-                   #'sci-wolfram-completion-at-point t)
-    (add-hook 'completion-at-point-functions
-	      #'sci-wolfram-completion-at-point nil t)))
+(defun sci-wolfram-mode-add-completion ()
+  "Add completion of wolfram symbols in sci-wolfram-mode."
+  (add-hook 'completion-at-point-functions
+	    #'sci-wolfram-completion-at-point nil t))
 
-(add-hook 'sci-wolfram-mode-hook
-	  (lambda ()
-	    (add-hook 'eglot-managed-mode-hook #'sci-wolfram-mode-setup-completion nil t)
-	    (add-hook 'lsp-mode-hook #'sci-wolfram-mode-setup-completion nil t)
-	    (sci-wolfram-mode-setup-completion)))
+(defun sci-wolfram-mode-remove-completion ()
+  "Remove completion of wolfram symbols in sci-wolfram-mode."
+  (remove-hook 'completion-at-point-functions
+               #'sci-wolfram-completion-at-point t))
+
+(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-mode-add-completion)
 
 ;; lsp server
 (defcustom sci-wolfram-kernel
@@ -281,8 +292,8 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
   (let ((lsp-server-path
 	 (string-trim-right
 	  (shell-command-to-string
-	   "wolframscript -code 'LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], LSPServerPath, \"False\"]'"))))
-    (if (not (string= lsp-server-path "False"))
+	   "wolframscript -code 'LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], LSPServerPath, \"Built-in LSPServer\"]'"))))
+    (if (not (string= lsp-server-path "Built-in LSPServer"))
 	(if (yes-or-no-p
 	     (format "Found locally installed LSPServer in \"%s\".
 In order to use the built-in LSPServer, the local version should be removed.
@@ -293,7 +304,27 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 	      (message "Failed to remove local LSPServer."))
 	  (message "Local LSPServer retained. Built-in version may not work properly.")))))
 
-(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-setup-lsp-server)
+(add-hook 'eglot-managed-mode-hook
+          (lambda ()
+            (when (derived-mode-p 'sci-wolfram-mode)
+	      (sci-wolfram-mode-remove-completion)
+              (sci-wolfram-setup-lsp-server))))
+
+(add-hook 'eglot-shutdown-hook
+          (lambda ()
+            (when (derived-mode-p 'sci-wolfram-mode)
+	      (sci-wolfram-mode-add-completion))))
+
+(add-hook 'lsp-mode-hook
+          (lambda ()
+            (when (derived-mode-p 'sci-wolfram-mode)
+	      (sci-wolfram-mode-remove-completion)
+              (sci-wolfram-setup-lsp-server))))
+
+(add-hook 'lsp-after-uninitialized-functions
+          (lambda (_workspace)
+            (when (derived-mode-p 'sci-wolfram-mode)
+	      (sci-wolfram-mode-add-completion))))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
