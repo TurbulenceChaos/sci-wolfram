@@ -116,6 +116,24 @@
       (start-process-shell-command "sci-wolfram-buffer-to-pdf" xoutbuf command))
     (display-buffer xoutbuf)))
 
+;; format
+(require 'format-all)
+(require 'language-id)
+
+(with-eval-after-load 'language-id
+  (setq language-id--definitions
+        (append language-id--definitions
+                '(("Mathematica" sci-wolfram-mode)))))
+
+(with-eval-after-load 'format-all
+  (define-format-all-formatter wolframscript
+    (:executable "wolframscript")
+    (:install "wolframscript")
+    (:languages "Mathematica")
+    ;; (:features region)
+    (:features)
+    (:format (format-all--buffer-easy executable "-script" "~/.emacs.d/sci-wolfram-format.wl"))))
+
 ;; eldoc
 (defun sci-wolfram-doc-lookup ()
   "Look up the symbol under cursor in Wolfram doc site in web browser."
