@@ -51,7 +51,7 @@
 ;; TODO:
 ;; - [o] wolfram player;
 ;; - [o] add usr symbols;
-;; - [ ] Codeformatter (when eglot=nil, reference: sci-wolfram-eval-region, format-all-region);
+;; - [o] Codeformatter (when eglot=nil, reference: sci-wolfram-eval-region, format-all-region);
 ;; - [ ] sci-wolfram-jupyter insert package (reference: jupyter-insert);
 ;; - [o] completion-at-point (when eglot=nil)
 ;; - [o] emacs-jupyter org block completion-at-point;
@@ -60,39 +60,76 @@
 ;; - [o] display images in jupyter repl (https://github.com/linux-xhyang/WolframLanguageForJupyter/commit/2a4ed08556a3f87e4b134b48d5b0bc44bc81fb8b?w=1);
 ;; - [ ] eval line, region, buffer (display images and latex in tmp buffer, reference: EPrint);
 
-(defun sci-wolfram-send-region-to-tmp-file (Begin End &optional Xinsert)
-  "Eval code in text selection with WolframScript."
-  (interactive
-   (append
-    (if (region-active-p)
-	(list (region-beginning) (region-end))
-      (list (point-min) (point-max)))
-    current-prefix-arg nil))
-  (when (not buffer-file-name)
-    (user-error "Buffer is not a file. Save it first!"))
-  (let* ((state
-	  (if (region-active-p)
-	      "region"
-	    "buffer"))
-	 (code (buffer-substring-no-properties Begin End))
-	 (file buffer-file-name)
-	 (dir (file-name-directory file))
-	 (tmpfile (expand-file-name
-		   (format "%s-%s-%x.wl"
-			   (file-name-base file)
-			   (format-time-string "%Y%m%d%-H%M%S")
-			   (random #xfffff))
-		   dir)))
-    (when (and (string= state "buffer")
-	       (not (eq major-mode 'sci-wolfram-mode)))
-      (user-error "Buffer is not a wolfram script!"))
-    (with-temp-file tmpfile (insert code))
-    ;; (sci-wolfram-eval state file tmpfile)
-    (sci-wolfram-to-pdf state file tmpfile dir)))
+(defmacro sci-wolfram-region-or-buffer-function (name-1 name-2 body doc)
+  "Use marco to define a function to process wolfram region or buffer code."
+  `(defun ,(intern (format "sci-wolfram-%s-region-or-buffer%s" name-1 name-2)) (Begin End &optional Xinsert)
+     ,doc
+     (interactive
+      (append
+       (if (region-active-p)
+	   (list (region-beginning) (region-end))
+	 (list (point-min) (point-max)))
+       current-prefix-arg nil))
+     ;; (when (not buffer-file-name)
+     ;;   (user-error "Buffer is not a file. Save it first!"))
+     (let* ((state
+	     (if (region-active-p)
+		 "region"
+	       "buffer"))
+	    (code (buffer-substring-no-properties Begin End))
+	    (file (if buffer-file-name
+		      buffer-file-name
+		    ;; for sci-wolfram-jupyter to edit source code block
+		    (let ((dir (concat temporary-file-directory "sci-wolfram")))
+		      (unless (file-directory-p dir)
+			(make-directory dir t))
+		      (with-temp-file (expand-file-name
+				       (format "%s-%s-%x.wl"
+					       (file-name-base file)
+					       (format-time-string "%Y%m%d%-H%M%S")
+					       (random #xfffff))
+				       dir)
+			(insert code)))))
+	    (dir (file-name-directory file))
+	    (tmpfile (expand-file-name
+		      (format "%s-%s-%x.wl"
+			      (file-name-base file)
+			      (format-time-string "%Y%m%d%-H%M%S")
+			      (random #xfffff))
+		      dir)))
+       (when (and (string= state "buffer")
+		  (not (eq major-mode 'sci-wolfram-mode)))
+	 (user-error "Buffer is not a wolfram script!"))
+       ;; send region or buffer to tmp file
+       (with-temp-file tmpfile (insert code))
+       ;; (sci-wolfram-format Begin End tmpfile)
+       ;; (sci-wolfram-eval state file tmpfile)
+       ;; (sci-wolfram-to-pdf-and-notebook state file tmpfile dir)
+       ,body)))
 
+;; format region or buffer
+(setq sci-wolfram-format-script
+      (expand-file-name "sci-wolfram-format.wl"
+			(file-name-directory (or load-file-name buffer-file-name))))
+
+(defun sci-wolfram-format (Begin End tmpfile)
+  (let ((formatted-code
+	 (shell-command-to-string
+	  (format "wolframscript -script %s %s" sci-wolfram-format-script tmpfile))))
+    (delete-region Begin End)
+    (goto-char Begin)
+    (insert (concat formatted-code "\n"))))
+
+(sci-wolfram-region-or-buffer-function
+ "format"
+ ""
+ (sci-wolfram-format Begin End tmpfile)
+ "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html) to format wolfram region or buffer code.")
+
+
+;; eval region or buffer
 (defun sci-wolfram-eval (state file tmpfile)
   "Execute the current file with WolframScript and print all expressions."
-  (interactive)
   (let ((outbuf (get-buffer-create "*sci-wolfram-eval output*" t))
         (command (format "wolframscript -print all -file %s" tmpfile)))
     (with-current-buffer outbuf
@@ -111,16 +148,23 @@
 				  (insert (format "\nDelete %s" tmpfile)))))))
     (display-buffer outbuf)))
 
-;; wolfram player
-(defvar sci-wolfram-pdf-script nil "Path to sci-wolfram-pdf.wl")
+(sci-wolfram-region-or-buffer-function
+ "eval"
+ ""
+ (sci-wolfram-eval state file tmpfile)
+ "Use `wolframscript' to eval wolfram region or buffer code.")
+
+;; convert region or buffer to pdf and notebook
+;; use wolframplayer to view notebook
 (defvar sci-wolfram-play nil "Play wolfram notebook")
 (defvar sci-wolfram-player nil "Path to Wolfram Player")
 
-(setq sci-wolfram-pdf-script (concat (file-name-directory (or load-file-name buffer-file-name)) "sci-wolfram-pdf.wl"))
+(setq sci-wolfram-pdf-script (expand-file-name
+			      "sci-wolfram-pdf.wl"
+			      (file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-to-pdf (state file tmpfile dir)
+(defun sci-wolfram-to-pdf-and-notebook (state file tmpfile dir)
   "Execute the current file with WolframScript and convert it to PDF."
-  (interactive)
   (let* ((outbuf (get-buffer-create "*sci-wolfram-eval output*"))
 	 (file-no-dir (file-name-nondirectory file)) 
 	 (file-name (file-name-base file))
@@ -165,23 +209,12 @@
 				  (find-file (concat dir pdf)))))))
     (display-buffer outbuf)))
 
-;; format
-(require 'format-all)
-(require 'language-id)
-
-(with-eval-after-load 'language-id
-  (setq language-id--definitions
-        (append language-id--definitions
-                '(("Mathematica" sci-wolfram-mode)))))
-
-(with-eval-after-load 'format-all
-  (define-format-all-formatter wolframscript
-    (:executable "wolframscript")
-    (:install "wolframscript")
-    (:languages "Mathematica")
-    ;; (:features region)
-    (:features)
-    (:format (format-all--buffer-easy executable "-script" "~/.emacs.d/sci-wolfram-format.wl"))))
+(sci-wolfram-region-or-buffer-function
+ "convert"
+ "-to-pdf-and-notebook"
+ (sci-wolfram-to-pdf-and-notebook state file tmpfile dir)
+ "Convert wolfram region or buffer code to pdf and Mathematica notebook.
+Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view the notebook.")
 
 ;; eldoc
 (defun sci-wolfram-doc-lookup ()
