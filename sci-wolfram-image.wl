@@ -66,7 +66,7 @@ sciWolframEnvironmentType[] :=
 
 sciWolframText[expr_] :=
   Module[{},
-    Print[StringForm["Out[`1`]=", n++]];
+    Print[ToString[StringForm["Out[`1`]= ", n++]]];
     Print[expr];
     (* Return the original expr *)
     If[sciWolframEnvironmentType[] == "script",
@@ -80,7 +80,7 @@ sciWolframText[expr_] :=
 
 sciWolframTeX[expr_] :=
   Module[{},
-    Print[StringForm["Out[`1`]=", n++]];
+    Print[ToString[StringForm["Out[`1`]= ", n++]]];
     Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
       ];
     (* Return the original expr *)
@@ -107,7 +107,7 @@ sciWolframImage[expr_, playCDF_] :=
     (* Display image *)
     Switch[sciWolframRunner,
       "emacs",
-        Print[StringForm["Out[`1`]=", n++]];
+        Print[ToString[StringForm["Out[`1`]= ", n++]]];
         Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth @ Directory[
           ]] <> "]]"]
       ,
