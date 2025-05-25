@@ -49,16 +49,18 @@
 ;;; Code:
 
 ;; TODO:
-;; - [o] wolfram player;
-;; - [o] add usr symbols;
-;; - [o] Codeformatter (when eglot=nil, reference: sci-wolfram-eval-region, format-all-region);
-;; - [ ] sci-wolfram-jupyter insert package (reference: jupyter-insert);
-;; - [o] completion-at-point (when eglot=nil)
-;; - [o] emacs-jupyter org block completion-at-point;
-;; - [o] emacs-jupyter org-block doc and completion with TAB;
-;; - [o] jupyter repl, send line, region, buffer ;
+;; - [o] add wolfram LSPServer symbols;
+;; - [o] add all wolfram LSPServer symbols to `completion-at-point' when `eglot' or `lsp-mode'=nil
+;; - [o] use `CodeFormatter' to format region or buffer when `eglot' or `lsp-mode'=nil (ref: `format-all' pkg);
+;; - [o] use `eglot' or `lsp-mode' to format wolframscript region or buffer and complete wolfram symbols;
+;; - [o] eval region or buffer, and display output as images and latex in tmp buffer (ref: wolfram-mode pkg `EPrint');
+;; - [o] convert wolfram script region or buffer to pdf and notebook, and use Wolfram Player to view notebook;
+;; - [o] jupyter org-block find doc, completion-at-point, eval region, format region, convert region to pdf and notebook;
+;; - [o] jupyter repl, send line, region, buffer;
 ;; - [o] display wolfram images in jupyter repl;
-;; - [ ] eval line, region, buffer (display images and latex in tmp buffer, reference: EPrint);
+;; - [ ] jupyter org-block insert package (ref: `jupyter-org-insert-src-block');
+;; - [ ] plan to remove `emacs-jupyter' dependence by replacing `jupyter-repl' with native wolfram repl (ref: `imaxima' pkg);
+;;       develop `ob-sci-wolfram' and add session support to it (ref: `ob-mathematica', `ob-jupyter' pkg)
 
 (defmacro sci-wolfram-region-or-buffer-function (name-1 name-2 body doc)
   "Use marco to define a function to process wolfram region or buffer code."
@@ -134,38 +136,48 @@
  "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html)
 to format wolfram region or buffer code.")
 
-;; eval region or buffer (plain text)
-(defun sci-wolfram-eval (state buffer-type file tmpfile)
-  "Execute the current file with WolframScript and print all expressions as plain texts."
-  (let ((outbuf (get-buffer-create "*sci-wolfram-eval output*" t))
-        (command (format "wolframscript -print all -file %s" tmpfile)))
-    (with-current-buffer outbuf
-      (erase-buffer)
-      (insert (if (string= state "region")
-		  (format "Eval region of %s\n\n" file)
-		(format "Eval %s\n\n" file)))
-      (insert (format "Send %s to %s\n\n" state tmpfile))
-      (insert (format "Running: %s\n\nResults:\n\n" command)))
-    (let ((proc (start-process-shell-command "sci-wolfram-eval-buffer" outbuf command)))
-      (set-process-sentinel proc
-			    (lambda (process event)
-			      (when (string-match "finished\\|exited" event)
-				(if (string= buffer-type "not-file")
-				    (delete-file file))
-				(delete-file tmpfile)
-				(with-current-buffer outbuf
-				  (insert (format "\nDelete %s" tmpfile))
-				  (if (string= buffer-type "not-file")
-				      (insert (format "\n\nDelete %s" file))))))))
-    (display-buffer outbuf)))
+;; eval region or buffer
+(defmacro sci-wolfram-eval-marco (name doc &optional body-1 body-2)
+  "Use marco to define a function to eval wolfram code."
+  `(defun ,(intern (format "sci-wolfram-eval%s" name)) (state buffer-type file tmpfile)
+     ,doc
+     ,body-1
+     (let ((outbuf (get-buffer-create "*sci-wolfram-eval output*" t))
+           (command (format "wolframscript -script %s" tmpfile)))
+       (with-current-buffer outbuf
+	 (erase-buffer)
+	 (insert (if (string= state "region")
+		     (format "Eval region of %s\n\n" file)
+		   (format "Eval %s\n\n" file)))
+	 (insert (format "Send %s to %s\n\n" state tmpfile))
+	 (insert (format "Running: %s\n\nResults:\n\n" command)))
+       (let ((proc (start-process-shell-command "sci-wolfram-eval-buffer" outbuf command)))
+	 (set-process-sentinel proc
+			       (lambda (process event)
+				 (when (string-match "finished\\|exited" event)
+				   (if (string= buffer-type "not-file")
+				       (delete-file file))
+				   (delete-file tmpfile)
+				   (with-current-buffer outbuf
+				     (goto-char (point-max))
+				     (insert (format "\nDelete %s" tmpfile))
+				     (if (string= buffer-type "not-file")
+					 (insert (format "\n\nDelete %s" file)))
+				     ,body-2)))))
+       (display-buffer outbuf))))
 
-(sci-wolfram-region-or-buffer-function
- "eval"
- ""
- (sci-wolfram-eval state buffer-type file tmpfile)
- "Use `wolframscript' to eval wolfram region or buffer code and print all expressions as plain texts.")
+;; eval as plain text
+;; (sci-wolfram-eval-marco
+;;  ""
+;;  "Execute the current file with WolframScript and print all expressions as plain texts.")
 
-;; eval region or buffer for pretty print
+;; (sci-wolfram-region-or-buffer-function
+;;  "eval-plain-text"
+;;  ""
+;;  (sci-wolfram-eval state buffer-type file tmpfile)
+;;  "Use `wolframscript' to eval wolfram region or buffer code and print all expressions as plain texts.")
+
+;; eval region or buffer
 (setq sci-wolfram-eval-script
       (expand-file-name "sci-wolfram-eval.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
@@ -174,83 +186,31 @@ to format wolfram region or buffer code.")
       (expand-file-name "sci-wolfram-image.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-eval-pretty (state buffer-type file tmpfile)
-  "Execute the current file with WolframScript and pretty print all expressions."
-  (let ((wrap-code
-	 (string-trim-right
-	  (shell-command-to-string
-	   (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile)))))
-    (with-temp-file tmpfile
-      (insert
-       (concat
-	(format "Get[\"%s\"]\n\n" sci-wolfram-image-script)
-	"sciWolframRunner = \"emacs\";\n\n"
-	wrap-code)))
-    ;; (sci-wolfram-eval state buffer-type file tmpfile)
-    (let ((result
-	   (string-trim-right
-	    (shell-command-to-string
-	     (format "wolframscript -script %s" tmpfile))))
-	  (tmporgfile (concat (file-name-sans-extension tmpfile) ".org")))
-      (with-temp-file tmporgfile
-	(insert (concat result "\n")))
-      (let ((pretty-buffer (find-file-noselect tmporgfile t)))
-	(display-buffer pretty-buffer)
-	(with-current-buffer pretty-buffer
-	  (rename-buffer (concat "*" (file-name-base tmporgfile) "*"))
-	  (revert-buffer nil t nil)
-	  (goto-char (point-min))
-	  (org-mode)
-	  (org-latex-preview)
-	  (org-display-inline-images)
-	  (goto-char (point-max))))
-      )))
+(sci-wolfram-eval-marco
+ ""
+ "Execute the current file with WolframScript and pretty print all expressions."
+ (let ((wrap-code
+	(string-trim-right
+	 (shell-command-to-string
+	  (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile)))))
+   (with-temp-file tmpfile
+     (insert
+      (concat
+       (format "Get[\"%s\"]\n\n" sci-wolfram-image-script)
+       "sciWolframRunner = \"emacs\";\n\n"
+       wrap-code))))
+ (progn
+   (unless (eq major-mode 'org-mode)
+     (org-mode))
+   (goto-char (point-min))
+   (org-latex-preview)
+   (org-display-inline-images)))
 
 (sci-wolfram-region-or-buffer-function
  "eval"
- "-pretty"
- (sci-wolfram-eval-pretty state buffer-type file tmpfile)
+ ""
+ (sci-wolfram-eval state buffer-type file tmpfile)
  "Use `wolframscript' to eval wolfram region or buffer code and pretty print all expressions.")
-
-(defun wolfram-run-script ()
-  "Execute and update file"
-  (interactive)
-  (save-buffer)
-  (let ((cur-name (file-name-base (buffer-file-name)))
-	(cur-file (file-name-nondirectory (buffer-file-name)))
-	(cur-dir  (file-name-directory (buffer-file-name)))
-	(output-buffer (get-buffer-create "*MathematicaOutput*"))
-	(pretty-buffer)
-	(pretty-file))
-
-    ;; Prepare output buffer
-    (with-current-buffer output-buffer
-      (delete-region (point-min) (point-max)))
-
-    ;; Ensure that package EPrint.m exists
-    (wolfram-run-check-or-make-eprint-package cur-dir)
-
-    ;; Call Mathematica
-    (call-process-shell-command (concat "cd "
-					cur-dir
-					"; wolframscript -script "
-					cur-file)
-				nil output-buffer)
-
-    ;; Open buffer for pretty printing
-    (setq pretty-file (concat cur-dir "pretty" cur-name ".org"))
-    (setq pretty-buffer (find-file-noselect pretty-file t))
-    (display-buffer pretty-buffer)
-
-    ;;(my-run-command-other-window "MathKernel -script test.m")
-    (with-current-buffer pretty-buffer
-      (rename-buffer (concat "*MathematicaPrettyPrint_" cur-name "*"))
-      (revert-buffer nil t nil)
-      (goto-char (point-min))
-      (org-remove-latex-fragment-image-overlays)
-      (org-toggle-latex-fragment)
-      (goto-char (point-max)))))
-
 
 ;; convert region or buffer to pdf and Mathematica notebook
 ;; use `wolframplayer' to view notebook if `sci-wolfram-play' = t
@@ -262,7 +222,7 @@ to format wolfram region or buffer code.")
 (defcustom sci-wolfram-player
   (string-trim-right
    (shell-command-to-string
-    "wolframscript -code 'FileNameJoin[$InstallationDirectory,\"Executables\",\"wolframplayer\"] <> Switch[$OperatingSystem,\"Unix\",\"\",\"Windows\",\".exe\"]'"))
+    "wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'"))
   "Path to Wolfram Player."
   :type 'string
   :group 'sci-wolfram-mode)
