@@ -1,140 +1,198 @@
 (* ::Package:: *)
 
-BeginPackage["WolframTerminalImage`"];
+BeginPackage["sciWolframImage`"];
 
-(* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
+sciWolframRunner::usage = "Code runner of wolfram script: `vscode`, `emacs`"
 
-wolframTerminalType = "vscode";
+sciWolframImageDPI::usage = "Image output resolution"
 
-(* Set the resolution (in DPI) for Wolfram terminal images *)
+sciWolframDeleteTempFile::usage = "Automatically delete temp images: `yes` (Enable) or `no` (disable)"
 
-wolframTerminalImageResolution = 100;
+sciWolframFormulaType::usage = "Formula output type: `latex` or `image`"
 
-(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images for vscode *)
+sciWolframPlay::usage = "Use `wolframplayer` to view `.cdf` files: `yes` (Enable) or `no` (disable)"
 
-wolframTerminalDeleteImage = "no";
+sciWolframPlayer::usage = "Path to the Wolfram Player"
 
-(* Specify the formula type for emacs (options: "latex", "image") *)
-
-wolframTerminalFormulaType = "latex";
-
-(* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
-
-wolframTerminalPlay = "no";
-
-(* Specify the player application for Wolfram terminal CDF files *)
-
-(* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
-
-wolframTerminalPlayer = "wolframplayer";
+sciWolframDisplay::usage = "Display outputs as different formats"
 
 Begin["`Private`"];
 
-(* TODO: The '%' operator works only in terminal mode *)
-(* TODO: Use $PrePrint to print output counter *)
+(* `%` operator works only in repl *)
+
+sciWolframRunner = "vscode";
+
+sciWolframImageDPI = 100;
+
+sciWolframDeleteTempFile = "no";
+
+sciWolframFormulaType = "latex";
+
+sciWolframPlay = "no";
+
+sciWolframPlayer =
+  FileNameJoin[
+    $InstallationDirectory
+    ,
+    Switch[$OperatingSystem,
+      "Unix",
+        "Executables"
+      ,
+      "Windows",
+        "Executables"
+    ]
+    ,
+    Switch[$OperatingSystem,
+      "Unix",
+        "wolframplayer"
+      ,
+      "Windows",
+        "wolframplayer.exe"
+    ]
+  ];
 
 (* Initialize output counter *)
+
 n = 1;
 
-(* Function to display plain text output *)
-WolframTerminalText[expr_] :=
-  Module[{},
-    (* Print the output number counter *)
-    Print[StringForm["Out[`1`]=", n++]];
-    
-    (* Print the expression itself *)
-    Print[expr];
+sciWolframEnvironmentType[] :=
+  If[MatchQ[$ScriptCommandLine, {_String, ___}],
+    "script"
+    ,
+    "repl"
+  ]
 
-    (* Return the original expression *)
-    expr;
-  ];
+(* Function to display plain text output *)
+
+sciWolframText[expr_] :=
+  Module[{},
+    Print[StringForm["Out[`1`]=", n++]];
+    Print[expr];
+    (* Return the original expr *)
+    If[sciWolframEnvironmentType[] == "script",
+      expr
+      ,
+      expr;
+    ]
+  ]
 
 (* Function to display LaTeX output *)
-WolframTerminalTeX[expr_] :=
+
+sciWolframTeX[expr_] :=
   Module[{},
-    (* Print the output number counter *)
     Print[StringForm["Out[`1`]=", n++]];
-    
-    (* Convert expression to LaTeX and wrap in equation environment *)  
-    Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"];
-    
-    (* Return the original expression *)
-    expr;
+    Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
+      ];
+    (* Return the original expr *)
+    If[sciWolframEnvironmentType[] == "script",
+      expr
+      ,
+      expr;
+    ]
   ];
 
-WolframTerminalImage[expr_, playCDF_] :=
-  Module[
-    {dir, filePNG, fileCDF},
-    (* Set up directory and file paths *)
+sciWolframImage[expr_, playCDF_] :=
+  Module[{dir, filePNG, fileCDF},
     dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
     filePNG = FileNameJoin[{dir, CreateUUID["wolfram-"] <> ".png"}];
     fileCDF = StringReplace[filePNG, ".png" -> ".cdf"];
-    
-    (* Create directory if needed (for older Wolfram versions) *)
     If[$VersionNumber < 12.2,
-      If[!DirectoryQ[dir], CreateDirectory[dir, CreateIntermediateDirectories -> True]]
+      If[!DirectoryQ[dir],
+        CreateDirectory[dir, CreateIntermediateDirectories -> True]
+      ]
     ];
-    
-    (* Export expression as PNG *)
-    Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], ImageResolution -> wolframTerminalImageResolution];
-    
-    (* Handle display based on terminal type *)
-    Switch[wolframTerminalType,
+    (* Export expr as image *)
+    Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], ImageResolution
+       -> sciWolframImageDPI];
+    (* Display image *)
+    Switch[sciWolframRunner,
       "emacs",
         Print[StringForm["Out[`1`]=", n++]];
-        Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth @ Directory[]] <> "]]"],
+        Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth @ Directory[
+          ]] <> "]]"]
+      ,
       "vscode",
         Run["imgcat " <> filePNG];
-        If[wolframTerminalDeleteImage == "yes", Quiet @ DeleteFile @ filePNG]
+        (* Delete temp file *)
+        If[sciWolframDeleteTempFile == "yes",
+          Quiet @ DeleteFile @ filePNG
+        ];
     ];
-    
-    (* Handle CDF export and playback if requested *)
+    (* Use `wolframplayer` to view `.cdf` files *)
     If[playCDF == "yes",
       Export[fileCDF, Notebook[{Cell @ BoxData @ ToBoxes @ expr}]];
-      StartProcess[{wolframTerminalPlayer, FileNameTake[fileCDF]}, ProcessDirectory -> DirectoryName[fileCDF]]
+      StartProcess[{sciWolframPlayer, FileNameTake[fileCDF]}, ProcessDirectory
+         -> DirectoryName[fileCDF]]
     ];
-    
-    (* Return the original expression *)
-    expr;
+    (* Return the original expr *)
+    If[sciWolframEnvironmentType[] == "script",
+      expr
+      ,
+      expr;
+    ]
   ];
 
-$Post =
-  Module[
-    {box, isFormula, isPlot},
-    (* Convert input to box representation *)
-    box = ToBoxes[#];
-    (* Check content type *)
+sciWolframDisplay[expr_] :=
+  Module[{box, isFormula, isPlot},
+    box = ToBoxes[expr];
     isFormula = !FreeQ[box, RowBox | SqrtBox | SuperscriptBox];
-    isPlot = !FreeQ[box, DynamicBox | DynamicModuleBox | GraphicsBox | Graphics3DBox];
-    
-    (* Handle different output formats based on content type and terminal *)
+    isPlot = !FreeQ[box, DynamicBox | DynamicModuleBox | GraphicsBox 
+      | Graphics3DBox];
     Which[
-      (* Plain text - neither formula nor plot *)
       !isFormula && !isPlot,
-        Switch[wolframTerminalType,
-          "emacs", If[MatchQ[#, Null], #, WolframTerminalText[#]],
-          "vscode", #
-        ],
-      
-      (* Formula or plot content *)
-      True,
-        Switch[wolframTerminalType,
+        Switch[sciWolframRunner,
           "emacs",
-            Switch[wolframTerminalFormulaType,
+            If[MatchQ[expr, Null],
+              expr
+              ,
+              sciWolframText[expr]
+            ]
+          ,
+          "vscode",
+            expr
+        ]
+      ,
+      True,
+        Switch[sciWolframRunner,
+          "emacs",
+            Switch[sciWolframFormulaType,
               "latex",
                 If[isPlot,
-                  WolframTerminalImage[#, playCDF = wolframTerminalPlay],
-                  WolframTerminalTeX[#]
-                ],
+                  sciWolframImage[expr, playCDF = sciWolframPlay]
+                  ,
+                  sciWolframTeX[expr]
+                ]
+              ,
               "image",
-                WolframTerminalImage[#, playCDF = If[isPlot, wolframTerminalPlay, "no"]]
-            ],
+                sciWolframImage[
+                  expr
+                  ,
+                  playCDF =
+                    If[isPlot,
+                      sciWolframPlay
+                      ,
+                      "no"
+                    ]
+                ]
+            ]
+          ,
           "vscode",
-            WolframTerminalImage[#, playCDF = If[isPlot, wolframTerminalPlay, "no"]]
+            sciWolframImage[
+              expr
+              ,
+              playCDF =
+                If[isPlot,
+                  sciWolframPlay
+                  ,
+                  "no"
+                ]
+            ]
         ]
     ]
-  ]&;
+  ];
 
 End[];
 
 EndPackage[];
+
+$Post = sciWolframDisplay[#]&;

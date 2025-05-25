@@ -1,34 +1,56 @@
 (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-  
-Get["/path/to/Wolfram-teminal-image/WolframTerminalImage.wl"];
 
-(* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
+Get["../sci-wolfram-image.wl"];
 
-wolframTerminalType = "vscode";
+(* Code runner of wolfram script: `vscode repl`, `emacs org babel`, or `wolframscript file` *)
 
-(* Set the resolution (in DPI) for Wolfram terminal images *)
+sciWolframRunner = "emacs";
 
-wolframTerminalImageResolution = 100;
+(* Image output resolution *)
 
-(* Enable ("yes") or disable ("no") automatic deletion of Wolfram terminal images for vscode *)
+sciWolframImageDPI = 100;
 
-wolframTerminalDeleteImage = "no";
+(* Automatically delete temp images: `yes` (Enable) or `no` (disable) *)
 
-(* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
+sciWolframDeleteTempFile = "no";
 
-wolframTerminalPlay = "no";
+(* Use `wolframplayer` to view `.cdf` files: `yes` (Enable) or `no` (disable) *)
 
-(* Specify the player application for Wolfram terminal CDF files *)
+sciWolframPlay = "no";
 
-(* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
+(* Path to the Wolfram Player
 
-wolframTerminalPlayer = "wolframplayer";
+By default, it is set as
 
-(* To restore `$Post` to its original state, simply execute "$Post=." *)
+sciWolframPlayer =
+  FileNameJoin[
+    $InstallationDirectory
+    ,
+    Switch[$OperatingSystem,
+      "Unix",
+        "Executables"
+      ,
+      "Windows",
+        "Executables"
+    ]
+    ,
+    Switch[$OperatingSystem,
+      "Unix",
+        "wolframplayer"
+      ,
+      "Windows",
+        "wolframplayer.exe"
+    ]
+  ];
+*)
+
+sciWolframPlayer = "wolframplayer.exe";
+
+(* In repl environment, if you want to restore `$Post` to its original state, just execute `$Post=.` *)
 
 sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
   Cos[t]}, y[x, t], {x, t}]
 
 sol2 = sol1[[1, 1, 2]]
 
-Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+plot = Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
