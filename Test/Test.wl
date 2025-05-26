@@ -1,4 +1,4 @@
-Get["/path/to/sci-wolfram-image.wl"];
+(* Get["/path/to/sci-wolfram-image.wl"]; *)
 
 (* 1. sciWolframEnv
 
@@ -28,13 +28,13 @@ For emacs, formula output types: "latex" or "image" (by default)
 
 You can specify it by
 
-sciWolframImageDPI = "latex"; 
+sciWolframFormulaType = "latex"; 
 
 *)
 
 (* 4. sciWolframOrigExpr
 
-If or not display both inline images and original expression: "yes" (Enable) or "no" (disable by default)
+Whether to display both inline images and original expression: "yes" (Enable) or "no" (disable by default)
 
 You can specify it by
 
@@ -44,9 +44,9 @@ sciWolframOrigExpr = "yes";
 
 (* 5. sciWolframPlay
 
-Use `wolframplayer` to view `.cdf` files: "yes" (Enable) or "no" (disable by default)
+Whether to use `wolframplayer` to view `.cdf` files: "yes" (Enable) or "no" (disable by default)
 
-You can also specify the environment by
+You can specify it by
 
 sciWolframPlay = "yes";
 

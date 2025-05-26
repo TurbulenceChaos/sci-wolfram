@@ -62,7 +62,94 @@
 ;; - [ ] plan to remove `emacs-jupyter' dependence by replacing `jupyter-repl' with native wolfram repl (ref: `imaxima' pkg);
 ;;       develop `ob-sci-wolfram' and add session support to it (ref: `ob-mathematica', `ob-jupyter' pkg)
 
-(defmacro sci-wolfram-region-or-buffer-function (name-1 name-2 body doc)
+(defcustom sci-wolfram-image-dpi 150
+  "sci-wolfram-image-dpi
+
+Image output resolution: 150 DPI in \"emacs\" by default
+
+You can specify it by
+
+(custom-set-variables
+ '(sci-wolfram-image-dpi 150))
+"
+  :type 'number
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-formula-type "image"
+  "sci-wolfram-formula-type
+
+For emacs, formula output types: \"latex\" or \"image\" (by default)
+
+You can specify it by
+
+(custom-set-variables
+ '(sci-wolfram-orig-expr \"latex\"))
+"
+  :type '(choice (const "image") (const "latex"))
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-orig-expr "no"
+  "sci-wolfram-orig-expr
+
+Whether to display both inline images and original expression: \"yes\" (Enable) or \"no\" (disable by default)
+
+You can specify it by
+
+(custom-set-variables
+ '(sci-wolfram-orig-expr \"yes\"))
+"
+  :type '(choice (const "yes") (const "no"))
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-play "no"
+  "sci-wolfram-play
+
+Whether to use `wolframplayer' to view `.cdf' files: \"yes\" (Enable) or \"no\" (disable by default)
+
+You can specify it by
+
+(custom-set-variables
+ '(sci-wolfram-play \"yes\"))
+"
+  :type '(choice (const "yes") (const "no"))
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-player
+  (string-trim-right
+   (shell-command-to-string
+    "wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'"))
+
+  "sci-wolfram-player
+
+Path to the Wolfram Player, which is set as
+
+(string-trim-right
+   (shell-command-to-string
+    \"wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'\"))
+
+You can also specify the path by
+
+for linux:
+
+(custom-set-variables
+ '(sci-wolfram-player \"/path/to/wolframplayer\"))
+
+for windows:
+(custom-set-variables
+ '(sci-wolfram-player \"/path/to/wolframplayer.exe\"))
+"
+  :type 'string
+  :group 'sci-wolfram-mode)
+
+(defcustom sci-wolfram-kernel
+  (string-trim-right
+   (shell-command-to-string
+    "wolframscript -code 'First[$CommandLine]'"))
+  "Path to WolframKernel executable for wolfram LSPServer usage"
+  :type 'string
+  :group 'sci-wolfram-mode)
+
+(defmacro sci-wolfram-region-or-buffer-marco (name-1 name-2 body doc)
   "Use marco to define a function to process wolfram region or buffer code."
   `(defun ,(intern (format "sci-wolfram-%s-region-or-buffer%s" name-1 name-2)) (Begin End &optional Xinsert)
      ,doc
@@ -84,8 +171,7 @@
 	    (code (buffer-substring-no-properties Begin End))
 	    (file (if (string= buffer-type "file")
 		      buffer-file-name
-		    ;; for sci-wolfram-jupyter to edit source code block
-		    ;; buffer is not a file
+		    ;; for edit org-src block, where buffer is not a file
 		    (let ((dir (concat temporary-file-directory "sci-wolfram")))
 		      (unless (file-directory-p dir)
 			(make-directory dir t))
@@ -122,14 +208,15 @@
   (let ((formatted-code
 	 (string-trim-right
 	  (shell-command-to-string
-	   (format "wolframscript -script %s %s" sci-wolfram-format-script tmpfile)))))
+	   (format "wolframscript -script %s %s"
+		   sci-wolfram-format-script tmpfile)))))
     (delete-region Begin End)
     (insert (concat formatted-code "\n"))
     (if (string= buffer-type "not-file")
 	(delete-file file))
     (delete-file tmpfile)))
 
-(sci-wolfram-region-or-buffer-function
+(sci-wolfram-region-or-buffer-marco
  "format"
  ""
  (sci-wolfram-format Begin End buffer-type file tmpfile)
@@ -137,33 +224,42 @@
 to format wolfram region or buffer code.")
 
 ;; eval region or buffer
-(defmacro sci-wolfram-eval-marco (name doc &optional body-1 body-2)
+(defmacro sci-wolfram-eval-marco (name doc &optional body-1 body-2 body-3)
   "Use marco to define a function to eval wolfram code."
   `(defun ,(intern (format "sci-wolfram-eval%s" name)) (state buffer-type file tmpfile)
      ,doc
      ,body-1
-     (let ((outbuf (get-buffer-create "*sci-wolfram-eval output*" t))
-           (command (format "wolframscript -script %s" tmpfile)))
+     (let ((outbuf (get-buffer-create
+		    (format
+		     "*Eval %s of %s*"
+		     state (file-name-nondirectory file))
+		    t))
+           (command (list "wolframscript" "-script" tmpfile)))
        (with-current-buffer outbuf
 	 (erase-buffer)
 	 (insert (if (string= state "region")
 		     (format "Eval region of %s\n\n" file)
 		   (format "Eval %s\n\n" file)))
 	 (insert (format "Send %s to %s\n\n" state tmpfile))
+	 ,body-2
 	 (insert (format "Running: %s\n\nResults:\n\n" command)))
-       (let ((proc (start-process-shell-command "sci-wolfram-eval-buffer" outbuf command)))
+       (let ((proc (make-process
+		    :name "sci-wolfram-eval"
+		    :buffer outbuf
+		    :command command
+		    :connection-type 'pipe)))
 	 (set-process-sentinel proc
-			       (lambda (process event)
+                               (lambda (process event)
 				 (when (string-match "finished\\|exited" event)
 				   (if (string= buffer-type "not-file")
-				       (delete-file file))
+                                       (delete-file file))
 				   (delete-file tmpfile)
 				   (with-current-buffer outbuf
 				     (goto-char (point-max))
 				     (insert (format "\nDelete %s" tmpfile))
 				     (if (string= buffer-type "not-file")
 					 (insert (format "\n\nDelete %s" file)))
-				     ,body-2)))))
+				     ,body-3)))))
        (display-buffer outbuf))))
 
 ;; eval as plain text
@@ -171,7 +267,7 @@ to format wolfram region or buffer code.")
 ;;  ""
 ;;  "Execute the current file with WolframScript and print all expressions as plain texts.")
 
-;; (sci-wolfram-region-or-buffer-function
+;; (sci-wolfram-region-or-buffer-marco
 ;;  "eval-plain-text"
 ;;  ""
 ;;  (sci-wolfram-eval state buffer-type file tmpfile)
@@ -188,73 +284,110 @@ to format wolfram region or buffer code.")
 
 (sci-wolfram-eval-marco
  ""
- "Execute the current file with WolframScript and pretty print all expressions."
- (let ((wrap-code
-	(string-trim-right
-	 (shell-command-to-string
-	  (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile)))))
+ "Execute file with `wolframscript' and pretty print all expressions."
+ (let* ((wrap-code
+	 (string-trim-right
+	  (shell-command-to-string
+	   (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile))))
+	(import-pkg
+	 (concat
+	  (format
+	   "Get[\"%s\"];\n\n"
+	   sci-wolfram-image-script)
+	  (format 
+	   "sciWolframImageDPI = %s;\n\n"
+	   sci-wolfram-image-dpi)
+	  (format 
+	   "sciWolframFormulaType = \"%s\";\n\n"
+	   sci-wolfram-formula-type)
+	  (format 
+	   "sciWolframOrigExpr = \"%s\";\n\n"
+	   sci-wolfram-orig-expr)
+	  (format 
+	   "sciWolframPlay = \"%s\";\n\n"
+	   sci-wolfram-play)
+	  (format 
+	   "yer = \"%s\";\n\n"
+	   sci-wolfram-player))))
    (with-temp-file tmpfile
-     (insert
-      (concat
-       (format "Get[\"%s\"]\n\n" sci-wolfram-image-script)
-       "sciWolframRunner = \"emacs\";\n\n"
-       wrap-code))))
+     (insert (concat import-pkg wrap-code))))
+
+ (progn
+   (insert (format "Run wolframscript -script %s %s to wrap original code\n\n" sci-wolfram-eval-script tmpfile))
+   (insert (format "Import %s package" sci-wolfram-image-script)))
+
  (progn
    (unless (eq major-mode 'org-mode)
      (org-mode))
+   (visual-line-mode 1)
    (goto-char (point-min))
-   (org-latex-preview)
-   (org-display-inline-images)))
+   (org-remove-latex-fragment-image-overlays)
+   (org-toggle-latex-fragment)
+   (org-remove-inline-images)
+   (org-toggle-inline-images)
+   (goto-char (point-max))))
 
-(sci-wolfram-region-or-buffer-function
+(sci-wolfram-region-or-buffer-marco
  "eval"
  ""
  (sci-wolfram-eval state buffer-type file tmpfile)
  "Use `wolframscript' to eval wolfram region or buffer code and pretty print all expressions.")
 
-;; convert region or buffer to pdf and Mathematica notebook
-;; use `wolframplayer' to view notebook if `sci-wolfram-play' = t
-(defcustom sci-wolfram-play nil
-  "Play Mathematica notebook."
-  :type 'boolean
-  :group 'sci-wolfram-mode)
-
-(defcustom sci-wolfram-player
-  (string-trim-right
-   (shell-command-to-string
-    "wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'"))
-  "Path to Wolfram Player."
-  :type 'string
-  :group 'sci-wolfram-mode)
-
+;; convert region or buffer to pdf and Mathematica notebook,
+;; and then use `wolframplayer' to view the notebook if `sci-wolfram-play' = "yes"
 (setq sci-wolfram-pdf-script (expand-file-name
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
 (defun sci-wolfram-to-pdf-and-notebook (state buffer-type file tmpfile dir)
   "Execute the current file with WolframScript and convert it to PDF."
-  (let* ((outbuf (get-buffer-create "*sci-wolfram-eval output*"))
+  (let* ((outbuf (get-buffer-create
+		  (format
+		   "*Convert %s of %s to pdf and notebook*"
+		   state (file-name-nondirectory file))))
 	 (file-no-dir (file-name-nondirectory file)) 
 	 (file-name (file-name-base file))
-	 (pdf (concat file-name "-convert.pdf"))
-	 (notebook (concat file-name "-convert.nb"))
+	 (pdf (concat
+	       file-name
+	       "-convert.pdf"))
+	 (notebook (concat
+		    file-name
+		    "-convert.nb"))
 	 (tmpfile-no-dir (file-name-nondirectory tmpfile))
 	 (tmpfile-name (file-name-base tmpfile))
-	 (tmppdf (concat tmpfile-name "-convert.pdf"))
-	 (tmpnotebook (concat tmpfile-name "-convert.nb"))
-         (command (format "wolframscript -script %s %s" sci-wolfram-pdf-script tmpfile))
-         (command-wolframplayer (format "cd %s;  %s %s" dir sci-wolfram-player notebook)))
+	 (tmppdf (concat
+		  tmpfile-name
+		  "-convert.pdf"))
+	 (tmpnotebook (concat
+		       tmpfile-name
+		       "-convert.nb"))
+         (command (list "wolframscript"
+			"-script"
+			sci-wolfram-pdf-script
+			tmpfile
+			;; sci-wolfram-play
+			;; sci-wolfram-player
+			)))
     (with-current-buffer outbuf
       (erase-buffer)
+      ;; (unless (eq major-mode 'org-mode)
+      ;; 	(org-mode))
+      (visual-line-mode 1)
       (if (string= state "region")
-	  (insert (format "Convert region of %s to %s.pdf and %s.nb in %s folder"
-			  file-no-dir file-name file-name dir))
-	(insert (format "Convert %s to %s.pdf and %s.nb in %s folder"
-			file-no-dir file-name file-name dir)))
-      (insert (format "\n\nRunning:\n\n%s\n\n" command)))
-    (let ((proc (start-process-shell-command
-		 "sci-wolfram-buffer-to-pdf" outbuf
-		 command)))
+	  (insert (format
+		   "Convert region of %s to %s.pdf and %s.nb in %s folder"
+		   file-no-dir file-name file-name dir))
+	(insert (format
+		 "Convert %s to %s.pdf and %s.nb in %s folder"
+		 file-no-dir file-name file-name dir)))
+      (insert (format
+	       "\n\nRunning:\n\n%s\n\n"
+	       command)))
+    (let ((proc (make-process
+		 :name "sci-wolfram-to-pdf-and-notebook"
+		 :buffer outbuf
+		 :command command
+		 :connection-type 'pipe)))
       (set-process-sentinel proc
 			    (lambda (process event)
 			      (when (string-match "finished\\|exited" event)
@@ -264,25 +397,34 @@ to format wolfram region or buffer code.")
 				(if (string= buffer-type "not-file")
 				    (delete-file file))
 				(delete-file tmpfile)
-				
+
 				(with-current-buffer outbuf
 				  (insert (format "Rename %s to %s\n\n" tmppdf pdf))
 				  (insert (format "Rename %s to %s\n\n" tmpnotebook notebook))
-				  (insert (format "Delete %s" tmpfile))
+				  (save-excursion
+				    (goto-char (point-max))
+				    (insert (format "Delete %s\n\n" tmpfile)))
 				  (if (string= buffer-type "not-file")
-				      (insert (format "\n\nDelete %s" file)))
-				  (if sci-wolfram-play
-				      (insert (format "\n\nUse wolframplayer to view %s" notebook))))
+				      (save-excursion
+					(goto-char (point-max))
+					(insert (format "\n\nDelete %s" file)))))
 
-				(if sci-wolfram-play
-				    (call-process-shell-command command-wolframplayer))
-				
+				(when (string= sci-wolfram-play "yes")
+				  (with-current-buffer outbuf
+				    (save-excursion
+				      (goto-char (point-max))
+				      (insert (format "Use wolframplayer to view %s" notebook))))
+				  (let ((default-directory dir))
+				    (start-process "sci-wolfram-play" nil sci-wolfram-player notebook)))
+
 				(let ((right-window (or (window-in-direction 'right) (split-window-right))))
 				  (select-window right-window)
-				  (find-file (concat dir pdf)))))))
+				  (with-current-buffer (current-buffer)
+				    (setq-local revert-without-query '(".pdf"))
+				    (find-file (concat dir pdf))))))))
     (display-buffer outbuf)))
 
-(sci-wolfram-region-or-buffer-function
+(sci-wolfram-region-or-buffer-marco
  "convert"
  "-to-pdf-and-notebook"
  (sci-wolfram-to-pdf-and-notebook state buffer-type file tmpfile dir)
@@ -339,18 +481,19 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 (add-hook 'sci-wolfram-mode-hook #'sci-wolfram-mode-add-completion)
 
 ;; lsp server
-(defcustom sci-wolfram-kernel
-  (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'"))
-  "Path to WolframKernel executable."
-  :type 'string
-  :group 'sci-wolfram-mode)
-
 (defun sci-wolfram-setup-lsp-server ()
   "Set up wolfram lsp server by removing local version if needed."
   (let ((lsp-server-path
 	 (string-trim-right
 	  (shell-command-to-string
-	   "wolframscript -code 'LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], LSPServerPath, \"Built-in LSPServer\"]'"))))
+	   (concat
+	    "wolframscript -code "
+	    "'"
+	    "LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; "
+	    "If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], "
+	    "LSPServerPath, "
+	    "\"Built-in LSPServer\"]"
+	    "'")))))
     (if (not (string= lsp-server-path "Built-in LSPServer"))
 	(if (yes-or-no-p
 	     (format "Found locally installed LSPServer in \"%s\".

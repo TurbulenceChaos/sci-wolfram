@@ -33,12 +33,12 @@ For emacs, formula output types: \"latex\" or \"image\" (by default)
 
 You can specify it by
 
-sciWolframImageDPI = \"latex\";
+sciWolframFormulaType = \"latex\";
 "
 
 sciWolframOrigExpr::usage = "sciWolframOrigExpr
 
-If or not display both inline images and original expression: \"yes\" (Enable) or \"no\" (disable by default)
+Whether to display both inline images and original expression: \"yes\" (Enable) or \"no\" (disable by default)
 
 You can specify it by
 
@@ -47,9 +47,9 @@ sciWolframOrigExpr = \"yes\";
 
 sciWolframPlay::usage = "sciWolframPlay
 
-Use `wolframplayer` to view `.cdf` files: \"yes\" (Enable) or \"no\" (disable by default)
+Whether to use `wolframplayer` to view `.cdf` files: \"yes\" (Enable) or \"no\" (disable by default)
 
-You can also specify the environment by
+You can specify it by
 
 sciWolframPlay = \"yes\";
 "
@@ -104,7 +104,7 @@ $Post=.
 Begin["`Private`"];
 
 sciWolframEnv =
-    If[Environment["TERM_PROGRAM"] == "vscode",
+    If[Environment["TERM_PROGRAM"] === "vscode",
         "vscode"
         ,
         "emacs"

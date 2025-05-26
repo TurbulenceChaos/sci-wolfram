@@ -49,11 +49,6 @@
 (require 'sci-wolfram)
 
 ;; diaply image and latex
-(defcustom sci-wolfram-jupyter-formula-type "image"
-  "Jupyter formula type. Options are \"image\" and \"latex\"."
-  :type '(choice (const "image") (const "latex"))
-  :group 'sci-wolfram-mode)
-
 (defun sci-wolfram-jupyter-clean-results ()
   "Clean jupyter-Wolfram-Language results."
   (let ((result-beg (org-babel-where-is-src-block-result)))
@@ -74,7 +69,7 @@
 	    (while (re-search-forward "^Out\\[\\([0-9]+\\)\\]" nil t)
 	      (replace-match ": Out[\\1]" nil nil))
 
-	    (when (string= sci-wolfram-jupyter-formula-type "latex")
+	    (when (string= sci-wolfram-formula-type "latex")
 	      (goto-char (point-min))
 	      (let ((latex-beg 0) (latex-end 0))
 		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
@@ -129,7 +124,7 @@
     (when (string= lang "jupyter-Wolfram-Language")
       (when (org-babel-where-is-src-block-result)
 	(sci-wolfram-jupyter-clean-results)
-	(when (string= sci-wolfram-jupyter-formula-type "latex")
+	(when (string= sci-wolfram-formula-type "latex")
 	  (sci-wolfram-jupyter-display-latex))))
     (sci-wolfram-jupyter-display-images)))
 

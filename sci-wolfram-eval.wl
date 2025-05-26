@@ -11,7 +11,7 @@ code =
             Module[{i = 0},
                 With[{expr = expr /. (HoldComplete :> HoldForm /; i++
                      == 0)},
-                    sciWolframDisplay[expr]
+                    ToString[sciWolframDisplay[expr]]
                 ]
             ]
         ] /@ exprs;
