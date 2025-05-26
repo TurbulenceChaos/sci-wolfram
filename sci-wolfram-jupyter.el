@@ -48,6 +48,49 @@
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
 
+;;;###autoload
+(defcustom org-babel-default-header-args:jupyter-Wolfram-Language
+  `((:async . "yes")
+    (:kernel . ,(string-trim-right
+                 (shell-command-to-string
+                  "jupyter kernelspec list | grep wolfram | awk '{print $1}' | head -1")))
+    (:session . "jupyter-wolfram-language")
+    (:results . "value drawer")
+    (:display . "text")
+    (:comments . "link")
+    (:eval . "never-export")
+    (:exports . "both"))
+  "Default header arguments for Jupyter-Wolfram-Language code blocks."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'sci-wolfram-mode)
+
+;;;###autoload
+(add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
+(add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram))
+
+;; tools
+(jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> f") #'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> e") #'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> j") #'sci-wolfram-jupyter-eval-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd "<f6> c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
+
+;; completion
+(defun sci-wolfram-jupyter-completion-at-point ()
+  (jupyter-org-with-src-block-client
+   (when (string= (org-element-property :language (org-element-at-point))
+		  "jupyter-Wolfram-Language")
+     (sci-wolfram-completion-at-point))))
+
+;;;###autoload
+(defun sci-wolfram-jupyter-add-completion ()
+  (add-hook 'completion-at-point-functions
+            #'sci-wolfram-jupyter-completion-at-point nil t))
+
+;;;###autoload
+(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
+
 ;; diaply image and latex
 (defun sci-wolfram-jupyter-clean-results ()
   "Clean jupyter-Wolfram-Language results."
@@ -96,10 +139,10 @@
   `(defun ,(intern (format "sci-wolfram-jupyter-display-%s" name)) ()
      ,doc
      (unless (or
-              ;; ...but not while emacs is exporting an org buffer
-              (bound-and-true-p org-export-current-backend)
-              ;; ...and not while tangling org buffers
-              (string-match-p "^ \\*temp" (buffer-name)))
+	      ;; ...but not while emacs is exporting an org buffer
+	      (bound-and-true-p org-export-current-backend)
+	      ;; ...and not while tangling org buffers
+	      (string-match-p "^ \\*temp" (buffer-name)))
        (save-excursion
          (let* ((beg (org-babel-where-is-src-block-result))
                 (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
@@ -131,33 +174,6 @@
 ;;;###autoload
 (add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
 
-;; sci-wolfram tools
-(jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> f") #'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> e") #'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
-
-(defun sci-wolfram-jupyter-completion-at-point ()
-  (jupyter-org-with-src-block-client
-   (when (string= (org-element-property :language (org-element-at-point))
-		  "jupyter-Wolfram-Language")
-     (sci-wolfram-completion-at-point))))
-
-;;;###autoload
-(defun sci-wolfram-jupyter-add-completion ()
-  (add-hook 'completion-at-point-functions
-            #'sci-wolfram-jupyter-completion-at-point nil t))
-
-;;;###autoload
-(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
-
-;;;###autoload
-(with-eval-after-load 'org
-  (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
-  (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
-
 
 (provide 'sci-wolfram-jupyter)
-
 ;;; sci-wolfram-jupyter.el ends here
