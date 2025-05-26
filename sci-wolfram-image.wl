@@ -15,7 +15,7 @@ sciWolframEnv = \"vscode\";
 
 sciWolframImageDPI::usage = "sciWolframImageDPI
 
-Image output resolution: 150 DPI by default
+Image output resolution: 100 DPI in \"vscode\" and  150 DPI in \"emacs\" by default
 
 You can specify it by
 
@@ -34,6 +34,15 @@ For emacs, formula output types: \"latex\" or \"image\" (by default)
 You can specify it by
 
 sciWolframImageDPI = \"latex\";
+"
+
+sciWolframOrigExpr::usage = "sciWolframOrigExpr
+
+If or not display both inline images and original expression: \"yes\" (Enable) or \"no\" (disable by default)
+
+You can specify it by
+
+sciWolframOrigExpr = \"yes\"; 
 "
 
 sciWolframPlay::usage = "sciWolframPlay
@@ -62,7 +71,7 @@ Display outputs as different formats
 
 $Post does not work in command line, 
 
-so you have to explicitly apply `sciWolframDisplay` function to the expression you want to display as image
+so you have to explicitly apply `sciWolframDisplay` function to the expression that you want to display as image
 
 For command line eval:
 
@@ -101,7 +110,14 @@ sciWolframEnv =
         "emacs"
     ];
 
-sciWolframImageDPI = 100;
+sciWolframImageDPI =
+    Switch[sciWolframEnv,
+        "vscode",
+            100
+        ,
+        "emacs",
+            150
+    ];
 
 sciWolframDeleteTempFile = "no";
 
@@ -112,13 +128,15 @@ sciWolframPlay = "no";
 sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory,
      2][[1]];
 
+sciWolframOrigExpr = "no";
+
 (* Initialize output counter *)
 
 n = 1;
 
 (* check if it is in repl or script *)
 
-sciWolframEnvironmentType[] :=
+sciWolframRunner[] :=
     If[MatchQ[$ScriptCommandLine, {_String, ___}],
         "script"
         ,
@@ -129,10 +147,10 @@ sciWolframEnvironmentType[] :=
 
 sciWolframText[expr_] :=
     Module[{},
-        Print[ToString[StringForm["Out[`1`]= ", n++]]];
+        Print[ToString[StringForm[": Out[`1`]= ", n++]]];
         Print[expr];
         (* Return the original expr *)
-        If[sciWolframEnvironmentType[] == "script",
+        If[sciWolframRunner[] == "script",
             expr
             ,
             expr;
@@ -143,14 +161,23 @@ sciWolframText[expr_] :=
 
 sciWolframTeX[expr_] :=
     Module[{},
-        Print[ToString[StringForm["Out[`1`]= ", n++]]];
+        Print[ToString[StringForm[": Out[`1`]= ", n++]]];
         Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
             ];
         (* Return the original expr *)
-        If[sciWolframEnvironmentType[] == "script",
-            expr
+        If[sciWolframRunner[] == "script",
+            If[sciWolframOrigExpr == "yes",
+                Print[expr];
+                expr
+                ,
+                expr
+            ]
             ,
-            expr;
+            If[sciWolframOrigExpr == "yes",
+                expr
+                ,
+                expr;
+            ]
         ]
     ];
 
@@ -172,14 +199,12 @@ sciWolframImage[expr_, playCDF_] :=
         (* Display image *)
         Switch[sciWolframEnv,
             "emacs",
-                Print[ToString[StringForm["Out[`1`]= ", n++]]];
+                Print[ToString[StringForm[": Out[`1`]= ", n++]]];
                 Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth
                      @ Directory[]] <> "]]"]
             ,
             "vscode",
-                If[sciWolframEnvironmentType[] == "repl",
-                    Run["imgcat " <> filePNG]
-                ];
+                Run["imgcat " <> filePNG];
                 (* Delete temp file *)
                 If[sciWolframDeleteTempFile == "yes",
                     Quiet @ DeleteFile @ filePNG
@@ -193,10 +218,19 @@ sciWolframImage[expr_, playCDF_] :=
                  -> DirectoryName[fileCDF]]
         ];
         (* Return the original expr *)
-        If[sciWolframEnvironmentType[] == "script",
-            expr
+        If[sciWolframRunner[] == "script",
+            If[sciWolframOrigExpr == "yes",
+                Print[expr];
+                expr
+                ,
+                expr
+            ]
             ,
-            expr;
+            If[sciWolframOrigExpr == "yes",
+                expr
+                ,
+                expr;
+            ]
         ]
     ];
 
@@ -217,7 +251,7 @@ sciWolframDisplay[expr_] :=
                         ]
                     ,
                     "vscode",
-                        expr
+                        Print[expr]
                 ]
             ,
             True,

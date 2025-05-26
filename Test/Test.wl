@@ -14,7 +14,7 @@ sciWolframEnv = "vscode";
 
 (* 2. sciWolframImageDPI
 
-Image output resolution: 150 DPI by default
+Image output resolution: Image output resolution: 100 DPI in "vscode" and  150 DPI in "emacs" by default
 
 You can specify it by
 
@@ -32,7 +32,17 @@ sciWolframImageDPI = "latex";
 
 *)
 
-(* 4. sciWolframPlay
+(* 4. sciWolframOrigExpr
+
+If or not display both inline images and original expression: "yes" (Enable) or "no" (disable by default)
+
+You can specify it by
+
+sciWolframOrigExpr = "yes";
+
+*)
+
+(* 5. sciWolframPlay
 
 Use `wolframplayer` to view `.cdf` files: "yes" (Enable) or "no" (disable by default)
 
@@ -42,7 +52,7 @@ sciWolframPlay = "yes";
 
 *)
 
-(* 5. sciWolframPlayer
+(* 6. sciWolframPlayer
 
 Path to the Wolfram Player, which is set as FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]] by default
 
@@ -54,13 +64,13 @@ sciWolframPlayer = "/path/to/wolframplayer.exe"; (for windows)
 
 *)
 
-(* sciWolframDisplay
+(* 7. sciWolframDisplay
 
 Display outputs as different formats
 
 $Post does not work in command line, 
 
-so you have to explicitly apply `sciWolframDisplay` function to the expression you want to display as image
+so you have to explicitly apply `sciWolframDisplay` function to the expression that you want to display as image
 
 For command line eval:
 
@@ -79,7 +89,7 @@ plot = Plot3D[sol2, {x, -10, 10}, {t, -5, 5}] // sciWolframDisplay
 
 *)
 
-(* 6. Notes: 
+(* 8. Notes: 
 
 1. In repl environment,
 
