@@ -22,20 +22,20 @@
   - [Installation for emacs](#installation-for-emacs)
     - [Prerequisites](#prerequisites-1)
     - [Configuration](#configuration-1)
-    - [Verify setup](#verify-setup-1)
-      - [For sci-wolfram-mode](#for-sci-wolfram-mode)
-        - [**`completion-at-point`**](#completion-at-point)
-        - [**`sci-wolfram-format-region-or-buffer`**](#sci-wolfram-format-region-or-buffer)
-        - [**`sci-wolfram-eval-region-or-buffer`**](#sci-wolfram-eval-region-or-buffer)
-        - [**`sci-wolfram-jupyter-eval-region-or-buffer`**](#sci-wolfram-jupyter-eval-region-or-buffer)
-        - [**`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`**](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
-        - [**`eglot`** or **`lsp-mode`**](#eglot-or-lsp-mode)
-        - [**`jupyter-send-region`**](#jupyter-send-region)
+  - [Usage](#usage)
+    - [For wolfram script file](#for-wolfram-script-file)
+      - [`completion-at-point`](#completion-at-point)
+      - [`sci-wolfram-format-region-or-buffer`](#sci-wolfram-format-region-or-buffer)
+      - [`sci-wolfram-eval-region-or-buffer`](#sci-wolfram-eval-region-or-buffer)
+      - [`sci-wolfram-jupyter-eval-region-or-buffer`](#sci-wolfram-jupyter-eval-region-or-buffer)
+      - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
+      - [`eglot` or `lsp-mode`](#eglot-or-lsp-mode)
+      - [`jupyter-send-region`](#jupyter-send-region)
       - [For jupyter wolfram src block in org-mode](#for-jupyter-wolfram-src-block-in-org-mode)
-        - [**`org-babel-execute-code`**](#org-babel-execute-code)
-        - [**`completion-at-point`**](#completion-at-point-1)
-        - [**`sci-wolfram-format-region-or-buffer`**](#sci-wolfram-format-region-or-buffer-1)
-        - [**`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`**](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-1)
+      - [`org-babel-execute-code`](#org-babel-execute-code)
+      - [`completion-at-point`](#completion-at-point-1)
+      - [`sci-wolfram-format-region-or-buffer`](#sci-wolfram-format-region-or-buffer-1)
+      - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-1)
   - [Reference](#reference)
 
 ---
@@ -116,7 +116,7 @@ Plot3D[sol2, {x, -10, 10}, {t, -5, 5}] // sciWolframDisplay
 
 Note: This process can be automatically done in emacs using `sci-wolfram.el` package. I haven't write vscode plugin to support it yet.
 
-Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.
+**Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
 
 ## Installation for emacs
 For emacs org-mode, formulas can be converted into LaTeX fragments, making it easy to paste them into Microsoft Word or LaTeX documents.
@@ -166,35 +166,35 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 
 ;; for more configurable parameters of `sci-wolfram' package, see https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-wolfram.el
 ```
-### Verify setup
-#### For sci-wolfram-mode
-##### **`completion-at-point`**
+## Usage
+### For wolfram script file
+#### `completion-at-point`
 
-##### **`sci-wolfram-format-region-or-buffer`**
+#### `sci-wolfram-format-region-or-buffer`
 
-##### **`sci-wolfram-eval-region-or-buffer`**
+#### `sci-wolfram-eval-region-or-buffer`
 
-##### **`sci-wolfram-jupyter-eval-region-or-buffer`**
+#### `sci-wolfram-jupyter-eval-region-or-buffer`
 
-##### **`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`**
+#### `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
-##### **`eglot`** or **`lsp-mode`**
+#### `eglot` or `lsp-mode`
 
-##### **`jupyter-send-region`**
+#### `jupyter-send-region`
 
 #### For jupyter wolfram src block in org-mode
 
-##### **`org-babel-execute-code`**
+#### `org-babel-execute-code`
 Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
 
-##### **`completion-at-point`**
+#### `completion-at-point`
 
-##### **`sci-wolfram-format-region-or-buffer`**
+#### `sci-wolfram-format-region-or-buffer`
 
-##### **`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`**
+#### `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
 See [Test.org](Test/Test.org) for more details.
 
