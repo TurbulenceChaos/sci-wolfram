@@ -56,9 +56,9 @@
 ;; - [o] eval region or buffer, and display output as images and latex in tmp buffer (ref: wolfram-mode pkg `EPrint');
 ;; - [o] convert wolfram script region or buffer to pdf and notebook, and use Wolfram Player to view notebook;
 ;; - [o] jupyter org-block find doc, completion-at-point, eval region, format region, convert region to pdf and notebook;
-;; - [o] jupyter repl, send line, region, buffer;
 ;; - [o] display wolfram images in jupyter repl;
 ;; - [o] `sci-wolfram-import-pkg': insert package based on emacs config;
+;; - [ ] Add more wolfram LSPServer symbols;
 ;; - [ ] `sci-wolfram-jupyter-eval' and `sci-wolfram-jupyter-comment' based on `jupyter-eval'
 ;; - [ ] plan to remove `emacs-jupyter' dependence by replacing `jupyter-repl' with native wolfram repl (ref: `imaxima' pkg);
 ;;       develop `ob-sci-wolfram' and add session support to it (ref: `ob-mathematica', `ob-jupyter' pkg)
