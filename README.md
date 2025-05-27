@@ -13,15 +13,9 @@
   - [Features](#features)
     - [Features for emacs](#features-for-emacs)
     - [Features for vscode](#features-for-vscode)
-  - [Installation for vscode](#installation-for-vscode)
+  - [Installation for emacs](#installation-for-emacs)
     - [Prerequisites](#prerequisites)
     - [Configuration](#configuration)
-    - [Verify setup](#verify-setup)
-      - [For repl](#for-repl)
-      - [For wolframscript command line](#for-wolframscript-command-line)
-  - [Installation for emacs](#installation-for-emacs)
-    - [Prerequisites](#prerequisites-1)
-    - [Configuration](#configuration-1)
   - [Usage](#usage)
     - [For wolfram script file](#for-wolfram-script-file)
       - [`completion-at-point`](#completion-at-point)
@@ -31,11 +25,17 @@
       - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
       - [`eglot` or `lsp-mode`](#eglot-or-lsp-mode)
       - [`jupyter-send-region`](#jupyter-send-region)
-      - [For jupyter wolfram src block in org-mode](#for-jupyter-wolfram-src-block-in-org-mode)
+    - [For jupyter wolfram src block in org-mode](#for-jupyter-wolfram-src-block-in-org-mode)
       - [`org-babel-execute-code`](#org-babel-execute-code)
       - [`completion-at-point`](#completion-at-point-1)
       - [`sci-wolfram-format-region-or-buffer`](#sci-wolfram-format-region-or-buffer-1)
       - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-1)
+  - [Installation for vscode](#installation-for-vscode)
+    - [Prerequisites](#prerequisites-1)
+    - [Configuration](#configuration-1)
+  - [Usage](#usage-1)
+    - [For repl](#for-repl)
+    - [For wolframscript command line](#for-wolframscript-command-line)
   - [Reference](#reference)
 
 ---
@@ -63,66 +63,7 @@ Display wolfram script images in vscode terminal.
 - [x] Display wolfram script images in vscode terminal using `imgcat`;
 - [x] Convert wolfram script to pdf and Mathematica notebook, and use `Wolfram Player` to view notebook; 
 
-## Installation for vscode
-### Prerequisites
-- **`wolframscript`** (free) and **`Wolfram Engine`** (free), or **`Mathematica`** (already include `wolframscript`)\
-Required for executing wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
-- **`imgcat`**\
-  Install using `pip install imgcat` to display images in vscode terminal.
-- **`Wolfram Player`**\
-Needed for viewing Mathematica notebook and `.cdf` files.\
-Both `Wolfram Engine` and `Mathematica` already include `Wolfram Player`, so you don't need to install it manually.
-
-### Configuration
-- Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in vscode settings, and make sure your system is using a discrete graphics card.
-![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
-
-- Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
-![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
-
-### Verify setup
-#### For repl
-Modify the path in below line and paste it into repl.
-```Mathematica
-Get["/path/to/sci-wolfram-image.wl"];
-```
-
-Then choose regions in wolfram script file, and send them into repl for execution through `Terminal: Run Selected Text In Active Terminal` vscode command.
-```Mathematica
-sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
-    Cos[t]}, y[x, t], {x, t}]
-
-sol2 = sol1[[1, 1, 2]]
-
-Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
-```
-
-Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
-
-![Wolfram script test](Images/wolfram-test.gif)
-
-#### For wolframscript command line
-For `wolframscript -script file.wl` command, `$post` doesn't work, so you need to explicitly add `sciWolframDisplay` function to the code to display images.
-```Mathematica
-Get["/path/to/sci-wolfram-image.wl"];
-
-sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
-    Cos[t]}, y[x, t], {x, t}] // sciWolframDisplay
-
-sol2 = sol1[[1, 1, 2]]
-
-Plot3D[sol2, {x, -10, 10}, {t, -5, 5}] // sciWolframDisplay
-```
-
-Note: This process can be automatically done in emacs using `sci-wolfram.el` package. I haven't write vscode plugin to support it yet.
-
-**Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
-
 ## Installation for emacs
-For emacs org-mode, formulas can be converted into LaTeX fragments, making it easy to paste them into Microsoft Word or LaTeX documents.
-
-You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
-
 ### Prerequisites
 - [Jupyter](https://jupyter.org/install)
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)\
@@ -130,7 +71,7 @@ Note: The latest version until 20/05/2025 is [9a26ac78743cc47084c9c99ff75c5aee26
 You need to download the wolfram jupyter repository and manually modify the `WolframLanguageForJupyter/Resources/RequestHandlers.wl` file according to this [commit](https://github.com/linux-xhyang/WolframLanguageForJupyter/commit/2a4ed08556a3f87e4b134b48d5b0bc44bc81fb8b)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)\
 Note: The latest version until 20/05/2025 is [3615c2de16988c4dd9d1978bfa10ee3092e85b33](https://github.com/emacs-jupyter/jupyter/tree/3615c2de16988c4dd9d1978bfa10ee3092e85b33), `completion-at-point` function does not work in jupyter org-block, see this [pull request](https://github.com/emacs-jupyter/jupyter/pull/582).\
-You have to overwrite the original `jupyter-org--set-src-block-cache` function manually, see my emacs config [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-emacs-jupyter.el).
+You have to overwrite the original `jupyter-org--set-src-block-cache` function manually, see my emacs config [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-emacs-jupyter.el) for example.
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 In linux, you can install it using `sudo apt install texlive-full` to preview latex fragments in org-mode.
 
@@ -182,9 +123,13 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 
 #### `jupyter-send-region`
 
-#### For jupyter wolfram src block in org-mode
+### For jupyter wolfram src block in org-mode
 
 #### `org-babel-execute-code`
+For emacs org-mode, formulas can be converted into LaTeX fragments, making it easy to paste them into Microsoft Word or LaTeX documents.
+
+You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
+
 Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
@@ -199,6 +144,61 @@ Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceCha
 See [Test.org](Test/Test.org) for more details.
 
 For my emacs configuration, please check out: [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs).
+
+## Installation for vscode
+### Prerequisites
+- **`wolframscript`** (free) and **`Wolfram Engine`** (free), or **`Mathematica`** (already include `wolframscript`)\
+Required for executing wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
+- **`imgcat`**\
+  Install using `pip install imgcat` to display images in vscode terminal.
+- **`Wolfram Player`**\
+Needed for viewing Mathematica notebook and `.cdf` files.\
+Both `Wolfram Engine` and `Mathematica` already include `Wolfram Player`, so you don't need to install it manually.
+
+### Configuration
+- Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in vscode settings, and make sure your system is using a discrete graphics card.
+![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
+
+- Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
+![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
+
+## Usage
+### For repl
+Modify the path in below line and paste it into repl.
+```Mathematica
+Get["/path/to/sci-wolfram-image.wl"];
+```
+
+Then choose regions in wolfram script file, and send them into repl for execution through `Terminal: Run Selected Text In Active Terminal` vscode command.
+```Mathematica
+sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
+    Cos[t]}, y[x, t], {x, t}]
+
+sol2 = sol1[[1, 1, 2]]
+
+Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+```
+
+Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
+
+![Wolfram script test](Images/wolfram-test.gif)
+
+### For wolframscript command line
+For `wolframscript -script file.wl` command, `$post` doesn't work, so you need to explicitly add `sciWolframDisplay` function to the code to display images.
+```Mathematica
+Get["/path/to/sci-wolfram-image.wl"];
+
+sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
+    Cos[t]}, y[x, t], {x, t}] // sciWolframDisplay
+
+sol2 = sol1[[1, 1, 2]]
+
+Plot3D[sol2, {x, -10, 10}, {t, -5, 5}] // sciWolframDisplay
+```
+
+Note: This process can be automatically done in emacs using `sci-wolfram.el` package. I haven't write vscode plugin to support it yet.
+
+**Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
 
 ## Reference
 for `sci-wolfram-image.wl`: 
