@@ -58,7 +58,8 @@
 ;; - [o] jupyter org-block find doc, completion-at-point, eval region, format region, convert region to pdf and notebook;
 ;; - [o] jupyter repl, send line, region, buffer;
 ;; - [o] display wolfram images in jupyter repl;
-;; - [ ] jupyter org-block insert package (ref: `jupyter-org-insert-src-block');
+;; - [o] `sci-wolfram-import-pkg': insert package based on emacs config;
+;; - [ ] `sci-wolfram-jupyter-eval' and `sci-wolfram-jupyter-comment' based on `jupyter-eval'
 ;; - [ ] plan to remove `emacs-jupyter' dependence by replacing `jupyter-repl' with native wolfram repl (ref: `imaxima' pkg);
 ;;       develop `ob-sci-wolfram' and add session support to it (ref: `ob-mathematica', `ob-jupyter' pkg)
 
@@ -642,15 +643,6 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
    xsynTable))
 
 ;; syntax coloring related
-(defface sci-wolfram-var-name
-  '((t :foreground "#2e8b57" :weight bold ))
-  "face for user variables."
-  :group 'sci-wolfram-mode)
-
-(face-spec-set
- 'sci-wolfram-var-name
- '((t :foreground "#2e8b57" :weight bold)))
-
 (defvar sci-wolfram-font-lock-keywords nil "Value for `font-lock-defaults'")
 
 (setq
@@ -664,12 +656,8 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
    (,(regexp-opt sci-wolfram-usr-functions 'symbols) . font-lock-function-name-face)
    (,(regexp-opt Constants 'symbols) . font-lock-builtin-face)
    (,(regexp-opt SystemLongNames 'symbols) . font-lock-constant-face)
-   ("\\b[a-z]+[0-9]*_+" . 'sci-wolfram-var-name)
-   ("#[0-9]" . 'sci-wolfram-var-name)
-   ("#+" . 'sci-wolfram-var-name)
    ("\\b[a-z][A-Za-z0-9]*" . font-lock-variable-name-face)
-   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-warning-face)
-   ))
+   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-warning-face)))
 
 ;; keybinding
 (defvar sci-wolfram-mode-map nil "Keybinding for `sci-wolfram-mode'")
