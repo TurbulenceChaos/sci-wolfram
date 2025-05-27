@@ -45,8 +45,7 @@ Display wolfram script images in vscode terminal.
 - [x] Send wolfram script to jupyter repl, and display images in it;
 - [x] Insert `sci-wolfram-image.wl` package based on your emacs config;
 - [ ] Execute wolfram script based on `jupyter-eval` when jupyter repl is started;
-- [ ] Add more wolfram symbols to font-lock-keywords. Currently, only `BuiltinFunctions`, `Constants`, and `SystemLongNames` are included;
-- [ ] Add gif doc.
+- [x] Add more wolfram symbols to font-lock-keywords.
 
 ## Features for vscode
 - [x] Display wolfram script images in vscode terminal using `imgcat`;
@@ -94,7 +93,8 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 (unless (package-installed-p 'sci-wolfram)
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
-;; for more configurable parameters of `sci-wolfram' package, see https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-wolfram.el
+;; for more configurable parameters of `sci-wolfram' package, see 
+https://github.com/TurbulenceChaos/sci-wolfram/blob/main/sci-wolfram.el
 ```
 # Usage for emacs
 ## For wolfram script file
@@ -119,7 +119,7 @@ For emacs org-mode, formulas can be converted into LaTeX fragments, making it ea
 
 You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
 
-demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
+demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
@@ -167,7 +167,7 @@ sol2 = sol1[[1, 1, 2]]
 Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 ```
 
-demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
+demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/wolfram-test.gif)  
 
 ![Wolfram script test](Images/wolfram-test.gif)
 

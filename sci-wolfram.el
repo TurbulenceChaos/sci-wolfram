@@ -127,8 +127,7 @@
 ;; - [o] Send wolfram script to jupyter repl, and display images in it;
 ;; - [o] Insert `sci-wolfram-image.wl' package based on your emacs config;
 ;; - [ ] Execute wolfram script based on `jupyter-eval' when jupyter repl is started;
-;; - [ ] Add more wolfram symbols to font-lock-keywords. Currently, only `BuiltinFunctions', `Constants', and `SystemLongNames' are included;
-;; - [ ] Add gif doc.
+;; - [o] Add more wolfram symbols to font-lock-keywords.
 
 (defcustom sci-wolfram-image-dpi 150
   "sci-wolfram-image-dpi
@@ -672,16 +671,13 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 
 (setq
  sci-wolfram-mode-syntax-table
- (let ((xsynTable (make-syntax-table )))
-
+ (let ((xsynTable (make-syntax-table)))
    ;; comment
    (modify-syntax-entry ?\( "()1n" xsynTable)
    (modify-syntax-entry ?\) ")(4n" xsynTable)
    (modify-syntax-entry ?* ". 23n" xsynTable)
-
    ;; symbol
    (modify-syntax-entry ?$ "_" xsynTable)
-
    ;; punctuation
    (modify-syntax-entry ?! "." xsynTable)
    (modify-syntax-entry ?# "." xsynTable)
@@ -714,36 +710,31 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 
 (setq
  sci-wolfram-font-lock-keywords
- `(
-   (,(regexp-opt BuiltinFunctions-1 'symbols) . font-lock-function-name-face)
+ `((,(regexp-opt BuiltinFunctions-1 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-2 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-3 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-4 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
    (,(regexp-opt sci-wolfram-usr-functions 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt Constants 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt Constants 'symbols) . font-lock-constant-face)
    (,(regexp-opt SystemLongNames 'symbols) . font-lock-constant-face)
+   (,(regexp-opt SpecialLongNames 'symbols) . font-lock-constant-face)
+   (,(regexp-opt UndocumentedLongNames 'symbols) . font-lock-type-face)
+   (,(regexp-opt FreeLongNames 'symbols) . font-lock-variable-name-face)
+   (,(regexp-opt SystemCharacters) . font-lock-constant-face)
+   (,(regexp-opt SpecialCharacters) . font-lock-keyword-face)
+   (,(regexp-opt UndocumentedCharacters) . font-lock-type-face)
+   (,(regexp-opt FreeCharacters) . font-lock-variable-name-face)
+   (,(regexp-opt Options 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt SessionSymbols 'symbols) . font-lock-preprocessor-face)
+   (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-warning-face)
+   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-type-face)
+   (,(regexp-opt ObsoleteSymbols 'symbols) . font-lock-comment-face)
+   (,(regexp-opt BadSymbols 'symbols) . font-lock-warning-face)
+   (,(regexp-opt UnsupportedCharacters) . font-lock-comment-face)
+   (,(regexp-opt UnsupportedLongNames 'symbols) . font-lock-comment-face)
    ("\\b[a-z][A-Za-z0-9]*" . font-lock-variable-name-face)
-   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-warning-face)))
-
-;; keybinding
-(defvar sci-wolfram-mode-map nil "Keybinding for `sci-wolfram-mode'")
-(setq sci-wolfram-mode-map (make-sparse-keymap))
-(define-prefix-command 'sci-wolfram-leader-map)
-
-(define-key sci-wolfram-mode-map
-	    (kbd (if (boundp 'sci-wolfram-major-leader-key)
-		     sci-wolfram-major-leader-key
-		   "<f6>"))
-	    sci-wolfram-leader-map)
-(define-key sci-wolfram-leader-map (kbd "SPC") #'sci-wolfram-complete-symbol)
-(define-key sci-wolfram-leader-map (kbd "h") #'sci-wolfram-doc-lookup)
-(define-key sci-wolfram-leader-map (kbd "f") #'sci-wolfram-format-region-or-buffer)
-(define-key sci-wolfram-leader-map (kbd "e") #'sci-wolfram-eval-region-or-buffer)
-(define-key sci-wolfram-leader-map (kbd "j") #'sci-wolfram-jupyter-eval-region-or-buffer)
-(define-key sci-wolfram-leader-map (kbd "c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
-
-(defvar sci-wolfram-mode-hook nil "Hook for function `sci-wolfram-mode'.")
+   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-type-face)))
 
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
@@ -752,6 +743,18 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
   (setq font-lock-defaults '((sci-wolfram-font-lock-keywords)))
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
+
+;; keybinding
+(defcustom sci-wolfram-mode-leader-key "<f6>" "leader key in `sci-wolfram-mode'"
+  :type 'string
+  :group 'sci-wolfram-mode)
+
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " c")) #'sci-wolfram-complete-symbol)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " h")) #'sci-wolfram-doc-lookup)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " f")) #'sci-wolfram-format-region-or-buffer)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " e")) #'sci-wolfram-eval-region-or-buffer)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " j")) #'sci-wolfram-jupyter-eval-region-or-buffer)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " p")) #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))

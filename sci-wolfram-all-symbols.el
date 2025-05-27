@@ -44,9 +44,24 @@ If not, copy them from the Data-example folder."
 	 nil t)))))
 
 (add-to-list 'load-path (expand-file-name "Data" (file-name-directory (or load-file-name buffer-file-name))))
-(require 'SystemLongNames)
 (require 'BuiltinFunctions)
 (require 'Constants)
+(require 'SystemLongNames)
+(require 'SpecialLongNames)
+(require 'UndocumentedLongNames)
+(require 'FreeLongNames)
+(require 'SystemCharacters)
+(require 'SpecialCharacters)
+(require 'UndocumentedCharacters)
+(require 'FreeCharacters)
+(require 'Options)
+(require 'SessionSymbols)
+(require 'ExperimentalSymbols)
+(require 'UndocumentedSymbols)
+(require 'ObsoleteSymbols)
+(require 'BadSymbols)
+(require 'UnsupportedCharacters)
+(require 'UnsupportedLongNames)
 
 (defcustom sci-wolfram-usr-functions '()
   "Add Additional Wolfram Language symbols."
@@ -59,14 +74,29 @@ If not, copy them from the Data-example folder."
 
 (setq sci-wolfram-all-symbols
       (append
-       SystemLongNames
        BuiltinFunctions-1
        BuiltinFunctions-2
        BuiltinFunctions-3
        BuiltinFunctions-4
        BuiltinFunctions-5
+       sci-wolfram-usr-functions
        Constants
-       sci-wolfram-usr-functions))
+       SystemLongNames
+       SpecialLongNames
+       UndocumentedLongNames
+       FreeLongNames
+       SystemCharacters
+       SpecialCharacters
+       UndocumentedCharacters
+       FreeCharacters
+       Options
+       SessionSymbols
+       ExperimentalSymbols
+       UndocumentedSymbols
+       ObsoleteSymbols
+       BadSymbols
+       UnsupportedCharacters
+       UnsupportedLongNames))
 
 
 (provide 'sci-wolfram-all-symbols)

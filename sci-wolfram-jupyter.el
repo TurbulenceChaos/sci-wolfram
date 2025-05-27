@@ -5,7 +5,7 @@
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages processes tools 
-;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram-jupyter
+;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
@@ -31,13 +31,13 @@
 
 ;;; Commentary:
 ;;
-;; Display wolfram script graphics in emacs org-mode.
+;; Display wolfram script images in emacs org-mode.
 ;;
 ;; Installation:
 ;;
 ;; Please check README.md.
-
-;; See https://github.com/TurbulenceChaos/sci-wolfram-jupyter for more information.
+;;
+;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
@@ -60,7 +60,7 @@
     (:comments . "link")
     (:eval . "never-export")
     (:exports . "both"))
-  "Default header arguments for Jupyter-Wolfram-Language code blocks."
+  "Default header arguments for `Jupyter-Wolfram-Language' block."
   :type '(alist :key-type symbol :value-type string)
   :group 'sci-wolfram-mode)
 
@@ -69,12 +69,18 @@
 (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram))
 
 ;; tools
-(jupyter-org-define-key (kbd "<f6> SPC") #'sci-wolfram-complete-symbol 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> h") #'sci-wolfram-doc-lookup 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> f") #'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> e") #'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> j") #'sci-wolfram-jupyter-eval-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd "<f6> c") #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " c"))
+			#'sci-wolfram-complete-symbol 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " h"))
+			#'sci-wolfram-doc-lookup 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " f"))
+			#'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " e"))
+			#'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " j"))
+			#'sci-wolfram-jupyter-eval-region-or-buffer 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " p"))
+			#'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
 
 ;; completion
 (defun sci-wolfram-jupyter-completion-at-point ()
@@ -115,8 +121,10 @@
 	    (when (string= sci-wolfram-formula-type "latex")
 	      (goto-char (point-min))
 	      (let ((latex-beg 0) (latex-end 0))
-		(while (setq latex-beg (re-search-forward "^\\\\begin{equation\\*}" nil t))
-		  (setq latex-end (re-search-forward "^\\\\end{equation\\*}" nil t))
+		(while (setq latex-beg
+			     (re-search-forward "^\\\\begin{equation\\*}" nil t))
+		  (setq latex-end
+			(re-search-forward "^\\\\end{equation\\*}" nil t))
 		  (save-restriction
 		    (narrow-to-region latex-beg latex-end)
 		    ;; Remove blank lines
@@ -135,7 +143,7 @@
 		      (replace-match "\\1" nil nil))))))))))))
 
 (defmacro sci-wolfram-jupyter-display-marco (name body doc)
-  "Use marco to define a function to display latex and image after executing jupyter-Wolfram-Language block."
+  "Use marco to define a function to display latex and image after executing `jupyter-Wolfram-Language' block."
   `(defun ,(intern (format "sci-wolfram-jupyter-display-%s" name)) ()
      ,doc
      (unless (or
