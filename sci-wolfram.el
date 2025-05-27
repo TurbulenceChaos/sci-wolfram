@@ -6,7 +6,7 @@
 ;; Created: 2025-05-20
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, Wolfram Language, Mathematica
-;; Homepage: https://github.com/TurbulenceChaos/Wolfram-terminal-image
+;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
@@ -34,34 +34,101 @@
 ;;
 ;; Major mode for editing Wolfram Language code
 ;;
-;; Installation:
+;; Installation and usage:
 ;;
 ;; Please check README.md.
 ;;
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
-;;; How to use:
-;; M-x describe-function then sci-wolfram-mode to see documentation.
-
 ;;; Customization:
-;; (setq sci-wolfram-major-leader-key "TAB")
+;; 1. sci-wolfram-formula-type
+;;
+;; For emacs, formula output types:
+;;
+;; "latex" or "image" (by default)
+;;
+;; You can also specify it by
+;;
+;; (custom-set-variables
+;;  '(sci-wolfram-formula-type "latex"))
+;;
+;; 2. sci-wolfram-image-dpi
+;;
+;; Image output resolution:
+;;
+;; 150 DPI in "emacs" by default
+;;
+;; You can specify it by
+;;
+;; (custom-set-variables
+;;  '(sci-wolfram-image-dpi 150))
+;;
+;; 3. sci-wolfram-orig-expr
+;;
+;; Whether to display both inline images and original expression:
+;;
+;; "yes" (Enable) or "no" (disable by default)
+;;
+;; You can specify it by
+;;
+;; (custom-set-variables
+;;  '(sci-wolfram-orig-expr "yes"))
+;;
+;; 4. sci-wolfram-play
+;;
+;; Whether to use `wolframplayer' to view `.cdf' files:
+;;
+;; "yes" (Enable) or "no" (disable by default)
+;;
+;; You can specify it by
+;;
+;; (custom-set-variables
+;;  '(sci-wolfram-play "yes"))
+;;
+;; 5. sci-wolfram-player
+;;
+;; Path to the Wolfram Player, which is set as
+;;
+;; (string-trim-right
+;;    (shell-command-to-string
+;;     "wolframscript -code 'FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]]'"))
+;;
+;; You can also specify the path by
+;;
+;; for linux:
+;;
+;; (custom-set-variables
+;;  '(sci-wolfram-player "/path/to/wolframplayer"))
+;;
+;; for windows:
+;; (custom-set-variables
+;;  '(sci-wolfram-player "/path/to/wolframplayer.exe"))
+;;
+;; 6. Notes: 
+;;
+;; (1) In repl environment (such as jupyter repl, jupyter org block),
+;;
+;; if you want to restore `$Post` to its original state, just execute
+;;
+;; $Post=.
+;;
+;; (2) `%` operator works only in repl env
 
 ;;; Code:
 
 ;; TODO:
-;; - [o] add wolfram LSPServer symbols;
-;; - [o] add all wolfram LSPServer symbols to `completion-at-point' when `eglot' or `lsp-mode'=nil
-;; - [o] use `CodeFormatter' to format region or buffer when `eglot' or `lsp-mode'=nil (ref: `format-all' pkg);
-;; - [o] use `eglot' or `lsp-mode' to format wolframscript region or buffer and complete wolfram symbols;
-;; - [o] eval region or buffer, and display output as images and latex in tmp buffer (ref: wolfram-mode pkg `EPrint');
-;; - [o] convert wolfram script region or buffer to pdf and notebook, and use Wolfram Player to view notebook;
-;; - [o] jupyter org-block find doc, completion-at-point, eval region, format region, convert region to pdf and notebook;
-;; - [o] display wolfram images in jupyter repl;
-;; - [o] `sci-wolfram-import-pkg': insert package based on emacs config;
-;; - [ ] Add more wolfram LSPServer symbols;
-;; - [ ] `sci-wolfram-jupyter-eval' and `sci-wolfram-jupyter-comment' based on `jupyter-eval'
-;; - [ ] plan to remove `emacs-jupyter' dependence by replacing `jupyter-repl' with native wolfram repl (ref: `imaxima' pkg);
-;;       develop `ob-sci-wolfram' and add session support to it (ref: `ob-mathematica', `ob-jupyter' pkg)
+;; - [o] Automatically read wolfram symbols from built-in `LSPServer' package and convert them to emacs variables.
+;; - [o] Add wolfram symbols to `completion-at-point' when lsp server is not available;
+;; - [o] Use `CodeFormatter' to format code when lsp server is not available;
+;; - [o] Add `LSPServer' to `eglot' or `lsp-mode' to support code formatting and completion;
+;; - [o] Execute wolfram script and display images and latex in tmp buffer;
+;; - [o] Convert wolfram script to pdf and Mathematica notebook, and use `wolframplayer' to view notebook;
+;; - [o] `jupyter-Wolfram-Language' src-block in org-mode: find doc, `completion-at-point', format, convert to pdf and notebook;
+;; - [o] Send wolfram script to jupyter repl, and display images in it;
+;; - [o] Insert `sci-wolfram-image.wl' package based on your emacs config;
+;; - [ ] Execute wolfram script based on `jupyter-eval' when jupyter repl is started;
+;; - [ ] Add more wolfram symbols to font-lock-keywords. Currently, only `BuiltinFunctions', `Constants', and `SystemLongNames' are included;
+;; - [ ] Add gif doc.
 
 (defcustom sci-wolfram-image-dpi 150
   "sci-wolfram-image-dpi

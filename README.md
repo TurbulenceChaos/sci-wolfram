@@ -6,54 +6,54 @@
 
 ---
 
-## Table of contents
+# Table of contents
 - [sci-wolfram](#sci-wolfram)
-  - [Table of contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Features](#features)
-    - [Features for emacs](#features-for-emacs)
-    - [Features for vscode](#features-for-vscode)
-  - [Installation for emacs](#installation-for-emacs)
-    - [Prerequisites](#prerequisites)
-    - [Configuration](#configuration)
-  - [Usage](#usage)
-    - [For wolfram script file](#for-wolfram-script-file)
-    - [For jupyter wolfram src block in org-mode](#for-jupyter-wolfram-src-block-in-org-mode)
-  - [Installation for vscode](#installation-for-vscode)
-    - [Prerequisites](#prerequisites-1)
-    - [Configuration](#configuration-1)
-  - [Usage](#usage-1)
-    - [For repl](#for-repl)
-    - [For wolframscript command line](#for-wolframscript-command-line)
-  - [Reference](#reference)
+- [Table of contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Features](#features)
+  - [Features for emacs](#features-for-emacs)
+  - [Features for vscode](#features-for-vscode)
+- [Installation for emacs](#installation-for-emacs)
+  - [Prerequisites](#prerequisites)
+  - [Configuration](#configuration)
+- [Usage for emacs](#usage-for-emacs)
+  - [For wolfram script file](#for-wolfram-script-file)
+  - [For `jupyter-Wolfram-Language` src-block in org-mode](#for-jupyter-wolfram-language-src-block-in-org-mode)
+- [Installation for vscode](#installation-for-vscode)
+  - [Prerequisites](#prerequisites-1)
+  - [Configuration](#configuration-1)
+- [Usage for vscode](#usage-for-vscode)
+  - [For repl](#for-repl)
+  - [For wolframscript command line](#for-wolframscript-command-line)
+- [Reference](#reference)
 
 ---
-## Introduction
+# Introduction
 An all-in-one wolfram package for emacs.
 
 Display wolfram script images in vscode terminal.
 
-## Features
-### Features for emacs
-- [x] Automatically read and split all wolfram symbols from system built-in `LSPServer` package, and convert them to emacs variables. 
-- [x] Add all wolfram LSPServer symbols to `completion-at-point` when `eglot` or `lsp-mode` are closed;
-- [x] Use `CodeFormatter` to format region or buffer when `eglot` or `lsp-mode` are closed;
-- [x] Add wolfram `LSPServer` to `eglot` or `lsp-mode`, which can format code and complete wolfram symbols;
-- [x] Execute region or buffer and display output as images and latex in tmp buffer;
-- [x] Convert region or buffer to pdf and Mathematica notebook, and use `Wolfram Player` to view notebook;
-- [x] Jupyter wolfram org-block find doc, completion-at-point, eval, format, convert to pdf and notebook;
-- [x] Send region or buffer to jupyter repl, and display images in it;
-- [x] Insert `sci-wolfram-image.wl` package with parameters based on your emacs config;
-- [ ] Execute region or buffer based on `jupyter-eval` when jupyter repl start;
-- [ ] Add more wolfram LSPServer symbols to `font-lock-keywords`. Currently, only `BuiltinFunctions`, `Constants`, `SystemLongNames` are included;
+# Features
+## Features for emacs
+- [x] Automatically read wolfram symbols from built-in `LSPServer` package and convert them to emacs variables.
+- [x] Add wolfram symbols to `completion-at-point` when lsp server is not available;
+- [x] Use `CodeFormatter` to format code when lsp server is not available;
+- [x] Add `LSPServer` to `eglot` or `lsp-mode` to support code formatting and completion;
+- [x] Execute wolfram script and display images and latex in tmp buffer;
+- [x] Convert wolfram script to pdf and Mathematica notebook, and use `Wolfram Player` to view notebook;
+- [x] `jupyter-Wolfram-Language` src-block in org-mode: find doc, `completion-at-point`, format, convert to pdf and notebook;
+- [x] Send wolfram script to jupyter repl, and display images in it;
+- [x] Insert `sci-wolfram-image.wl` package based on your emacs config;
+- [ ] Execute wolfram script based on `jupyter-eval` when jupyter repl is started;
+- [ ] Add more wolfram symbols to font-lock-keywords. Currently, only `BuiltinFunctions`, `Constants`, and `SystemLongNames` are included;
 - [ ] Add gif doc.
 
-### Features for vscode
+## Features for vscode
 - [x] Display wolfram script images in vscode terminal using `imgcat`;
 - [x] Convert wolfram script to pdf and Mathematica notebook, and use `Wolfram Player` to view notebook; 
 
-## Installation for emacs
-### Prerequisites
+# Installation for emacs
+## Prerequisites
 - [Jupyter](https://jupyter.org/install)
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)\
 Note: The latest version until 20/05/2025 is [9a26ac78743cc47084c9c99ff75c5aee2657a409](https://github.com/WolframResearch/WolframLanguageForJupyter/tree/9a26ac78743cc47084c9c99ff75c5aee2657a409), which can not display images in emacs jupyter-repl, see this [issue](https://github.com/emacs-jupyter/jupyter/issues/223#issuecomment-927137191).\
@@ -64,7 +64,7 @@ You have to overwrite the original `jupyter-org--set-src-block-cache` function m
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 In linux, you can install it using `sudo apt install texlive-full` to preview latex fragments in org-mode.
 
-### Configuration
+## Configuration
 ```lisp
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -96,8 +96,8 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 
 ;; for more configurable parameters of `sci-wolfram' package, see https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-wolfram.el
 ```
-## Usage
-### For wolfram script file
+# Usage for emacs
+## For wolfram script file
 `completion-at-point`
 
 `sci-wolfram-format-region-or-buffer`
@@ -112,7 +112,7 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 
 `jupyter-send-region`
 
-### For jupyter wolfram src block in org-mode
+## For `jupyter-Wolfram-Language` src-block in org-mode
 `org-babel-execute-code`
 
 For emacs org-mode, formulas can be converted into LaTeX fragments, making it easy to paste them into Microsoft Word or LaTeX documents.
@@ -133,8 +133,8 @@ See [Test.org](Test/Test.org) for more details.
 
 For my emacs configuration, please check out: [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs).
 
-## Installation for vscode
-### Prerequisites
+# Installation for vscode
+## Prerequisites
 - **`wolframscript`** (free) and **`Wolfram Engine`** (free), or **`Mathematica`** (already include `wolframscript`)\
 Required for executing wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
 - **`imgcat`**\
@@ -143,15 +143,15 @@ Required for executing wolfram scripts, which can be downloaded from https://www
 Needed for viewing Mathematica notebook and `.cdf` files.\
 Both `Wolfram Engine` and `Mathematica` already include `Wolfram Player`, so you don't need to install it manually.
 
-### Configuration
+## Configuration
 - Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in vscode settings, and make sure your system is using a discrete graphics card.
 ![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
 
 - Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
 ![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
 
-## Usage
-### For repl
+# Usage for vscode
+## For repl
 Modify the path in below line and paste it into repl.
 ```Mathematica
 Get["/path/to/sci-wolfram-image.wl"];
@@ -171,7 +171,7 @@ demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-ima
 
 ![Wolfram script test](Images/wolfram-test.gif)
 
-### For wolframscript command line
+## For wolframscript command line
 For `wolframscript -script file.wl` command, `$post` doesn't work, so you need to explicitly add `sciWolframDisplay` function to the code to display images.
 ```Mathematica
 Get["/path/to/sci-wolfram-image.wl"];
@@ -188,7 +188,7 @@ Note: This process can be automatically done in emacs using `sci-wolfram.el` pac
 
 **Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
 
-## Reference
+# Reference
 for `sci-wolfram-image.wl`: 
 - [Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 - [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
