@@ -172,16 +172,24 @@ for windows:
 	    (file (if (string= buffer-type "file")
 		      buffer-file-name
 		    ;; for edit org-src block, where buffer is not a file
-		    (let ((dir (concat temporary-file-directory "sci-wolfram")))
+		    (let* ((dir default-directory)
+			   (filename (expand-file-name
+				      (format "%s-%s-%x.wl"
+					      (replace-regexp-in-string
+					       "^-\\|-$"
+					       ""
+					       (replace-regexp-in-string
+						"[^a-z0-9]+"
+						"-"
+						(downcase (buffer-name))))
+					      (format-time-string "%Y%m%d-%H%M%S")
+					      (random #xfffff))
+				      dir)))
 		      (unless (file-directory-p dir)
 			(make-directory dir t))
-		      (with-temp-file (expand-file-name
-				       (format "%s-%s-%x.wl"
-					       (file-name-base file)
-					       (format-time-string "%Y%m%d%-H%M%S")
-					       (random #xfffff))
-				       dir)
-			(insert code)))))
+		      (with-temp-file filename
+			(insert code))
+		      filename)))
 	    (dir (file-name-directory file))
 	    (tmpfile (expand-file-name
 		      (format "%s-%s-%x.wl"
@@ -232,8 +240,8 @@ to format wolfram region or buffer code.")
       (expand-file-name "sci-wolfram-image.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
 
-(defun import-sci-wolfram-pkg ()
-  "Import `sci-wolfram-image.wl' package"
+(defun sci-wolfram-import-pkg-string ()
+  "Import `sci-wolfram-image.wl' package to string"
   (concat
    (format
     "Get[\"%s\"];\n\n"
@@ -254,6 +262,14 @@ to format wolfram region or buffer code.")
     "sciwolframPlayer = \"%s\";"
     sci-wolfram-player)))
 
+(defun sci-wolfram-import-pkg ()
+  "Insert `sci-wolfram-image.wl' package at point"
+  (interactive)
+  (let ((pkg (sci-wolfram-import-pkg-string)))
+    (save-excursion
+      (forward-line 1)
+      (insert (concat pkg "\n")))))
+
 (defun sci-wolfram-eval (state buffer-type file tmpfile)
   "Execute file with `wolframscript' and pretty print all expressions."
   (let* ((wrap-code
@@ -261,7 +277,7 @@ to format wolfram region or buffer code.")
 	   (shell-command-to-string
 	    (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile))))) 
     (with-temp-file tmpfile
-      (insert (concat (import-sci-wolfram-pkg) "\n\n" wrap-code))))
+      (insert (concat (sci-wolfram-import-pkg-string) "\n\n" wrap-code))))
 
   (let ((outbuf (get-buffer-create
 		 (format
@@ -305,9 +321,9 @@ to format wolfram region or buffer code.")
 	       (org-mode))
 	     (visual-line-mode 1)
 	     (goto-char (point-min))
-	     (when (string= sci-wolfram-formula-type "latex"
-			    (org-remove-latex-fragment-image-overlays)
-			    (org-toggle-latex-fragment)))
+	     (when (string= sci-wolfram-formula-type "latex")
+	       (org-remove-latex-fragment-image-overlays)
+	       (org-toggle-latex-fragment))
 	     (org-remove-inline-images)
 	     (org-toggle-inline-images)
 	     (goto-char (point-max)))))))
@@ -334,13 +350,13 @@ to format wolfram region or buffer code.")
       (insert (concat
 	       "#+name: sci-wolfram-import-pkg\n"
 	       "#+begin_src jupyter-Wolfram-Language\n"
-	       (import-sci-wolfram-pkg)
+	       (sci-wolfram-import-pkg-string)
 	       "\n#+end_src\n\n"))
 
       (insert (format "Insert code from %s\n\n" tmpfile))
       (insert (concat
 	       (if (string= state "region")
-		   (format "#+name: sci-wolfram-jupyter-eval-region-of-%s\n" file)
+		   (format "#+name: sci-wolfram-jupyter-eval-region-of-%s\n" (file-name-nondirectory file))
 		 (format "#+name: sci-wolfram-jupyter-eval-%s\n" (file-name-nondirectory file)))
 	       "#+begin_src jupyter-Wolfram-Language\n"
 	       (string-trim-right
@@ -357,7 +373,7 @@ to format wolfram region or buffer code.")
 
       (insert "Run `org-babel-execute-buffer'")
 
-      ;; (org-fold-hide-block-all)
+      (org-fold-hide-block-all)
       (org-babel-execute-buffer))
     (display-buffer outbuf)))
 

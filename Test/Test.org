@@ -1,92 +1,22 @@
-#+Title: Testing Wolfram Terminal Image Package
+#+Title: Sci-Wolfram Test
 #+Author: Peng Peng
 #+Email: 211110103110@stu.just.edu.cn
 #+GitHub: https://github.com/TurbulenceChaos
 
-#+name: Import-Wolfram-terminal-image-package
-#+begin_src jupyter-Wolfram-Language :results silent
-  (* Get["https://raw.githubusercontent.com/TurbulenceChaos/Wolfram-terminal-image/refs/heads/main/WolframTerminalImage.wl"]; *)
-
-  Get["~/.emacs.d/elpa/Wolfram-terminal-image/WolframTerminalImage.wl"];
-
-  (* Specify the terminal type for Wolfram terminal images (options: "vscode", "emacs") *)
-
-  wolframTerminalType = "emacs";
-
-  (* Set the resolution (in DPI) for Wolfram terminal images *)
-
-  wolframTerminalImageResolution = 150;
-
-  (* Specify the formula type for emacs (options: "latex", "image") *)
-
-  wolframTerminalFormulaType = "latex";
-
-  (* Enable ("yes") or disable ("no") playback of Wolfram terminal CDF files *)
-
-  wolframTerminalPlay = "no";
-
-  (* Specify the player application for Wolfram terminal CDF files *)
-
-  (* Options: "/path/to/wolframplayer" for Linux or WSL2, "/path/to/wolframplayer.exe" for Windows or WSL2 *)
-
-  wolframTerminalPlayer = "wolframplayer";
-
-  (* To restore `$Post` to its original state, simply execute "$Post=." *)
-#+end_src
-
-#+name: Wolfram-test
+#+name: sci-wolfram-import-pkg
 #+begin_src jupyter-Wolfram-Language
-  sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
-     Cos[t]}, y[x, t], {x, t}]
-
-  sol2 = sol1[[1, 1, 2]]
-
-  Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]  
-
-  MatrixForm[Array[Subscript[a, ##] &, {2, 2, 2}]]
+(* Please run `M-x sci-wolfram-import-pkg` from this line *)
 #+end_src
 
-#+RESULTS: Wolfram-test
-:results:
-: Out[1]=
-\begin{equation*}
-\left\{\left\{y(x,t)\to \frac{1}{2} \left(2 \cos
-    \left(t-\frac{x}{2}\right)-\cos (x)+1\right)\right\}\right\}
-\end{equation*}
-: Out[2]=
-\begin{equation*}
-\frac{1}{2} \left(2 \cos \left(t-\frac{x}{2}\right)-\cos (x)+1\right)
-\end{equation*}
-: Out[3]=
-[[file:tmp/wolfram/wolfram-dd2286a1-7b3f-43ba-8412-eb959523e3eb.png]]
-: Out[4]=
-\begin{equation*}
-\left(
-\begin{array}{cc}
- \left(
-\begin{array}{c}
- a_{1,1,1} \\
- a_{1,1,2} \\
-\end{array}
-\right) & \left(
-\begin{array}{c}
- a_{1,2,1} \\
- a_{1,2,2} \\
-\end{array}
-\right) \\
- \left(
-\begin{array}{c}
- a_{2,1,1} \\
- a_{2,1,2} \\
-\end{array}
-\right) & \left(
-\begin{array}{c}
- a_{2,2,1} \\
- a_{2,2,2} \\
-\end{array}
-\right) \\
-\end{array}
-\right)
-\end{equation*}
-:end:
+#+name: sci-wolfram-eval-code
+#+begin_src jupyter-Wolfram-Language
+sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
+    Cos[t]}, y[x, t], {x, t}]
+
+sol2 = sol1[[1, 1, 2]]
+
+Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+
+MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
+#+end_src
 
