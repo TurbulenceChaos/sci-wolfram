@@ -18,18 +18,7 @@
     - [Configuration](#configuration)
   - [Usage](#usage)
     - [For wolfram script file](#for-wolfram-script-file)
-      - [`completion-at-point`](#completion-at-point)
-      - [`sci-wolfram-format-region-or-buffer`](#sci-wolfram-format-region-or-buffer)
-      - [`sci-wolfram-eval-region-or-buffer`](#sci-wolfram-eval-region-or-buffer)
-      - [`sci-wolfram-jupyter-eval-region-or-buffer`](#sci-wolfram-jupyter-eval-region-or-buffer)
-      - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
-      - [`eglot` or `lsp-mode`](#eglot-or-lsp-mode)
-      - [`jupyter-send-region`](#jupyter-send-region)
     - [For jupyter wolfram src block in org-mode](#for-jupyter-wolfram-src-block-in-org-mode)
-      - [`org-babel-execute-code`](#org-babel-execute-code)
-      - [`completion-at-point`](#completion-at-point-1)
-      - [`sci-wolfram-format-region-or-buffer`](#sci-wolfram-format-region-or-buffer-1)
-      - [`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`](#sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-1)
   - [Installation for vscode](#installation-for-vscode)
     - [Prerequisites](#prerequisites-1)
     - [Configuration](#configuration-1)
@@ -109,37 +98,36 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 ```
 ## Usage
 ### For wolfram script file
-#### `completion-at-point`
+`completion-at-point`
 
-#### `sci-wolfram-format-region-or-buffer`
+`sci-wolfram-format-region-or-buffer`
 
-#### `sci-wolfram-eval-region-or-buffer`
+`sci-wolfram-eval-region-or-buffer`
 
-#### `sci-wolfram-jupyter-eval-region-or-buffer`
+`sci-wolfram-jupyter-eval-region-or-buffer`
 
-#### `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
+`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
-#### `eglot` or `lsp-mode`
+`eglot` or `lsp-mode`
 
-#### `jupyter-send-region`
+`jupyter-send-region`
 
 ### For jupyter wolfram src block in org-mode
+`org-babel-execute-code`
 
-#### `org-babel-execute-code`
 For emacs org-mode, formulas can be converted into LaTeX fragments, making it easy to paste them into Microsoft Word or LaTeX documents.
 
 You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
 
-Demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
+demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
 
 ![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
 
+`completion-at-point`
 
-#### `completion-at-point`
+`sci-wolfram-format-region-or-buffer`
 
-#### `sci-wolfram-format-region-or-buffer`
-
-#### `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
+`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
 See [Test.org](Test/Test.org) for more details.
 
@@ -179,7 +167,7 @@ sol2 = sol1[[1, 1, 2]]
 Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 ```
 
-Demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
+demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/Wolfram-terminal-image/blob/main/Images/wolfram-test.gif)  
 
 ![Wolfram script test](Images/wolfram-test.gif)
 
