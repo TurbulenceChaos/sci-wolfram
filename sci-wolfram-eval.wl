@@ -8,11 +8,8 @@ exprs = Import[file, "HeldExpressions"];
 
 code =
     Function[expr,
-            Module[{i = 0},
-                With[{expr = expr /. (HoldComplete :> HoldForm /; i++
-                     == 0)},
-                    ToString[sciWolframDisplay[expr]]
-                ]
+            With[{expr = expr /. HoldComplete -> HoldForm},
+                ToString[sciWolframDisplay[expr], InputForm]
             ]
         ] /@ exprs;
 
