@@ -73,6 +73,8 @@
 			#'sci-wolfram-complete-symbol 'Wolfram-Language)
 (jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " h"))
 			#'sci-wolfram-doc-lookup 'Wolfram-Language)
+(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " i"))
+			#'sci-wolfram-import-pkg 'Wolfram-Language)
 (jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " f"))
 			#'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
 (jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " e"))

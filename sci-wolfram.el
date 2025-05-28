@@ -504,9 +504,15 @@ to format wolfram region or buffer code.")
 	 (file-name (file-name-base file))
 	 (pdf (concat
 	       file-name
+	       (if (eq major-mode 'org-mode)
+		   (concat "-" (org-element-property :name (org-element-at-point)))	
+		 "")
 	       "-convert.pdf"))
 	 (notebook (concat
 		    file-name
+		    (if (eq major-mode 'org-mode)
+			(concat "-" (org-element-property :name (org-element-at-point)))	
+		      "")
 		    "-convert.nb"))
 	 (tmpfile-no-dir (file-name-nondirectory tmpfile))
 	 (tmpfile-name (file-name-base tmpfile))
@@ -783,6 +789,7 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 
 (define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " c")) #'sci-wolfram-complete-symbol)
 (define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " h")) #'sci-wolfram-doc-lookup)
+(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " i")) #'sci-wolfram-import-pkg)
 (define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " f")) #'sci-wolfram-format-region-or-buffer)
 (define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " e")) #'sci-wolfram-eval-region-or-buffer)
 (define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " j")) #'sci-wolfram-jupyter-eval-region-or-buffer)
