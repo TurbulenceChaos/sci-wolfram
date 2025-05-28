@@ -65,8 +65,9 @@
   :group 'sci-wolfram-mode)
 
 ;;;###autoload
-(add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
-(add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram))
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
+  (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
 
 ;; tools
 (jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " c"))
