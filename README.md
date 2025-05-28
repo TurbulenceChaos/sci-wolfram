@@ -101,43 +101,43 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 ## For wolfram script file
 `completion-at-point`
 
-demo: ![sci-wolfram-completion-at-point-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
+demo: [sci-wolfram-completion-at-point-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
 
-![sci-wolfram-completion-at-point-emacs-script-file.gif](Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)`
+![sci-wolfram-completion-at-point-emacs-script-file.gif](Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
 
 `sci-wolfram-format-region-or-buffer`
 
-demo: ![sci-wolfram-format-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
+demo: [sci-wolfram-format-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
 ![sci-wolfram-format-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
 `sci-wolfram-doc-lookup` (forked from `xah-wolfram-mode`)
 
-demo: ![sci-wolfram-doc-lookup-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
+demo: [sci-wolfram-doc-lookup-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
 
 ![sci-wolfram-doc-lookup-emacs-script-file.gif](Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
 
 `eglot` or `lsp-mode`
 
-demo: ![sci-wolfram-lsp-server-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
+demo: [sci-wolfram-lsp-server-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
 
 ![sci-wolfram-lsp-server-emacs-script-file.gif](Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
 
 `sci-wolfram-eval-region-or-buffer`
 
-demo: ![sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
+demo: [sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
 
 ![sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
 
 `sci-wolfram-jupyter-eval-region-or-buffer`
 
-demo: ![sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
+demo: [sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
 
 ![sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
 
 `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
-demo: ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
+demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
 
 ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
 
@@ -148,25 +148,25 @@ For emacs org-mode, formulas can be converted into LaTeX fragments, making it ea
 
 You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
 
-demo: ![sci-wolfram-org-babel-execute-code-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-org-babel-execute-code-emacs-org-block.gif)  
+demo: [sci-wolfram-org-babel-execute-code-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-org-babel-execute-code-emacs-org-block.gif)
 
 ![sci-wolfram-org-babel-execute-code-emacs-org-block.gif](Images/gif/sci-wolfram-org-babel-execute-code-emacs-org-block.gif)
 
 `completion-at-point`
 
-demo: ![sci-wolfram-completion-at-point-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-org-block.gif)
+demo: [sci-wolfram-completion-at-point-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-org-block.gif)
 
 ![sci-wolfram-completion-at-point-emacs-org-block.gif](Images/gif/sci-wolfram-completion-at-point-emacs-org-block.gif)
 
 `sci-wolfram-format-region-or-buffer`
 
-demo: ![sci-wolfram-format-region-or-buffer-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-org-block.gif)
+demo: [sci-wolfram-format-region-or-buffer-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-org-block.gif)
 
 ![sci-wolfram-format-region-or-buffer-emacs-org-block.gif](Images/gif/sci-wolfram-format-region-or-buffer-emacs-org-block.gif)
 
 `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
-demo: ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif)
+demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif)
 
 ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif)
 
