@@ -94,7 +94,7 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
 ;; for more configurable parameters of `sci-wolfram' package, see 
-https://github.com/TurbulenceChaos/sci-wolfram/blob/main/sci-wolfram.el
+;; https://github.com/TurbulenceChaos/sci-wolfram/blob/main/sci-wolfram.el
 ```
 # Usage for emacs
 ## For wolfram script file
