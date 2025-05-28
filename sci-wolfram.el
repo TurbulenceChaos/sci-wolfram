@@ -367,7 +367,9 @@ to format wolfram region or buffer code.")
   (let ((pkg (sci-wolfram-import-pkg-string)))
     (save-excursion
       (forward-line 1)
-      (insert (concat pkg "\n")))))
+      (insert (concat pkg "\n"))
+      (if (eq major-mode 'org-mode)
+	  (org-element-cache-reset)))))
 
 (defun sci-wolfram-eval (state buffer-type file tmpfile)
   "Execute file with `wolframscript' and pretty print all expressions."

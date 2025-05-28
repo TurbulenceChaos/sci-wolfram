@@ -86,31 +86,60 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
    (jupyter . t)))
 
 ;; for emacs 29+, you can use `package-vc-install' to install packages from github
+(unless (package-installed-p 'sci-wolfram)
+  (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
+
 ;; or you can manually download the package and add it to `load-path`
 ;; (add-to-list 'load-path "/path/to/sci-wolfram")
 ;; (require 'sci-wolfram)
 ;; (require 'sci-wolfram-jupyter)
-(unless (package-installed-p 'sci-wolfram)
-  (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
-;; for more configurable parameters of `sci-wolfram' package, see 
-;; https://github.com/TurbulenceChaos/sci-wolfram/blob/main/sci-wolfram.el
+;; to customize all configurable variables of `sci-wolfram' package,
+;; just type M-x customize-group RET sci-wolfram-mode
 ```
 # Usage for emacs
 ## For wolfram script file
 `completion-at-point`
 
+demo: ![sci-wolfram-completion-at-point-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
+
+![sci-wolfram-completion-at-point-emacs-script-file.gif](Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)`
+
 `sci-wolfram-format-region-or-buffer`
 
-`sci-wolfram-eval-region-or-buffer`
+demo: ![sci-wolfram-format-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
-`sci-wolfram-jupyter-eval-region-or-buffer`
+![sci-wolfram-format-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
-`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
+`sci-wolfram-doc-lookup` (forked from `xah-wolfram-mode`)
+
+demo: ![sci-wolfram-doc-lookup-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
+
+![sci-wolfram-doc-lookup-emacs-script-file.gif](Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
 
 `eglot` or `lsp-mode`
 
-`jupyter-send-region`
+demo: ![sci-wolfram-lsp-server-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
+
+![sci-wolfram-lsp-server-emacs-script-file.gif](Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
+
+`sci-wolfram-eval-region-or-buffer`
+
+demo: ![sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
+
+![sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
+
+`sci-wolfram-jupyter-eval-region-or-buffer`
+
+demo: ![sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
+
+![sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
+
+`sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
+
+demo: ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
+
+![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
 
 ## For `jupyter-Wolfram-Language` src-block in org-mode
 `org-babel-execute-code`
@@ -119,19 +148,31 @@ For emacs org-mode, formulas can be converted into LaTeX fragments, making it ea
 
 You can place the cursor on a formula and run `org-latex-preview` command to  preview LaTeX fragments.
 
-demo: [Test-emacs-jupyter-wolfram-language.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/Test-emacs-jupyter-wolfram-language.gif)  
+demo: ![sci-wolfram-org-babel-execute-code-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-org-babel-execute-code-emacs-org-block.gif)  
 
-![Jupyter-Wolfram output](Images/Test-emacs-jupyter-wolfram-language.gif)
+![sci-wolfram-org-babel-execute-code-emacs-org-block.gif](Images/gif/sci-wolfram-org-babel-execute-code-emacs-org-block.gif)
 
 `completion-at-point`
 
+demo: ![sci-wolfram-completion-at-point-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-org-block.gif)
+
+![sci-wolfram-completion-at-point-emacs-org-block.gif](Images/gif/sci-wolfram-completion-at-point-emacs-org-block.gif)
+
 `sci-wolfram-format-region-or-buffer`
+
+demo: ![sci-wolfram-format-region-or-buffer-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-org-block.gif)
+
+![sci-wolfram-format-region-or-buffer-emacs-org-block.gif](Images/gif/sci-wolfram-format-region-or-buffer-emacs-org-block.gif)
 
 `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
+demo: ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif)
+
+![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-org-block.gif)
+
 See [Test.org](Test/Test.org) for more details.
 
-For my emacs configuration, please check out: [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs).
+**For my emacs configuration, please check out: [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs).**
 
 # Installation for vscode
 ## Prerequisites
@@ -145,14 +186,14 @@ Both `Wolfram Engine` and `Mathematica` already include `Wolfram Player`, so you
 
 ## Configuration
 - Enable **`Terminal > Integrated: Enable Images`** and **`Terminal > Integrated: GPU Acceleration`** in vscode settings, and make sure your system is using a discrete graphics card.
-![Enable images in VS Code terminal](Images/vscode-terminal-enable-images.png)
+![vscode-terminal-enable-display-images.png](Images/vscode-terminal-enable-display-images.png)
 
 - Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
-![Install Wolfram extension](Images/vscode-official-wolfram-extension.png)
+![vscode-official-wolfram-extension.png](Images/vscode-official-wolfram-extension.png)
 
 # Usage for vscode
 ## For repl
-Modify the path in below line and paste it into repl.
+Modify the path of `sci-wolfram-image.wl` and paste it into repl.
 ```Mathematica
 Get["/path/to/sci-wolfram-image.wl"];
 ```
@@ -167,12 +208,13 @@ sol2 = sol1[[1, 1, 2]]
 Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 ```
 
-demo: [wolfram-test.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/wolfram-test.gif)  
+demo: [sci-wolfram-vscode-repl.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-vscode-repl.gif)  
 
-![Wolfram script test](Images/wolfram-test.gif)
+![sci-wolfram-vscode-repl.gif](Images/gif/sci-wolfram-vscode-repl.gif)
 
 ## For wolframscript command line
 For `wolframscript -script file.wl` command, `$post` doesn't work, so you need to explicitly add `sciWolframDisplay` function to the code to display images.
+
 ```Mathematica
 Get["/path/to/sci-wolfram-image.wl"];
 
@@ -185,6 +227,10 @@ Plot3D[sol2, {x, -10, 10}, {t, -5, 5}] // sciWolframDisplay
 ```
 
 Note: This process can be automatically done in emacs using `sci-wolfram.el` package. I haven't write vscode plugin to support it yet.
+
+demo: [sci-wolfram-vscode-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-vscode-script-file.gif)  
+
+![sci-wolfram-vscode-script-file.gif](Images/gif/sci-wolfram-vscode-script-file.gif)
 
 **Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
 
