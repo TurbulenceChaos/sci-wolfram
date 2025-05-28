@@ -8,7 +8,7 @@ exprs = Import[file, "HeldExpressions"];
 
 code =
     Function[expr,
-            With[{expr = expr /. HoldComplete -> HoldForm},
+            With[{expr = First[expr]},
                 ToString[sciWolframDisplay[expr], InputForm]
             ]
         ] /@ exprs;
