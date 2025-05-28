@@ -129,6 +129,9 @@
 ;; - [ ] Execute wolfram script based on `jupyter-eval' when jupyter repl is started;
 ;; - [o] Add more wolfram symbols to font-lock-keywords.
 
+(require 'org)
+(require 'org-element)
+
 (defcustom sci-wolfram-image-dpi 150
   "sci-wolfram-image-dpi
 
@@ -235,6 +238,26 @@ for windows:
 	    (buffer-type (if buffer-file-name
 			     "file"
 			   "not-file"))
+	    (Begin (if (and (string= state "buffer")
+			    (eq major-mode 'org-mode)
+			    (string= (org-element-property :language (org-element-at-point))
+                                     "jupyter-Wolfram-Language"))
+                       (save-excursion
+			 (org-babel-goto-src-block-head)
+			 (forward-line 1)
+			 (point))
+                     Begin))
+	    (End (if (and (string= state "buffer")
+			  (eq major-mode 'org-mode)
+			  (string= (org-element-property :language (org-element-at-point))
+				   "jupyter-Wolfram-Language"))
+                     (save-excursion
+                       (org-babel-goto-src-block-head)
+                       (re-search-forward "^[ \t]*#\\+end_src" nil t)
+                       (forward-line -1)
+                       (end-of-line)
+                       (point))
+		   End))
 	    (code (buffer-substring-no-properties Begin End))
 	    (file (if (string= buffer-type "file")
 		      buffer-file-name
@@ -263,8 +286,9 @@ for windows:
 			      (file-name-base file)
 			      (format-time-string "%Y%m%d%-H%M%S")
 			      (random #xfffff))
-		      dir)))
+		      dir))) 
        (when (and (string= state "buffer")
+		  (not (eq major-mode 'org-mode)) 
 		  (not (eq major-mode 'sci-wolfram-mode)))
 	 (user-error "Buffer is not a wolfram script!"))
        ;; send region or buffer to tmp file
@@ -285,10 +309,18 @@ for windows:
 	  (shell-command-to-string
 	   (format "wolframscript -script %s %s"
 		   sci-wolfram-format-script tmpfile)))))
-    (delete-region Begin End)
-    (insert (concat formatted-code "\n"))
+    (save-excursion
+      (save-restriction
+	(narrow-to-region Begin End)
+	(goto-char (point-min))
+	(delete-region (point-min) (point-max))
+	(insert (if (string-suffix-p "\n" formatted-code)
+                    formatted-code
+                  (concat formatted-code "\n")))
+	(if (eq major-mode 'org-mode)
+	    (org-element-cache-reset))))
     (if (string= buffer-type "not-file")
-	(delete-file file))
+    	(delete-file file))
     (delete-file tmpfile)))
 
 (sci-wolfram-region-or-buffer-marco
