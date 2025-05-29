@@ -2,3 +2,5 @@ tmp/
 logs/
 *.elc
 /Data/
+sci-wolfram-autoloads.el
+sci-wolfram-pkg.el
