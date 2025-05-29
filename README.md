@@ -54,6 +54,11 @@ Display wolfram script images in vscode terminal.
 
 # Installation for emacs
 ## Prerequisites
+- **`wolframscript`** (free) and **`Wolfram Engine`** (free), or **`Mathematica`** (already include `wolframscript`)\
+Required for executing wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en 
+- **`Wolfram Player`**\
+Needed for viewing Mathematica notebook and `.cdf` files.\
+Both `Wolfram Engine` and `Mathematica` already include `Wolfram Player`, so you don't need to install it manually.
 - [Jupyter](https://jupyter.org/install)
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)\
 Note: The latest version until 20/05/2025 is [9a26ac78743cc47084c9c99ff75c5aee2657a409](https://github.com/WolframResearch/WolframLanguageForJupyter/tree/9a26ac78743cc47084c9c99ff75c5aee2657a409), where images can not be shown in emacs jupyter-repl. See this [issue](https://github.com/emacs-jupyter/jupyter/issues/223#issuecomment-927137191).\
