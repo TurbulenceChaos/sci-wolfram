@@ -99,6 +99,8 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 ;; just type M-x customize-group RET sci-wolfram-mode
 ```
 # Usage for emacs
+The default leader key of `sci-wolfram` is `F6`.
+
 ## For wolfram script file
 `completion-at-point`
 
