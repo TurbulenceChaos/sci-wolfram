@@ -25,6 +25,7 @@
 - [Usage for vscode](#usage-for-vscode)
   - [For repl](#for-repl)
   - [For wolframscript command line](#for-wolframscript-command-line)
+  - [Convert wolfram script to pdf and notebook](#convert-wolfram-script-to-pdf-and-notebook)
 - [Reference](#reference)
 
 ---
@@ -55,11 +56,11 @@ Display wolfram script images in vscode terminal.
 ## Prerequisites
 - [Jupyter](https://jupyter.org/install)
 - [WolframLanguageForJupyter](https://github.com/WolframResearch/WolframLanguageForJupyter)\
-Note: The latest version until 20/05/2025 is [9a26ac78743cc47084c9c99ff75c5aee2657a409](https://github.com/WolframResearch/WolframLanguageForJupyter/tree/9a26ac78743cc47084c9c99ff75c5aee2657a409), which can not display images in emacs jupyter-repl, see this [issue](https://github.com/emacs-jupyter/jupyter/issues/223#issuecomment-927137191).\
+Note: The latest version until 20/05/2025 is [9a26ac78743cc47084c9c99ff75c5aee2657a409](https://github.com/WolframResearch/WolframLanguageForJupyter/tree/9a26ac78743cc47084c9c99ff75c5aee2657a409), where images can not be shown in emacs jupyter-repl. See this [issue](https://github.com/emacs-jupyter/jupyter/issues/223#issuecomment-927137191).\
 You need to download the wolfram jupyter repository and manually modify the `WolframLanguageForJupyter/Resources/RequestHandlers.wl` file according to this [commit](https://github.com/linux-xhyang/WolframLanguageForJupyter/commit/2a4ed08556a3f87e4b134b48d5b0bc44bc81fb8b)
 - [emacs-jupyter](https://github.com/emacs-jupyter/jupyter)\
-Note: The latest version until 20/05/2025 is [3615c2de16988c4dd9d1978bfa10ee3092e85b33](https://github.com/emacs-jupyter/jupyter/tree/3615c2de16988c4dd9d1978bfa10ee3092e85b33), `completion-at-point` function does not work in jupyter org-block, see this [pull request](https://github.com/emacs-jupyter/jupyter/pull/582).\
-You have to overwrite the original `jupyter-org--set-src-block-cache` function manually, see my emacs config [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-emacs-jupyter.el) for example.
+Note: The latest version until 20/05/2025 is [3615c2de16988c4dd9d1978bfa10ee3092e85b33](https://github.com/emacs-jupyter/jupyter/tree/3615c2de16988c4dd9d1978bfa10ee3092e85b33), where `completion-at-point` function does not work in jupyter org-block, see this [pull request](https://github.com/emacs-jupyter/jupyter/pull/582).\
+You have to overwrite the original `jupyter-org--set-src-block-cache` function manually. See my emacs config [sci-emacs](https://github.com/TurbulenceChaos/sci-emacs/blob/main/lisp/init-emacs-jupyter.el) for ref.
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 In linux, you can install it using `sudo apt install texlive-full` to preview latex fragments in org-mode.
 
@@ -140,6 +141,12 @@ demo: [sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](https://
 demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
 
 ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
+
+A more complex case to add title, subtitle, section, text, etc., using `TextCell` (can include formulas):
+
+demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif)
+
+![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif)
 
 ## For `jupyter-Wolfram-Language` src-block in org-mode
 `org-babel-execute-code`
@@ -234,6 +241,17 @@ demo: [sci-wolfram-vscode-script-file.gif](https://github.com/TurbulenceChaos/sc
 
 **Please see [Test.wl](Test/Test.wl) script for more details about configurable parameters of `sci-wolfram-image` package.**
 
+## Convert wolfram script to pdf and notebook
+You can add title, subtitle, section, text, etc., to convert wolfram script to pdf and Mathematica notebook using `TextCell` (can include formulas)
+
+demo: [sci-wolfram-convert-to-pdf-and-notebook-vscode.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-to-pdf-and-notebook-vscode.gif) 
+
+![sci-wolfram-convert-to-pdf-and-notebook-vscode.gif](Images/gif/sci-wolfram-convert-to-pdf-and-notebook-vscode.gif)
+
+See [Test-to-pdf-and-notebook.wl](Test/Test-to-pdf-and-notebook.wl) for example.
+
+See [sci-wolfram-pdf.wl](sci-wolfram-pdf.wl) for configurable parameters.
+
 # Reference
 for `sci-wolfram-image.wl`: 
 - [Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
@@ -243,6 +261,9 @@ for `sci-wolfram-mode`:
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)\
 Note: `sci-wolfram-mode` was originally developed based on `xah-wolfram-mode`, with code heavily refactored and many features added.
 - [wolfram-mode](https://github.com/kawabata/wolfram-mode)
+
+for `eglot` `LSPServer`:
+- [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
 
 for `sci-wolfram-pdf.wl`:
 - [Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/293543/converting-wolfram-language-scripts-wls-into-pdfs)
