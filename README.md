@@ -47,6 +47,7 @@ Display wolfram script images in vscode terminal.
 - [x] Insert `sci-wolfram-image.wl` package based on your emacs config;
 - [ ] Execute wolfram script based on `jupyter-eval` when jupyter repl is started;
 - [x] Add more wolfram symbols to font-lock-keywords.
+- [x] Add prettify symbols to `sci-wolfram-mode` 
 
 ## Features for vscode
 - [x] Display wolfram script images in vscode terminal using `imgcat`;
@@ -95,7 +96,7 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 (unless (package-installed-p 'sci-wolfram)
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
-;; or you can manually download the package and add it to `load-path`
+;; or you can manually download the package and add it to `load-path'
 ;; (add-to-list 'load-path "/path/to/sci-wolfram")
 ;; (require 'sci-wolfram)
 ;; (require 'sci-wolfram-jupyter)
@@ -112,6 +113,12 @@ The default leader key of `sci-wolfram` is `F6`.
 demo: [sci-wolfram-completion-at-point-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
 
 ![sci-wolfram-completion-at-point-emacs-script-file.gif](Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
+
+`sci-wolfram-prettify-symbols` (toggle with M-x `prettify-symbols-mode`)
+
+demo: [sci-wolfram-prettify-symbols-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-prettify-symbols-emacs-script-file.gif)
+
+![sci-wolfram-prettify-symbols-emacs-script-file.gif](Images/gif/sci-wolfram-prettify-symbols-emacs-script-file.gif)
 
 `sci-wolfram-format-region-or-buffer`
 
