@@ -108,7 +108,7 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 The default leader key of `sci-wolfram` is `F6`.
 
 ## For wolfram script file
-`completion-at-point`
+`completion-at-point` (when lsp server is not available)
 
 demo: [sci-wolfram-completion-at-point-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-completion-at-point-emacs-script-file.gif)
 
@@ -120,7 +120,7 @@ demo: [sci-wolfram-prettify-symbols-emacs-script-file.gif](https://github.com/Tu
 
 ![sci-wolfram-prettify-symbols-emacs-script-file.gif](Images/gif/sci-wolfram-prettify-symbols-emacs-script-file.gif)
 
-`sci-wolfram-format-region-or-buffer`
+`sci-wolfram-format-region-or-buffer` (use CodeFormatter, when lsp server is not available)
 
 demo: [sci-wolfram-format-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
@@ -132,19 +132,19 @@ demo: [sci-wolfram-doc-lookup-emacs-script-file.gif](https://github.com/Turbulen
 
 ![sci-wolfram-doc-lookup-emacs-script-file.gif](Images/gif/sci-wolfram-doc-lookup-emacs-script-file.gif)
 
-`eglot` or `lsp-mode`
+`eglot` or `lsp-mode` (support completion and format)
 
 demo: [sci-wolfram-lsp-server-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
 
 ![sci-wolfram-lsp-server-emacs-script-file.gif](Images/gif/sci-wolfram-lsp-server-emacs-script-file.gif)
 
-`sci-wolfram-eval-region-or-buffer`
+`sci-wolfram-eval-region-or-buffer` (display images and latex fragments)
 
 demo: [sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
 
 ![sci-wolfram-eval-region-or-buffer-emacs-script-file.gif](Images/gif/sci-wolfram-eval-region-or-buffer-emacs-script-file.gif)
 
-`sci-wolfram-jupyter-eval-region-or-buffer`
+`sci-wolfram-jupyter-eval-region-or-buffer` (support org src-block session)
 
 demo: [sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-jupyter-eval-region-or-buffer-emacs-script-file.gif)
 
