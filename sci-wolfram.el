@@ -944,7 +944,7 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
     ("\\[RightFloor]" . "⌋"))
   "Mapping of Wolfram symbols to Unicode."
   :type '(alist :key-type string :value-type string)
-  :group 'sci-wolfram)
+  :group 'sci-wolfram-mode)
 
 ;;;###autoload
 (defun sci-wolfram-prettify-symbols ()

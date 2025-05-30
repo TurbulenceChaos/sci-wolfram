@@ -150,10 +150,15 @@ sciWolframText[expr_] :=
         Print[ToString[StringForm[": Out[`1`]= ", n++]]];
         Print[expr];
         (* Return the original expr *)
-        If[sciWolframRunner[] == "script",
-            expr
-            ,
+        If[sciWolframOrigExpr == "yes",
+            Print[expr];
             expr;
+            ,
+            If[sciWolframRunner[] == "script",
+                expr
+                ,
+                expr;
+            ]
         ]
     ];
 
@@ -165,15 +170,11 @@ sciWolframTeX[expr_] :=
         Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
             ];
         (* Return the original expr *)
-        If[sciWolframRunner[] == "script",
-            If[sciWolframOrigExpr == "yes",
-                Print[expr];
-                expr
-                ,
-                expr
-            ]
+        If[sciWolframOrigExpr == "yes",
+            Print[expr];
+            expr;
             ,
-            If[sciWolframOrigExpr == "yes",
+            If[sciWolframRunner[] == "script",
                 expr
                 ,
                 expr;
@@ -218,15 +219,11 @@ sciWolframImage[expr_, playCDF_] :=
                  -> DirectoryName[fileCDF]]
         ];
         (* Return the original expr *)
-        If[sciWolframRunner[] == "script",
-            If[sciWolframOrigExpr == "yes",
-                Print[expr];
-                expr
-                ,
-                expr
-            ]
+        If[sciWolframOrigExpr == "yes",
+            Print[expr];
+            expr;
             ,
-            If[sciWolframOrigExpr == "yes",
+            If[sciWolframRunner[] == "script",
                 expr
                 ,
                 expr;
