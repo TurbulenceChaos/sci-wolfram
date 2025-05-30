@@ -248,7 +248,7 @@ sciWolframDisplay[expr_] :=
                         ]
                     ,
                     "vscode",
-                        Print[expr]
+                        expr
                 ]
             ,
             True,
