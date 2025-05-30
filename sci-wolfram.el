@@ -932,6 +932,8 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
     ("\\[Parallel]" . "∥")
     ("\\[NotParallel]" . "∦")
     ;; Special brackets
+    ("[[" . "⟦")
+    ("]]" . "⟧")
     ("\\[LeftDoubleBracket]" . "⟦")
     ("\\[RightDoubleBracket]" . "⟧")
     ("\\[LeftAngleBracket]" . "⟨")
@@ -948,8 +950,7 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 (defun sci-wolfram-prettify-symbols ()
   "Set up prettify-symbols for Wolfram language."
   (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
-  (setq-local prettify-symbols-compose-predicate
-              (lambda (start end _match) t))
+  (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
   (setq-local prettify-symbols-unprettify-at-point t)
   (prettify-symbols-mode 1))
 
