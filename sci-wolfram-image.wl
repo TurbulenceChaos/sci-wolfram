@@ -216,7 +216,8 @@ sciWolframImage[expr_, playCDF_] :=
             Export[fileCDF, Notebook[{Cell @ BoxData @ ToBoxes @ expr
                 }]];
             StartProcess[{sciWolframPlayer, FileNameTake[fileCDF]}, ProcessDirectory
-                 -> DirectoryName[fileCDF]]
+                 -> DirectoryName[fileCDF]];
+            Pause[0.1];
         ];
         (* Return the original expr *)
         If[sciWolframOrigExpr == "yes",
