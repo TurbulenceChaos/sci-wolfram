@@ -951,7 +951,7 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
   "Set up prettify-symbols for Wolfram language."
   (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
   (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
-  (setq-local prettify-symbols-unprettify-at-point t)
+  (setq-local prettify-symbols-unprettify-at-point nil)
   (prettify-symbols-mode 1))
 
 ;;;###autoload
