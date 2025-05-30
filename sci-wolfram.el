@@ -41,6 +41,9 @@
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Customization:
+;; To customize all configurable variables of `sci-wolfram' package,
+;; just type M-x customize-group RET sci-wolfram-mode
+;;
 ;; 1. sci-wolfram-formula-type
 ;;
 ;; For emacs, formula output types:
