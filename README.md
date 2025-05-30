@@ -120,7 +120,7 @@ demo: [sci-wolfram-prettify-symbols-emacs-script-file.gif](https://github.com/Tu
 
 ![sci-wolfram-prettify-symbols-emacs-script-file.gif](Images/gif/sci-wolfram-prettify-symbols-emacs-script-file.gif)
 
-`sci-wolfram-format-region-or-buffer` (use CodeFormatter, when lsp server is not available)
+`sci-wolfram-format-region-or-buffer` (use `CodeFormatter`, when lsp server is not available)
 
 demo: [sci-wolfram-format-region-or-buffer-emacs-script-file.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-format-region-or-buffer-emacs-script-file.gif)
 
@@ -156,7 +156,7 @@ demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-fil
 
 ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
 
-A more complex case to add title, subtitle, section, text, etc., using `TextCell` (can include formulas):
+A more complex case to add title, subtitle, section, text, formula, etc. using `TextCell`:
 
 demo: [sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif](https://github.com/TurbulenceChaos/sci-wolfram/blob/main/Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif)
 

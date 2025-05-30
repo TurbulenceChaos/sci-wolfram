@@ -50,7 +50,7 @@ exprs = Import[file, "HeldExpressions"];
 
 cells =
     Function[expr,
-            If[StringContainsQ[ToString[expr], "TextCell"],
+            If[MatchQ[First @ expr, TextCell[__]],
                 With[{expr = First @ expr},
                     expr
                 ]
