@@ -944,16 +944,65 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
   :type '(alist :key-type string :value-type string)
   :group 'sci-wolfram-mode)
 
+;; https://www.reddit.com/r/emacs/comments/i9pfld/disable_orgprettyentities_on_the_current_line/
+(defvar-local sci-wolfram-current-line-range '(0 . 0))
+
+(defun sci-wolfram-unprettify-current-line (limit)
+  (when sci-wolfram-prettify-symbols
+    (when (or (derived-mode-p 'sci-wolfram-mode)
+	      (and (derived-mode-p 'org-mode)
+		   (org-in-src-block-p)
+		   (string= (org-element-property :language (org-element-at-point))
+			    "jupyter-Wolfram-Language")))
+      (let ((start (max (point) (car sci-wolfram-current-line-range)))
+            (end (min limit (cdr sci-wolfram-current-line-range))))
+	(when (< start end)
+	  (with-silent-modifications
+            (remove-text-properties start end '(composition nil display nil)))
+	  (goto-char end)
+	  t)))))
+
+(defun sci-wolfram-reprettify-current-line ()
+  (when sci-wolfram-prettify-symbols
+    (when (or (derived-mode-p 'sci-wolfram-mode)
+	      (and (derived-mode-p 'org-mode)
+		   (org-in-src-block-p)
+		   (string= (org-element-property :language (org-element-at-point))
+			    "jupyter-Wolfram-Language")))
+      (let* ((start (line-beginning-position))
+             (end (line-end-position))
+             (old-range sci-wolfram-current-line-range)
+             (new-range (cons start end)))
+	(unless (equal old-range new-range)
+	  (setq sci-wolfram-current-line-range new-range)
+	  (when (car old-range)
+            (font-lock-flush (car old-range) (cdr old-range)))
+	  (font-lock-flush start end))))))
+
+(defun sci-wolfram-setup-prettify-current-line ()
+  (font-lock-add-keywords nil '((sci-wolfram-unprettify-current-line)) 'append)
+  (add-hook 'post-command-hook #'sci-wolfram-reprettify-current-line nil t))
+
+(defcustom sci-wolfram-prettify-symbols t
+  "Enable (t) or disable (nil) prettify symbols for Wolfram Language."
+  :type 'boolean
+  :group 'sci-wolfram-mode)
+
 ;;;###autoload
 (defun sci-wolfram-prettify-symbols ()
-  "Set up prettify-symbols for Wolfram language."
-  (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
-  (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
-  (setq-local prettify-symbols-unprettify-at-point nil)
-  (prettify-symbols-mode -1))
+  "Setup prettify-symbols for Wolfram language."
+  (when sci-wolfram-prettify-symbols
+    (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
+    (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
+    (setq-local prettify-symbols-unprettify-at-point nil)
+    (sci-wolfram-setup-prettify-current-line)
+    (prettify-symbols-mode 1)))
 
 ;;;###autoload
 (add-hook 'sci-wolfram-mode-hook #'sci-wolfram-prettify-symbols)
+
+;;;###autoload
+(add-hook 'org-mode-hook #'sci-wolfram-setup-prettify-current-line)
 
 
 (provide 'sci-wolfram)
