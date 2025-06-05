@@ -799,8 +799,8 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
+;; ;;;###autoload
+;; (add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
 
