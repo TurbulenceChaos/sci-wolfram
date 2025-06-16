@@ -950,7 +950,7 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
   (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
   (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
   (setq-local prettify-symbols-unprettify-at-point nil)
-  (prettify-symbols-mode -1))
+  (prettify-symbols-mode 1))
 
 ;;;###autoload
 (add-hook 'sci-wolfram-mode-hook #'sci-wolfram-prettify-symbols)
