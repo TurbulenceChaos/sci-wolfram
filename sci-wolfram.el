@@ -803,6 +803,8 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
 ;; (add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.cdf\\'" . sci-wolfram-mode))
 
 ;; prettify symbols
 (defcustom sci-wolfram-symbol-alist
