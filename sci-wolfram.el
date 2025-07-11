@@ -130,6 +130,9 @@
 (require 'org)
 (require 'org-element)
 
+;;;###autoload
+(defgroup sci-wolfram-mode nil "Major mode for interacting with Wolfram Language code in Emacs.")
+
 (defcustom sci-wolfram-image-dpi 150
   "sci-wolfram-image-dpi
 
@@ -182,40 +185,13 @@ You can specify it by
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
-(defcustom sci-wolfram-player
-  (string-trim-right
-   (shell-command-to-string
-    "wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'"))
+(setq sci-wolfram-path-script (expand-file-name
+			      "sci-wolfram-path.wl"
+			      (file-name-directory (or load-file-name buffer-file-name))))
 
-  "sci-wolfram-player
-
-Path to the Wolfram Player, which is set as
-
-(string-trim-right
-   (shell-command-to-string
-    \"wolframscript -code 'FileNames[\"*wolframplayer*\", $InstallationDirectory, 2][[1]]'\"))
-
-You can also specify the path by
-
-for linux:
-
-(custom-set-variables
- '(sci-wolfram-player \"/path/to/wolframplayer\"))
-
-for windows:
-(custom-set-variables
- '(sci-wolfram-player \"/path/to/wolframplayer.exe\"))
-"
-  :type 'string
-  :group 'sci-wolfram-mode)
-
-(defcustom sci-wolfram-kernel
-  (string-trim-right
-   (shell-command-to-string
-    "wolframscript -code 'First[$CommandLine]'"))
-  "Path to WolframKernel executable for wolfram LSPServer usage"
-  :type 'string
-  :group 'sci-wolfram-mode)
+(when (not (file-exists-p (concat (file-name-sans-extension sci-wolfram-path-script) ".el")))
+  (shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
+(require 'sci-wolfram-path)
 
 (defmacro sci-wolfram-region-or-buffer-marco (name-1 name-2 body doc)
   "Use marco to define a function to process wolfram region or buffer code."

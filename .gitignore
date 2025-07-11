@@ -4,3 +4,4 @@ logs/
 /Data/
 sci-wolfram-autoloads.el
 sci-wolfram-pkg.el
+sci-wolfram-path.el
