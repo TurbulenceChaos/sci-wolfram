@@ -104,7 +104,28 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 ;; to customize all configurable variables of `sci-wolfram' package,
 ;; just type M-x customize-group RET sci-wolfram-mode
 ```
+
+For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discussion](https://github.com/TurbulenceChaos/sci-wolfram/issues/4)):
+
+```lisp
+;; packages.el
+(package! sci-wolfram
+  :recipe (:host github
+	   :repo "TurbulenceChaos/sci-wolfram"
+	   :files ("*.el" "*.wl" "Data-example")))
+```
+
+```lisp
+;; config.el
+(use-package! sci-wolfram
+  :defer t
+  :init
+  (unless (executable-find "wolframscript")
+    (message "sci-wolfram: wolframscript not found on PATH")))
+```
+
 # Usage for emacs
+
 The default leader key of `sci-wolfram` is `F6`.
 
 ## For wolfram script file
