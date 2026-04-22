@@ -105,7 +105,7 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 ;; just type M-x customize-group RET sci-wolfram-mode
 ```
 
-Note: By default, Org mode truncates large org-babel outputs. Setting `(setq org-babel-min-lines-for-block-output 100)` prevents truncation when using `Jupyter-Wolfram-Language` blocks, especially for long computational results. The default value is 10.
+Note: `(setq org-babel-min-lines-for-block-output 100)` is important for preventing truncation when using `Jupyter-Wolfram-Language` org-babel blocks in Org mode, especially when the output spans many lines. The default value is 10.
 
 For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discussion](https://github.com/TurbulenceChaos/sci-wolfram/issues/4)):
 
@@ -118,6 +118,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ```
 
 ```lisp
+;; config.el
 (use-package! sci-wolfram
   :defer t
   :init
