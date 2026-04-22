@@ -45,4 +45,4 @@ for windows:
   {sciWolframPlayer, sciWolframKernel}
   ]
 
-Export[FileNameJoin[{Directory[], "sci-wolfram-path.el"}], sciWolframPath, "Text"];
+Export[FileNameJoin[{DirectoryName[$InputFileName], "sci-wolfram-path.el"}], sciWolframPath, "Text"];
