@@ -116,10 +116,6 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ```
 
 ```lisp
-;; config.el
-(after! org
-  (setq org-babel-min-lines-for-block-output 100))
-
 (use-package! sci-wolfram
   :defer t
   :init
