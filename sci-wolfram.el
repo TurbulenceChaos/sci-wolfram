@@ -619,28 +619,14 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 
 ;; lsp server
 (defun sci-wolfram-setup-lsp-server ()
-  "Set up wolfram lsp server by removing local version if needed."
-  (let ((lsp-server-path
-	 (string-trim-right
-	  (shell-command-to-string
-	   (concat
-	    "wolframscript -code "
-	    "'"
-	    "LSPServerPath = PacletObject[\"LSPServer\"][\"Location\"]; "
-	    "If[StringContainsQ[LSPServerPath, $UserBasePacletsDirectory], "
-	    "LSPServerPath, "
-	    "\"Built-in LSPServer\"]"
-	    "'")))))
-    (if (not (string= lsp-server-path "Built-in LSPServer"))
-	(if (yes-or-no-p
-	     (format "Found locally installed LSPServer in \"%s\".
-In order to use the built-in LSPServer, the local version should be removed.
-Use PacletUninstall[\"LSPServer\"] to remove it?"
-		     lsp-server-path))
-	    (if (= 0 (shell-command "wolframscript -code 'PacletUninstall[\"LSPServer\"]'"))
-		(message "Local LSPServer successfully removed.")
-	      (message "Failed to remove local LSPServer."))
-	  (message "Local LSPServer retained. Built-in version may not work properly.")))))
+    "Set up wolfram lsp server by removing local version if needed."
+    (call-process-shell-command
+     (concat
+      "wolframscript -code "
+      "'"
+      "PacletUninstall[\"LSPServer\"];"
+      "'")
+     nil 0))
 
 (add-hook 'eglot-managed-mode-hook
 	  (lambda ()
@@ -675,8 +661,8 @@ Use PacletUninstall[\"LSPServer\"] to remove it?"
    (make-lsp-client
     :new-connection (lsp-stdio-connection
 		     `(,sci-wolfram-kernel
-		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets"
-		       "-run" "PacletUninstall[\"LSPServer\"]; Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
+		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
+		       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
     :major-modes '(sci-wolfram-mode)
     :server-id 'wolfram-lsp)))
 
