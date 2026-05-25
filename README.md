@@ -96,6 +96,9 @@ In linux, you can install it using `sudo apt install texlive-full` to preview la
 (unless (package-installed-p 'sci-wolfram)
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
+;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; for eglot
+;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; for lsp-mode
+
 ;; or you can manually download the package and add it to `load-path'
 ;; (add-to-list 'load-path "/path/to/sci-wolfram")
 ;; (require 'sci-wolfram)
@@ -113,17 +116,23 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ;; packages.el
 (package! sci-wolfram
   :recipe (:host github
-	   :repo "TurbulenceChaos/sci-wolfram"
-	   :files ("*.el" "*.wl" "Data-example")))
+           :repo "TurbulenceChaos/sci-wolfram"
+           :files ("*.el" "*.wl" "Data-example")))
 ```
 
 ```lisp
 ;; config.el
 (use-package! sci-wolfram
   :defer t
-  :init
+  :config
   (unless (executable-find "wolframscript")
-    (message "sci-wolfram: wolframscript not found on PATH")))
+    (message "sci-wolfram: wolframscript not found on PATH"))
+  ;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; for eglot
+  ;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; for lsp-mode
+  )
+
+;; to customize all configurable variables of `sci-wolfram' package,
+;; just type M-x customize-group RET sci-wolfram-mode
 ```
 
 # Usage for emacs
