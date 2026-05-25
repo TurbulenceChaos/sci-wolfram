@@ -195,7 +195,7 @@ sciWolframImage[expr_, playCDF_] :=
             ]
         ];
         (* Export expr as image *)
-        Export[filePNG, Notebook[{Cell @ BoxData @ ToBoxes @ expr}], 
+        Export[filePNG, Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}], 
             ImageResolution -> sciWolframImageDPI];
         (* Display image *)
         Switch[sciWolframEnv,
@@ -213,8 +213,7 @@ sciWolframImage[expr_, playCDF_] :=
         ];
         (* Use `wolframplayer` to view `.cdf` files *)
         If[playCDF == "yes",
-            Export[fileCDF, Notebook[{Cell @ BoxData @ ToBoxes @ expr
-                }]];
+            Export[fileCDF, Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}]];
             StartProcess[{sciWolframPlayer, FileNameTake[fileCDF]}, ProcessDirectory
                  -> DirectoryName[fileCDF]];
             Pause[0.1];
