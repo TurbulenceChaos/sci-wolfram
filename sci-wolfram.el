@@ -114,74 +114,29 @@
 
 ;;; Code:
 
-;; TODO:
-;; - [o] Automatically read wolfram symbols from built-in `LSPServer' package and convert them to emacs variables.
-;; - [o] Add wolfram symbols to `completion-at-point' when lsp server is not available;
-;; - [o] Use `CodeFormatter' to format code when lsp server is not available;
-;; - [o] Add `LSPServer' to `eglot' or `lsp-mode' to support code formatting and completion;
-;; - [o] Execute wolfram script and display images and latex in tmp buffer;
-;; - [o] Convert wolfram script to pdf and Mathematica notebook, and use `wolframplayer' to view notebook;
-;; - [o] `jupyter-Wolfram-Language' src-block in org-mode: find doc, `completion-at-point', format, convert to pdf and notebook;
-;; - [o] Send wolfram script to jupyter repl, and display images in it;
-;; - [o] Insert `sci-wolfram-image.wl' package based on your emacs config;
-;; - [ ] Execute wolfram script based on `jupyter-eval' when jupyter repl is started;
-;; - [o] Add more wolfram symbols to font-lock-keywords.
-
 (require 'org)
 (require 'org-element)
 
 ;;;###autoload
-(defgroup sci-wolfram-mode nil "Major mode for interacting with Wolfram Language code in Emacs.")
+(defgroup sci-wolfram-mode nil "Major mode for wolfram scripts.")
 
 (defcustom sci-wolfram-image-dpi 150
-  "sci-wolfram-image-dpi
-
-Image output resolution: 150 DPI in \"emacs\" by default
-
-You can specify it by
-
-(custom-set-variables
- '(sci-wolfram-image-dpi 150))
-"
+  "Image resolution"
   :type 'number
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-formula-type "image"
-  "sci-wolfram-formula-type
-
-For emacs, formula output types: \"latex\" or \"image\" (by default)
-
-You can specify it by
-
-(custom-set-variables
- '(sci-wolfram-formula-type \"latex\"))
-"
+  "Formula output type: image (default) or latex"
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-orig-expr "no"
-  "sci-wolfram-orig-expr
-
-Whether to display both inline images and original expression: \"yes\" (Enable) or \"no\" (disable by default)
-
-You can specify it by
-
-(custom-set-variables
- '(sci-wolfram-orig-expr \"yes\"))
-"
+  "Whether to display both images and original expression: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-play "no"
-  "sci-wolfram-play
-
-Whether to use `wolframplayer' to view `.cdf' files: \"yes\" (Enable) or \"no\" (disable by default)
-
-You can specify it by
-
-(custom-set-variables
- '(sci-wolfram-play \"yes\"))
-"
+  "Use Wolfram Player to view CDF interactive files: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
@@ -189,8 +144,9 @@ You can specify it by
 			      "sci-wolfram-path.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
-(when (not (file-exists-p (concat (file-name-sans-extension sci-wolfram-path-script) ".el")))
-  (shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
+(unless (file-exists-p (concat (file-name-sans-extension sci-wolfram-path-script) ".el"))
+	(shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
+
 (require 'sci-wolfram-path)
 
 (defmacro sci-wolfram-region-or-buffer-marco (name-1 name-2 body doc)
@@ -568,16 +524,16 @@ to format wolfram region or buffer code.")
  "Convert wolfram region or buffer code to pdf and Mathematica notebook.
 Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view the notebook.")
 
-;; eldoc
+;; doc lookup
 (defun sci-wolfram-doc-lookup ()
-  "Look up the symbol under cursor in Wolfram doc site in web browser."
+  "Look up wolfram doc in web browser."
   (interactive)
-  (let* ((xword
+  (let* ((word
 	  (if (region-active-p)
 	      (buffer-substring-no-properties (region-beginning) (region-end))
 	    (upcase-initials (current-word))))
-         (xurl (format "https://reference.wolfram.com/language/ref/%s.html" xword)))
-    (browse-url xurl)))
+         (url (format "https://reference.wolfram.com/language/ref/%s.html" word)))
+    (browse-url url)))
 
 ;; completion
 (require 'sci-wolfram-all-symbols)
@@ -745,7 +701,7 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
   (setq-local comment-end "*)"))
 
 ;; keybinding
-(defcustom sci-wolfram-mode-leader-key "<f6>" "leader key in `sci-wolfram-mode'"
+(defcustom sci-wolfram-mode-leader-key "<f6>" "leader key for `sci-wolfram-mode'"
   :type 'string
   :group 'sci-wolfram-mode)
 
@@ -761,8 +717,6 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
-;; ;;;###autoload
-;; (add-to-list 'auto-mode-alist '("\\.m\\'" . sci-wolfram-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
 ;;;###autoload

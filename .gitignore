@@ -5,3 +5,4 @@ logs/
 sci-wolfram-autoloads.el
 sci-wolfram-pkg.el
 sci-wolfram-path.el
+ltximg/

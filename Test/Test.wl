@@ -1,5 +1,3 @@
-(* Get["/path/to/sci-wolfram-image.wl"]; *)
-
 (* 1. sciWolframEnv
 
 Environment: "vscode" (where inline images are displayed by `imgcat`), "emacs" (where images are printed as file link)
@@ -100,6 +98,8 @@ $Post=.
 2. `%` operator works only in repl env
 
 *)
+
+(* Get["/path/to/sci-wolfram-image.wl"]; *)
 
 sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == 
     Cos[t]}, y[x, t], {x, t}]

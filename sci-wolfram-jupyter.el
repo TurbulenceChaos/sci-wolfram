@@ -60,9 +60,9 @@
   :group 'sci-wolfram-mode)
 
 ;;;###autoload
-(with-eval-after-load 'org-src
-  (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
-  (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
+;; (with-eval-after-load 'org-src
+;;   (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
+;;   (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
 
 ;; tools
 (jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " c"))
@@ -106,39 +106,11 @@
 	      (end   (re-search-forward "^:end:" nil t)))
 	  (save-restriction
 	    (narrow-to-region beg end)
-	    ;; Remove ': ' at beginning
 	    (goto-char (point-min))
-	    (while (re-search-forward "^: " nil t)
-	      (replace-match "" nil nil))
-
-	    ;; Change 'Out[number]' to ': Out[number]'
-	    (goto-char (point-min))
-	    (while (re-search-forward "^Out\\[\\([0-9]+\\)\\]" nil t)
-	      (replace-match ": Out[\\1]" nil nil))
-
-	    (when (string= sci-wolfram-formula-type "latex")
-	      (goto-char (point-min))
-	      (let ((latex-beg 0) (latex-end 0))
-		(while (setq latex-beg
-			     (re-search-forward "^\\\\begin{equation\\*}" nil t))
-		  (setq latex-end
-			(re-search-forward "^\\\\end{equation\\*}" nil t))
-		  (save-restriction
-		    (narrow-to-region latex-beg latex-end)
-		    ;; Remove blank lines
-		    (goto-char (point-min))
-		    (while (re-search-forward "\n\\s-*\n" nil t)
-		      (replace-match "\n" nil nil))
-		    
-		    ;; Remove '>' at beginning
-		    (goto-char (point-min))
-		    (while (re-search-forward "^> " nil t)
-		      (replace-match " " nil nil))
-
-		    ;; Remove '\' at end
-		    (goto-char (point-min))
-		    (while (re-search-forward "\\([^\\]\\)\\\\\\s-*$" nil t)
-		      (replace-match "\\1" nil nil))))))))))))
+	    (replace-regexp "^: " "")
+	    ;; (replace-regexp "^\s-*$" "")
+	    ;; (replace-regexp "^> " "")
+	    ))))))
 
 (defmacro sci-wolfram-jupyter-display-marco (name body doc)
   "Use marco to define a function to display latex and image after executing `jupyter-Wolfram-Language' block."

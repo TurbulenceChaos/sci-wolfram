@@ -20,3 +20,11 @@ Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 #+end_src
 
+#+name: sci-wolfram-print-vs-writestring
+#+begin_src jupyter-Wolfram-Language
+str = "For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.";
+
+Print[str];
+
+WriteString["stdout", str, "\n"];
+#+end_src

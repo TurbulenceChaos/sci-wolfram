@@ -125,8 +125,7 @@ sciWolframFormulaType = "image";
 
 sciWolframPlay = "no";
 
-sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory,
-     2][[1]];
+sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]];
 
 sciWolframOrigExpr = "no";
 
@@ -147,11 +146,11 @@ sciWolframRunner[] :=
 
 sciWolframText[expr_] :=
     Module[{},
-        Print[ToString[StringForm[": Out[`1`]= ", n++]]];
-        Print[expr];
+        WriteString["stdout", ToString[StringForm[": Out[`1`]= ", n++]], "\n"];
+        WriteString["stdout", expr, "\n"];
         (* Return the original expr *)
         If[sciWolframOrigExpr == "yes",
-            Print[expr];
+            WriteString["stdout", expr, "\n"];
             expr;
             ,
             If[sciWolframRunner[] == "script",
@@ -166,12 +165,11 @@ sciWolframText[expr_] :=
 
 sciWolframTeX[expr_] :=
     Module[{},
-        Print[ToString[StringForm[": Out[`1`]= ", n++]]];
-        Print["\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}"
-            ];
+        WriteString["stdout", ToString[StringForm[": Out[`1`]= ", n++]], "\n"];
+        WriteString["stdout", "\\begin{equation*}\n" <> ToString[TeXForm[expr]] <> "\n\\end{equation*}", "\n"];
         (* Return the original expr *)
         If[sciWolframOrigExpr == "yes",
-            Print[expr];
+            WriteString["stdout", expr, "\n"];
             expr;
             ,
             If[sciWolframRunner[] == "script",
@@ -200,9 +198,8 @@ sciWolframImage[expr_, playCDF_] :=
         (* Display image *)
         Switch[sciWolframEnv,
             "emacs",
-                Print[ToString[StringForm[": Out[`1`]= ", n++]]];
-                Print["[[file:" <> FileNameDrop[filePNG, FileNameDepth
-                     @ Directory[]] <> "]]"]
+                WriteString["stdout", ToString[StringForm[": Out[`1`]= ", n++]], "\n"];
+                WriteString["stdout", "[[file:" <> FileNameDrop[filePNG, FileNameDepth @ Directory[]] <> "]]", "\n"]
             ,
             "vscode",
                 Run["imgcat " <> filePNG];
@@ -220,7 +217,7 @@ sciWolframImage[expr_, playCDF_] :=
         ];
         (* Return the original expr *)
         If[sciWolframOrigExpr == "yes",
-            Print[expr];
+            WriteString["stdout", expr, "\n"];
             expr;
             ,
             If[sciWolframRunner[] == "script",
