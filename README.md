@@ -5,8 +5,6 @@ Email: [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)  \
 GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wolfram)
 
 # Table of contents
-- [sci-wolfram](#sci-wolfram)
-- [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
 - [Features for Emacs](#features-for-emacs)
 - [Features for VSCode](#features-for-vscode)
@@ -76,7 +74,7 @@ In linux, you can install LaTeX with `sudo apt install texlive-full` to preview 
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
 ;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; for eglot
-;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or for lsp-mode
+;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or lsp-mode
 
 ;; or you can manually download the package and add it to `load-path'
 ;; (add-to-list 'load-path "/path/to/sci-wolfram")
@@ -107,7 +105,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
   (unless (executable-find "wolframscript")
     (message "sci-wolfram: wolframscript not found on PATH"))
   ;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; for eglot
-  ;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or for lsp-mode
+  ;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or lsp-mode
   )
 
 ;; to customize all configurable variables of `sci-wolfram' package,
@@ -146,10 +144,6 @@ Use wolframscript to execute code. Slower than jupyter and do not support sessio
 
 `sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook`
 
-![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif)
-
-A more complex case to add title, section, text, formula, etc. using `TextCell`:
-
 ![sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file.gif](Images/gif/sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook-emacs-script-file-complex-case.gif)
 
 ## For src-block in Org mode
@@ -177,7 +171,7 @@ For emacs org-mode, formulas can be converted into LaTeX fragments, making it ea
 > [!IMPORTANT]
 > Wolfram `Print[code]` function may truncate string lines in repl or jupyter. Consider using `WriteString` instead:
 > ```Mathematica
-> WriteString["std", code, "\n"];
+> WriteString["stdout", code, "\n"];
 > ```
 
 # Installation for VSCode
