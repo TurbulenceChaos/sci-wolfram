@@ -76,6 +76,13 @@
   (shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
 (require 'sci-wolfram-path)
 
+;;;###autoload
+(defun sci-wolfram-run-repl ()
+  "Run wolfram repl"
+  (interactive)
+  (sci-wolfram-make-repl)
+  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+
 ;; format region or buffer
 (defun sci-wolfram-format-code ()
   "Format wolfram codes"

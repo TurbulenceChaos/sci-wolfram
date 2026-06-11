@@ -55,7 +55,8 @@
 
 (defun sci-wolfram-jupyter-display-images ()
   "Auto display latex or images after executing jupyter-Wolfram-Language block."
-  (let ((lang (org-element-property :language (org-element-at-point))))
+  (let* ((info (org-babel-get-src-block-info))
+	 (lang (nth 0 info)))
     (when (string= lang "jupyter-Wolfram-Language")
       (sci-wolfram-jupyter-clean-results)
       (sci-wolfram-display-images))))
