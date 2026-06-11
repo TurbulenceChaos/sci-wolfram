@@ -1,4 +1,4 @@
-;;; sci-wolfram-jupyter.el --- Display wolfram script graphics in emacs org-mode -*- lexical-binding: t -*-
+;;; sci-wolfram-jupyter.el --- Run wolfram script code with jupyter -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025 Peng Peng
 ;; Created: 2025-05-20
@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 ;;
-;; Display wolfram script images in emacs org-mode.
+;; Run wolfram script code with jupyter
 ;;
 ;; Installation:
 ;;
@@ -42,58 +42,77 @@
 (require 'jupyter)
 (require 'jupyter-org-client)
 (require 'sci-wolfram)
+(require 'sci-wolfram-display-images)
 
-;;;###autoload
+(defcustom sci-wolfram-jupyter-kernel
+  (string-trim-right (shell-command-to-string "jupyter kernelspec list | grep wolfram | awk '{print $1}' | head -1"))
+  "wolfram jupyter kernel"
+  :type 'string
+  :group 'sci-wolfram-mode)
+
 (defcustom org-babel-default-header-args:jupyter-Wolfram-Language
   `((:async . "yes")
-    (:kernel . ,(string-trim-right
-                 (shell-command-to-string
-                  "jupyter kernelspec list | grep wolfram | awk '{print $1}' | head -1")))
+    (:kernel . ,sci-wolfram-jupyter-kernel)
     (:session . "jupyter-wolfram-language")
     (:results . "value drawer")
     (:display . "text")
     (:comments . "link")
     (:eval . "never-export")
     (:exports . "both"))
-  "Default header arguments for `Jupyter-Wolfram-Language' block."
+  "Default header arguments for jupyter-Wolfram-Language block."
   :type '(alist :key-type symbol :value-type string)
   :group 'sci-wolfram-mode)
 
-;;;###autoload
 (with-eval-after-load 'org-src
   (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
   (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
 
-;; tools
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " c"))
-			#'sci-wolfram-complete-symbol 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " h"))
-			#'sci-wolfram-doc-lookup 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " i"))
-			#'sci-wolfram-import-pkg 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " f"))
-			#'sci-wolfram-format-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " e"))
-			#'sci-wolfram-eval-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " j"))
-			#'sci-wolfram-jupyter-eval-region-or-buffer 'Wolfram-Language)
-(jupyter-org-define-key (kbd (concat sci-wolfram-mode-leader-key " p"))
-			#'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook 'Wolfram-Language)
+(sci-wolfram-run-region-or-buffer-macro
+ sci-wolfram-jupyter-run-region-or-buffer
+ "Run wolfram script region or buffer code with jupyter"
+ "jupyter-Wolfram-Language")
 
-;; completion
+(add-to-list 'sci-wolfram-key-map '(sci-wolfram-jupyter-run-region-or-buffer . "j") t)
+
+;; org-babel block tools
+(dolist (key-map sci-wolfram-key-map)
+  (jupyter-org-define-key
+   (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr sci-wolfram-key-map)))
+   (car sci-wolfram-key-map)
+   'Wolfram-Language))
+
+;; auto-completion
 (defun sci-wolfram-jupyter-completion-at-point ()
   (jupyter-org-with-src-block-client
    (when (string= (org-element-property :language (org-element-at-point))
 		  "jupyter-Wolfram-Language")
      (sci-wolfram-completion-at-point))))
 
-;;;###autoload
 (defun sci-wolfram-jupyter-add-completion ()
   (add-hook 'completion-at-point-functions
             #'sci-wolfram-jupyter-completion-at-point nil t))
 
-;;;###autoload
 (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
+
+(defun sci-wolfram-jupyter-clean-results ()
+  "Clean jupyter-Wolfram-Language results."
+  (save-excursion
+    (when-let* ((beg (org-babel-where-is-src-block-result))
+		(end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
+      (save-restriction
+        (narrow-to-region (min beg end) (max beg end))
+	(goto-char (point-min))
+	(replace-regexp "^: " "")))))
+
+(defun sci-wolfram-jupyter-display-images ()
+  "Auto display latex or images after executing jupyter-Wolfram-Language block."
+  (let* ((info (org-babel-get-src-block-info))
+	 (lang (nth 0 info)))
+    (when (string= lang "jupyter-Wolfram-Language")
+      (sci-wolfram-jupyter-clean-results)
+      (sci-wolfram-display-images))))
+
+(add-hook 'org-babel-after-execute-hook 'sci-wolfram-jupyter-display-images)
 
 
 (provide 'sci-wolfram-jupyter)

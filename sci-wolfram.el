@@ -83,324 +83,76 @@
   (sci-wolfram-make-repl)
   (switch-to-buffer-other-window sci-wolfram-repl-buffer))
 
-;; format region or buffer
-(defun sci-wolfram-format-code ()
-  "Format wolfram codes"
-  (interactive)
-  (sci-wolfram-make-repl)
-
+(defun sci-wolfram-region-or-buffer-code ()
+  "Return code in region or buffer without space lines"
   (let* ((beg (if (region-active-p)
 		  (region-beginning)
 		(point-min)))
 	 (end (if (region-active-p)
 		  (region-end)
 		(point-max)))
-	 (code (buffer-substring-no-properties beg end))
-	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (code (buffer-substring-no-properties beg end)))
+    (sci-wolfram-remove-space-lines code)))
+
+;; format region or buffer
+(defun sci-wolfram-format-code ()
+  "Format wolfram codes"
+  (interactive)
+  (sci-wolfram-make-repl)
+  (let* ((eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (code (concat
+		(format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n"
+			(sci-wolfram-region-or-buffer-code))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (org-babel-comint-with-output
 	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string
-	     sci-wolfram-repl-buffer
-	     (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"]];\n" "1+1"))
-	    (comint-send-string
-	     sci-wolfram-repl-buffer
-	     (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe)))))
-
-    (delete-region beg end)
-    (insert (substring-no-properties
-	     (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result))))))
-
-(defun sci-wolfram-format (Begin End buffer-type file tmpfile)
-  (let ((formatted-code
-	 (string-trim-right
-	  (shell-command-to-string
-	   (format "wolframscript -script %s %s"
-		   sci-wolfram-format-script tmpfile)))))
+	    (comint-send-string sci-wolfram-repl-buffer code))))
     (save-excursion
-      (save-restriction
-	(narrow-to-region Begin End)
-	(goto-char (point-min))
-	(delete-region (point-min) (point-max))
-	(insert (if (string-suffix-p "\n" formatted-code)
-                    formatted-code
-                  (concat formatted-code "\n")))
-	(if (eq major-mode 'org-mode)
-	    (org-element-cache-reset))))
-    (if (string= buffer-type "not-file")
-    	(delete-file file))
-    (delete-file tmpfile)))
-
-(sci-wolfram-region-or-buffer-marco
- "format"
- ""
- (sci-wolfram-format Begin End buffer-type file tmpfile)
- "Use `CodeFormatter' (https://reference.wolfram.com/language/CodeFormatter/ref/CodeFormat.html)
-to format wolfram region or buffer code.")
+      (if (region-active-p)
+	  (delete-region (region-beginning) (region-end))
+	(erase-buffer))
+      (insert (sci-wolfram-remove-eoe eoe result)))))
 
 ;; eval region or buffer
-(setq sci-wolfram-eval-script
-      (expand-file-name "sci-wolfram-eval.wl"
-			(file-name-directory (or load-file-name buffer-file-name))))
-
 (setq sci-wolfram-image-script
       (expand-file-name "sci-wolfram-image.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-import-pkg-string ()
-  "Import `sci-wolfram-image.wl' package to string"
-  (concat
-   (format
-    "Get[\"%s\"];\n\n"
-    sci-wolfram-image-script)
-   (format 
-    "sciWolframImageDPI = %s;\n\n"
-    sci-wolfram-image-dpi)
-   (format 
-    "sciWolframFormulaType = \"%s\";\n\n"
-    sci-wolfram-formula-type)
-   (format 
-    "sciWolframOrigExpr = \"%s\";\n\n"
-    sci-wolfram-orig-expr)
-   (format 
-    "sciWolframPlay = \"%s\";\n\n"
-    sci-wolfram-play)
-   (format 
-    "sciwolframPlayer = \"%s\";"
-    sci-wolfram-player)))
+(defmacro sci-wolfram-run-region-or-buffer-macro (func-name func-doc lang)
+  "Define a function to run wolfram script region or buffer code"
+  `(defun ,func-name ()
+     ,func-doc
+     (interactive)
+     (let ((code (sci-wolfram-region-or-buffer-code))
+	   (outbuf (get-buffer-create "*Sci-Wolfram Run Result*")))
+       (with-current-buffer outbuf
+	 (unless (eq major-mode 'org-mode)
+	   (org-mode))
+	 (erase-buffer)
+	 (insert (concat
+		  "#+name: sci-wolfram-import-image-package\n"
+		  (format "#+begin_src %s\n" ,lang)
+		  (sci-wolfram-image-package)
+		  "#+end_src\n\n"))
+	 (insert (concat
+		  "#+name: sci-wolfram-run-region-or-buffer\n"
+		  (format "#+begin_src %s\n" ,lang)
+		  code
+		  "\n#+end_src\n\n"))
+	 (org-fold-hide-block-all)
+	 (org-babel-execute-buffer))
+       (display-buffer outbuf))))
 
-(defun sci-wolfram-import-pkg ()
-  "Insert `sci-wolfram-image.wl' package at point"
-  (interactive)
-  (let ((pkg (sci-wolfram-import-pkg-string)))
-    (save-excursion
-      (forward-line 1)
-      (insert (concat pkg "\n"))
-      (if (eq major-mode 'org-mode)
-	  (org-element-cache-reset)))))
+(sci-wolfram-run-region-or-buffer-macro
+ sci-wolfram-run-region-or-buffer
+ "Run wolfram script region or buffer code"
+ "wolfram")
 
-(defun sci-wolfram-eval (state buffer-type file tmpfile)
-  "Execute file with `wolframscript' and pretty print all expressions."
-  (let* ((wrap-code
-	  (string-trim-right
-	   (shell-command-to-string
-	    (format "wolframscript -script %s %s" sci-wolfram-eval-script tmpfile))))) 
-    (with-temp-file tmpfile
-      (insert (concat (sci-wolfram-import-pkg-string) "\n\n" wrap-code))))
-
-  (let ((outbuf (get-buffer-create
-		 (format
-		  "*Eval %s of %s*"
-		  state (file-name-nondirectory file))
-		 t))
-        (command (list "wolframscript" "-script" tmpfile)))
-    (with-current-buffer outbuf
-      (erase-buffer)
-      (insert (if (string= state "region")
-		  (format "Eval region of %s\n\n" file)
-		(format "Eval %s\n\n" file)))
-      (insert (format "Send %s to %s\n\n" state tmpfile))
-      (insert (format
-	       "Run wolframscript -script %s %s to wrap original code\n\n"
-	       sci-wolfram-eval-script tmpfile))
-      (insert (format "Import %s package\n\n" sci-wolfram-image-script))
-      (insert (format "Run wolframscript -script %s\n\n:results:\n" tmpfile)))
-
-    (let ((proc (make-process
-		 :name "sci-wolfram-eval"
-		 :buffer outbuf
-		 :command command
-		 :connection-type 'pipe)))
-
-      (set-process-sentinel
-       proc
-       (lambda (process event)
-	 (when (string-match "finished\\|exited" event)
-	   (if (string= buffer-type "not-file")
-	       (delete-file file))
-	   (delete-file tmpfile)
-	   (with-current-buffer outbuf
-	     (goto-char (point-max))
-	     (insert (format ":end:" tmpfile))
-	     (insert (format "\n\nDelete %s" tmpfile))
-	     (if (string= buffer-type "not-file")
-		 (insert (format "\n\nDelete %s" file)))
-
-	     (unless (eq major-mode 'org-mode)
-	       (org-mode))
-	     (visual-line-mode 1)
-	     (goto-char (point-min))
-	     (when (string= sci-wolfram-formula-type "latex")
-	       (org-remove-latex-fragment-image-overlays)
-	       (org-toggle-latex-fragment))
-	     (org-remove-inline-images)
-	     (org-toggle-inline-images)
-	     (goto-char (point-max)))))))
-    (display-buffer outbuf)))
-
-(defun sci-wolfram-jupyter-eval (state buffer-type file tmpfile)
-  "Execute file with `jupyter-repl' and pretty print all expressions."
-  (let ((outbuf (get-buffer-create
-		 (format
-		  "*Jupyter eval %s of %s*"
-		  state (file-name-nondirectory file))
-		 t)))
-    (with-current-buffer outbuf
-      (unless (eq major-mode 'org-mode)
-	(org-mode))
-      (visual-line-mode 1)
-      (erase-buffer)
-      (insert (if (string= state "region")
-		  (format "Jupyter eval region of %s\n\n" file)
-		(format "Jupyter eval %s\n\n" file)))
-      (insert (format "Send %s to %s\n\n" state tmpfile))
-
-      (insert (format "Import %s package\n\n" sci-wolfram-image-script))
-      (insert (concat
-	       "#+name: sci-wolfram-import-pkg\n"
-	       "#+begin_src jupyter-Wolfram-Language\n"
-	       (sci-wolfram-import-pkg-string)
-	       "\n#+end_src\n\n"))
-
-      (insert (format "Insert code from %s\n\n" tmpfile))
-      (insert (concat
-	       (if (string= state "region")
-		   (format "#+name: sci-wolfram-jupyter-eval-region-of-%s\n" (file-name-nondirectory file))
-		 (format "#+name: sci-wolfram-jupyter-eval-%s\n" (file-name-nondirectory file)))
-	       "#+begin_src jupyter-Wolfram-Language\n"
-	       (string-trim-right
-		(with-temp-buffer
-		  (insert-file-contents tmpfile)
-		  (buffer-string)))
-	       "\n#+end_src\n\n"))
-
-      (delete-file tmpfile)
-      (insert (format "Delete %s\n\n" tmpfile))
-      (when (string= buffer-type "not-file")
-        (delete-file file)
-	(insert (format "Delete %s\n\n" file)))
-
-      (insert "Run `org-babel-execute-buffer'")
-
-      (org-fold-hide-block-all)
-      (org-babel-execute-buffer))
-    (display-buffer outbuf)))
-
-(sci-wolfram-region-or-buffer-marco
- "eval"
- ""
- (sci-wolfram-eval state buffer-type file tmpfile)
- "Use `wolframscript' to eval wolfram region or buffer code and pretty print all expressions.")
-
-(sci-wolfram-region-or-buffer-marco
- "jupyter-eval"
- ""
- (sci-wolfram-jupyter-eval state buffer-type file tmpfile)
- "Use `jupyter-repl' to eval wolfram region or buffer code and pretty print all expressions.")
-
-;; convert region or buffer to pdf and Mathematica notebook,
-;; and then use `wolframplayer' to view the notebook if `sci-wolfram-play' = "yes"
+;; Convert wolfram script to PDF and Mathematica notebook
 (setq sci-wolfram-pdf-script (expand-file-name
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
-
-(defun sci-wolfram-to-pdf-and-notebook (state buffer-type file tmpfile dir)
-  "Execute the current file with WolframScript and convert it to PDF."
-  (let* ((outbuf (get-buffer-create
-		  (format
-		   "*Convert %s of %s to pdf and notebook*"
-		   state (file-name-nondirectory file))))
-	 (file-no-dir (file-name-nondirectory file)) 
-	 (file-name (file-name-base file))
-	 (pdf (concat
-	       file-name
-	       (if (eq major-mode 'org-mode)
-		   (concat "-" (org-element-property :name (org-element-at-point)))	
-		 "")
-	       "-convert.pdf"))
-	 (notebook (concat
-		    file-name
-		    (if (eq major-mode 'org-mode)
-			(concat "-" (org-element-property :name (org-element-at-point)))	
-		      "")
-		    "-convert.nb"))
-	 (tmpfile-no-dir (file-name-nondirectory tmpfile))
-	 (tmpfile-name (file-name-base tmpfile))
-	 (tmppdf (concat
-		  tmpfile-name
-		  "-convert.pdf"))
-	 (tmpnotebook (concat
-		       tmpfile-name
-		       "-convert.nb"))
-         (command (list "wolframscript"
-			"-script"
-			sci-wolfram-pdf-script
-			tmpfile
-			;; sci-wolfram-play
-			;; sci-wolfram-player
-			)))
-    (with-current-buffer outbuf
-      (erase-buffer)
-      ;; (unless (eq major-mode 'org-mode)
-      ;; 	(org-mode))
-      (visual-line-mode 1)
-      (if (string= state "region")
-	  (insert (format
-		   "Convert region of %s to %s.pdf and %s.nb in %s folder"
-		   file-no-dir file-name file-name dir))
-	(insert (format
-		 "Convert %s to %s.pdf and %s.nb in %s folder"
-		 file-no-dir file-name file-name dir)))
-      (insert (format
-	       "\n\nRun %s\n\n"
-	       command)))
-    (let ((proc (make-process
-		 :name "sci-wolfram-to-pdf-and-notebook"
-		 :buffer outbuf
-		 :command command
-		 :connection-type 'pipe)))
-      (set-process-sentinel proc
-			    (lambda (process event)
-			      (when (string-match "finished\\|exited" event)
-				(rename-file (concat dir tmppdf) (concat dir pdf) t)
-				(rename-file (concat dir tmpnotebook) (concat dir notebook) t)
-
-				(if (string= buffer-type "not-file")
-				    (delete-file file))
-				(delete-file tmpfile)
-
-				(with-current-buffer outbuf
-				  (insert (format "Rename %s to %s\n\n" tmppdf pdf))
-				  (insert (format "Rename %s to %s\n\n" tmpnotebook notebook))
-				  (save-excursion
-				    (goto-char (point-max))
-				    (insert (format "Delete %s\n\n" tmpfile)))
-				  (if (string= buffer-type "not-file")
-				      (save-excursion
-					(goto-char (point-max))
-					(insert (format "\n\nDelete %s" file)))))
-
-				(when (string= sci-wolfram-play "yes")
-				  (with-current-buffer outbuf
-				    (save-excursion
-				      (goto-char (point-max))
-				      (insert (format "Use wolframplayer to view %s" notebook))))
-				  (let ((default-directory dir))
-				    (start-process "sci-wolfram-play" nil sci-wolfram-player notebook)))
-
-				(let ((right-window (or (window-in-direction 'right) (split-window-right))))
-				  (select-window right-window)
-				  (with-current-buffer (current-buffer)
-				    (setq-local revert-without-query '(".pdf"))
-				    (find-file (concat dir pdf))))))))
-    (display-buffer outbuf)))
-
-(sci-wolfram-region-or-buffer-marco
- "convert"
- "-to-pdf-and-notebook"
- (sci-wolfram-to-pdf-and-notebook state buffer-type file tmpfile dir)
- "Convert wolfram region or buffer code to pdf and Mathematica notebook.
-Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view the notebook.")
 
 ;; doc lookup
 (defun sci-wolfram-doc-lookup ()
@@ -452,21 +204,17 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 (add-hook 'sci-wolfram-mode-hook #'sci-wolfram-mode-add-completion)
 
 ;; lsp server
-(defun sci-wolfram-setup-lsp-server ()
-  "Set up wolfram lsp server by removing local version if needed."
+(defun sci-wolfram-remove-local-lsp-server ()
+  "Remove local installed LSPServer if needed."
   (call-process-shell-command
-   (concat
-    "wolframscript -code "
-    "'"
-    "PacletUninstall[\"LSPServer\"];"
-    "'")
+   "wolframscript -code 'PacletUninstall[\"LSPServer\"];'"
    nil 0))
 
 (add-hook 'eglot-managed-mode-hook
 	  (lambda ()
 	    (when (derived-mode-p 'sci-wolfram-mode)
 	      (sci-wolfram-mode-remove-completion)
-	      (sci-wolfram-setup-lsp-server))))
+	      (sci-wolfram-remove-local-lsp-server))))
 
 (add-hook 'eglot-shutdown-hook
 	  (lambda ()
@@ -477,7 +225,7 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 	  (lambda ()
 	    (when (derived-mode-p 'sci-wolfram-mode)
 	      (sci-wolfram-mode-remove-completion)
-	      (sci-wolfram-setup-lsp-server))))
+	      (sci-wolfram-remove-local-lsp-server))))
 
 (add-hook 'lsp-after-uninitialized-functions
 	  (lambda (_workspace)
@@ -501,43 +249,43 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
     :server-id 'wolfram-lsp)))
 
 ;; syntax table
-(defvar sci-wolfram-mode-syntax-table nil "Syntax table for `sci-wolfram-mode'.")
+(defvar sci-wolfram-mode-syntax-table nil "Syntax table for sci-wolfram-mode")
 
 (setq
  sci-wolfram-mode-syntax-table
- (let ((xsynTable (make-syntax-table)))
+ (let ((synTable (make-syntax-table)))
    ;; comment
-   (modify-syntax-entry ?\( "()1n" xsynTable)
-   (modify-syntax-entry ?\) ")(4n" xsynTable)
-   (modify-syntax-entry ?* ". 23n" xsynTable)
+   (modify-syntax-entry ?\( "()1n" synTable)
+   (modify-syntax-entry ?\) ")(4n" synTable)
+   (modify-syntax-entry ?* ". 23n" synTable)
    ;; symbol
-   (modify-syntax-entry ?$ "_" xsynTable)
+   (modify-syntax-entry ?$ "_" synTable)
    ;; punctuation
-   (modify-syntax-entry ?! "." xsynTable)
-   (modify-syntax-entry ?# "." xsynTable)
-   (modify-syntax-entry ?% "." xsynTable)
-   (modify-syntax-entry ?& "." xsynTable)
-   (modify-syntax-entry ?' "." xsynTable)
-   (modify-syntax-entry ?+ "." xsynTable)
-   (modify-syntax-entry ?, "." xsynTable)
-   (modify-syntax-entry ?- "." xsynTable)
-   (modify-syntax-entry ?. "." xsynTable)
-   (modify-syntax-entry ?/ "." xsynTable)
-   (modify-syntax-entry ?: "." xsynTable)
-   (modify-syntax-entry ?\; "." xsynTable)
-   (modify-syntax-entry ?< "." xsynTable)
-   (modify-syntax-entry ?= "." xsynTable)
-   (modify-syntax-entry ?> "." xsynTable)
-   (modify-syntax-entry ?? "." xsynTable)
-   (modify-syntax-entry ?@ "." xsynTable)
-   (modify-syntax-entry ?\ "." xsynTable)
-   (modify-syntax-entry ?^ "." xsynTable)
-   (modify-syntax-entry ?_ "." xsynTable)
-   (modify-syntax-entry ?` "." xsynTable)
-   (modify-syntax-entry ?| "." xsynTable)
-   (modify-syntax-entry ?~ "." xsynTable)
-   (modify-syntax-entry ?\\ "." xsynTable)
-   xsynTable))
+   (modify-syntax-entry ?! "." synTable)
+   (modify-syntax-entry ?# "." synTable)
+   (modify-syntax-entry ?% "." synTable)
+   (modify-syntax-entry ?& "." synTable)
+   (modify-syntax-entry ?' "." synTable)
+   (modify-syntax-entry ?+ "." synTable)
+   (modify-syntax-entry ?, "." synTable)
+   (modify-syntax-entry ?- "." synTable)
+   (modify-syntax-entry ?. "." synTable)
+   (modify-syntax-entry ?/ "." synTable)
+   (modify-syntax-entry ?: "." synTable)
+   (modify-syntax-entry ?\; "." synTable)
+   (modify-syntax-entry ?< "." synTable)
+   (modify-syntax-entry ?= "." synTable)
+   (modify-syntax-entry ?> "." synTable)
+   (modify-syntax-entry ?? "." synTable)
+   (modify-syntax-entry ?@ "." synTable)
+   (modify-syntax-entry ?\ "." synTable)
+   (modify-syntax-entry ?^ "." synTable)
+   (modify-syntax-entry ?_ "." synTable)
+   (modify-syntax-entry ?` "." synTable)
+   (modify-syntax-entry ?| "." synTable)
+   (modify-syntax-entry ?~ "." synTable)
+   (modify-syntax-entry ?\\ "." synTable)
+   synTable))
 
 ;; syntax coloring related
 (defvar sci-wolfram-font-lock-keywords nil "Value for `font-lock-defaults'")
@@ -579,17 +327,26 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
   (setq-local comment-end "*)"))
 
 ;; keybinding
-(defcustom sci-wolfram-mode-leader-key "<f6>" "leader key for `sci-wolfram-mode'"
+(defcustom sci-wolfram-mode-leader-key "<f6>"
+  "sci-wolfram-mode leader key"
   :type 'string
   :group 'sci-wolfram-mode)
 
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " c")) #'sci-wolfram-complete-symbol)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " h")) #'sci-wolfram-doc-lookup)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " i")) #'sci-wolfram-import-pkg)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " f")) #'sci-wolfram-format-region-or-buffer)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " e")) #'sci-wolfram-eval-region-or-buffer)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " j")) #'sci-wolfram-jupyter-eval-region-or-buffer)
-(define-key sci-wolfram-mode-map (kbd (concat sci-wolfram-mode-leader-key " p")) #'sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook)
+(defcustom sci-wolfram-key-map
+  '((sci-wolfram-complete-symbol . "c")
+    (sci-wolfram-doc-lookup . "h")
+    (sci-wolfram-import-pkg . "i")
+    (sci-wolfram-format-region-or-buffer . "f")
+    (sci-wolfram-eval-region-or-buffer . "e")
+    (sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook . "p"))
+  "sci-wolfram key map"
+  :type '(alist :key-type symbol :value-type string)
+  :group 'sci-wolfram-mode)
+
+(dolist (key-map sci-wolfram-key-map)
+  (define-key sci-wolfram-mode-map
+	      (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr sci-wolfram-key-map)))
+	      (car sci-wolfram-key-map)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))

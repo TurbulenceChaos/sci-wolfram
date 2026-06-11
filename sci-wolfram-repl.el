@@ -69,16 +69,24 @@
     (let* ((eoe (format "ob_comint_session_wolfram_started_%s" (org-id-uuid))))
       (org-babel-comint-with-output
           (sci-wolfram-repl-buffer eoe)
-        (comint-send-string sci-wolfram-repl-buffer (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe)))))
+        (comint-send-string sci-wolfram-repl-buffer (format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))))
   (setq sci-wolfram-org-babel-initiated t))
+
+(defun sci-wolfram-remove-space-lines (body)
+  "Remove code string space lines"
+  (substring-no-properties
+   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
+
+(defun sci-wolfram-remove-eoe (eoe result)
+  "Remove EOE from result"
+  (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result)))
 
 (defun sci-wolfram-evaluate-session (body)
   "wolfram org-babel block execute session"
   (let* ((eoe (format "ob_comint_session_wolfram_eoe_%s" (org-id-uuid)))
 	 (code (concat
-		(format "%s\n"
-			(replace-regexp-in-string "\n[ \t]*\n+" "\n" body))
-		(format "WriteString[\"stdout\", \"%s\"];\n" eoe)))
+		(format "%s\n" (sci-wolfram-remove-space-lines body))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (if (version<= "9.8" (org-version))
 	      (org-babel-comint-with-output
@@ -87,7 +95,7 @@
 	    (org-babel-comint-with-output
 		(sci-wolfram-repl-buffer eoe)
 	      (comint-send-string sci-wolfram-repl-buffer code)))))
-    (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result))))
+    (sci-wolfram-remove-eoe eoe result)))
 
 (defun sci-wolfram-result-clean (result)
   (prog1
@@ -118,9 +126,9 @@
          (start (format "ob_comint_async_wolfram_start_%s" uuid))
          (end   (format "ob_comint_async_wolfram_end_%s" uuid))
          (code (concat
-		(format "WriteString[\"stdout\", \"%s\"];\n" start)
-		(format "%s\n" (replace-regexp-in-string "\n[ \t]*\n+" "\n" body))
-		(format "WriteString[\"stdout\", \"%s\"];\n" end))))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" start)
+		(format "%s\n" (sci-wolfram-remove-space-lines body))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
     (comint-send-string sci-wolfram-repl-buffer code)
     uuid))
 
@@ -158,6 +166,29 @@
 	(sci-wolfram-display-images)))))
 
 (add-hook 'org-babel-after-execute-hook 'sci-wolfram-auto-display-images)
+
+(defun sci-wolfram-image-package ()
+  "sci-wolfram-image.wl package"
+  (concat
+   (format "Get[\"%s\"];\n\n" sci-wolfram-image-script)
+   (format "sciWolframImageDPI = %s;\n\n" sci-wolfram-image-dpi)
+   "(* Output type: image or latex *)\n\n"
+   (format "sciWolframFormulaType = \"%s\";\n\n" sci-wolfram-formula-type)
+   "(* if or not show original expression *)\n\n"
+   (format "sciWolframOrigExpr = \"%s\";\n\n" sci-wolfram-orig-expr)
+   "(* if or not auto use Wolfram Player to view CDF interactive file *)\n\n"
+   (format "sciWolframPlay = \"%s\";\n\n" sci-wolfram-play)
+   (format "sciWolframPlayer = \"%s\";\n" sci-wolfram-player)))
+
+(defun sci-wolfram-import-image-package ()
+  "Import sci-wolfram-image.wl package"
+  (interactive)
+  (let ((pkg (sci-wolfram-image-package)))
+    (save-excursion
+      (forward-line 1)
+      (insert pkg)
+      (if (eq major-mode 'org-mode)
+	  (org-element-cache-reset)))))
 
 
 (provide 'sci-wolfram-repl)
