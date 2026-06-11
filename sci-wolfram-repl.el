@@ -1,56 +1,126 @@
 ;;; sci-wolfram-repl.el --- Wolfram Mathematica repl -*- lexical-binding: t -*-
+;;
+;; Copyright (C) 2025 Peng Peng
+;; Created: 2025-05-20
+;; Author: Peng Peng <211110103110@stu.just.edu.cn>
+;; Package-Requires: ((emacs "29.1"))
+;; Keywords: languages processes tools
+;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
+;; This file is not part of GNU Emacs
+
+;;; License
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; Add wolfram repl support
+;;
+;; Installation:
+;;
+;; Please check README.md.
+;;
+;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
+
+;;; Code:
+
+(require 'org)
+(require 'org-element)
+(require 'org-src)
 (require 'comint)
+(require 'sci-wolfram-display-images)
 
-(defvar org-babel-wolfram-async--registered nil)
+(defvar sci-wolfram-org-babel-async--registered nil)
 
-(defun wolfram-repl ()
-  (unless (comint-check-proc "*wolfram*")
-    (make-comint-in-buffer "wolfram" "*wolfram*" "wolframscript" nil "-rawterm")
-    (with-current-buffer "*wolfram*"
-      (setq-local comint-prompt-regexp "^In\\[[0-9]+\\]:= *"))
-    (setq org-babel-wolfram-async--registered nil)))
+(defvar sci-wolfram-repl-buffer "*sci-wolfram-repl*")
 
-(defun run-wolfram ()
+(defun sci-wolfram-preoutput-filter-function (input-string)
+  (replace-regexp-in-string " *\r" " \r" input-string))
+
+(defun sci-wolfram-make-repl ()
+  (unless (comint-check-proc sci-wolfram-repl-buffer)
+    ;; (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
+    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript")
+    (with-current-buffer sci-wolfram-repl-buffer
+      (setq-local comint-prompt-regexp "^In\\[[0-9]+\\]:= *")
+      (setq-local comint-process-echoes t)
+      (add-hook 'comint-preoutput-filter-functions
+		'sci-wolfram-preoutput-filter-function nil t))
+    (setq sci-wolfram-org-babel-async--registered nil)))
+
+;;;###autoload
+(defun sci-wolfram-run-repl ()
   (interactive)
-  (wolfram-repl)
-  (switch-to-buffer-other-window "*wolfram*"))
+  (sci-wolfram-make-repl)
+  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+
+;;;###autoload
+(defcustom org-babel-default-header-args:wolfram
+  '((:results . "value drawer")
+    (:display . "text")
+    (:comments . "link")
+    (:eval . "never-export")
+    (:exports . "both"))
+  "Default header arguments for wolfram block."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'sci-wolfram-mode)
+
+;;;###autoload
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
 
 ;; (defun org-babel-execute:wolfram (body params)
 ;;   "wolfram org-babel block session execute"
-;;   (wolfram-repl)
+;;   (sci-wolfram-make-repl)
 
 ;;   (let* ((eoe (format "ob_comint_session_wolfram_eoe_%s" (org-id-uuid)))
 ;; 	 (result
 ;; 	  (org-babel-comint-with-output
-;; 	      ("*wolfram*" eoe) ; for org 9.8 ("*wolfram*" eoe nil nil 'disable-prompt-filtering)
-;; 	    (comint-send-string "*wolfram*" (format "%s\n" body))
-;; 	    (comint-send-string "*wolfram*" (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe)))))
+;; 	      (sci-wolfram-repl-buffer eoe) ; for org 9.8 (sci-wolfram-repl-buffer eoe nil nil 'disable-prompt-filtering)
+;; 	    (comint-send-string sci-wolfram-repl-buffer (format "%s\n" body))
+;; 	    (comint-send-string sci-wolfram-repl-buffer (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe)))))
 ;;     (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result))))
+
+;; (defun sci-wolfram-result-clean (result)
+;;   (prog1
+;;       (replace-regexp-in-string "^ \n \n" "" result)
+;;     (run-at-time 0 nil 'sci-wolfram-auto-display-images)))
 
 (defun org-babel-execute:wolfram (body params)
   "wolfram org-babel block async execute"
-  (wolfram-repl)
+  (sci-wolfram-make-repl)
 
-  (unless org-babel-wolfram-async--registered
+  (unless sci-wolfram-org-babel-async--registered
     ;; (let* ((eoe (format "ob_comint_session_wolfram_started_%s" (org-id-uuid))))
     ;;   (org-babel-comint-with-output
-    ;;       ("*wolfram*" eoe)
-    ;;     (comint-send-string "*wolfram*" (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe))))
+    ;;       (sci-wolfram-repl-buffer eoe)
+    ;;     (comint-send-string sci-wolfram-repl-buffer (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe))))
 
     (if (version<= "9.8" (org-version))
         (org-babel-comint-async-register
-         "*wolfram*" (current-buffer)
+         sci-wolfram-repl-buffer (current-buffer)
          "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-         'org-babel-chomp
+         'sci-wolfram-result-clean ; 'org-babel-chomp
          'org-babel-eval-read-file
          'disable-prompt-filtering)
       (org-babel-comint-async-register
-       "*wolfram*" (current-buffer)
+       sci-wolfram-repl-buffer (current-buffer)
        "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-       'org-babel-chomp
+       'sci-wolfram-result-clean ; 'org-babel-chomp
        'org-babel-eval-read-file))
-    (setq org-babel-wolfram-async--registered t))
+    (setq sci-wolfram-org-babel-async--registered t))
 
   (let* ((uuid (org-id-uuid))
          (start (format "ob_comint_async_wolfram_start_%s" uuid))
@@ -58,9 +128,8 @@
          (code (concat
 		(format "WriteString[\"stdout\", \"\\n%s\\n\"];\n" start)
 		body "\n"
-		(format "WriteString[\"stdout\", \"\\n%s\\n\"];\n" end)
-		)))
-    (comint-send-string "*wolfram*" code)
+		(format "WriteString[\"stdout\", \"\\n%s\\n\"];\n" end))))
+    (comint-send-string sci-wolfram-repl-buffer code)
     uuid))
 
 

@@ -95,63 +95,6 @@
 ;;;###autoload
 (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
 
-;; diaply image and latex
-(defun sci-wolfram-jupyter-clean-results ()
-  "Clean jupyter-Wolfram-Language results."
-  (let ((result-beg (org-babel-where-is-src-block-result)))
-    (save-excursion
-      (when (and result-beg
-		 (goto-char result-beg))
-	(let ((beg (re-search-forward "^:results:" nil t))
-	      (end   (re-search-forward "^:end:" nil t)))
-	  (save-restriction
-	    (narrow-to-region beg end)
-	    (goto-char (point-min))
-	    (replace-regexp "^: " "")
-	    ;; (replace-regexp "^\s-*$" "")
-	    ;; (replace-regexp "^> " "")
-	    ))))))
-
-(defmacro sci-wolfram-jupyter-display-marco (name body doc)
-  "Use marco to define a function to display latex and image after executing `jupyter-Wolfram-Language' block."
-  `(defun ,(intern (format "sci-wolfram-jupyter-display-%s" name)) ()
-     ,doc
-     (unless (or
-	      ;; ...but not while emacs is exporting an org buffer
-	      (bound-and-true-p org-export-current-backend)
-	      ;; ...and not while tangling org buffers
-	      (string-match-p "^ \\*temp" (buffer-name)))
-       (save-excursion
-         (let* ((beg (org-babel-where-is-src-block-result))
-                (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
-           (save-restriction
-             (narrow-to-region (min beg end) (max beg end))
-             ,body))))))
-
-(sci-wolfram-jupyter-display-marco
- "latex"
- (org-latex-preview)
- "Display latex after executing jupyter-Wolfram-Language block.")
-
-(sci-wolfram-jupyter-display-marco
- "images"
- (org-display-inline-images)
- "Display image after executing jupyter-Wolfram-Language block.")
-
-;;;###autoload
-(defun sci-wolfram-jupyter-display ()
-  "Display latex and image after executing jupyter-Wolfram-Language block."
-  (let ((lang (org-element-property :language (org-element-at-point))))
-    (when (string= lang "jupyter-Wolfram-Language")
-      (when (org-babel-where-is-src-block-result)
-	(sci-wolfram-jupyter-clean-results)
-	(when (string= sci-wolfram-formula-type "latex")
-	  (sci-wolfram-jupyter-display-latex))))
-    (sci-wolfram-jupyter-display-images)))
-
-;;;###autoload
-(add-hook 'org-babel-after-execute-hook #'sci-wolfram-jupyter-display)
-
 
 (provide 'sci-wolfram-jupyter)
 ;;; sci-wolfram-jupyter.el ends here

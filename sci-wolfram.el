@@ -33,105 +33,33 @@
 ;;
 ;; Please check README.md.
 ;;
-;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
-
-;;; Customization:
 ;; To customize all configurable variables of `sci-wolfram' package,
-;; just type M-x customize-group RET sci-wolfram-mode
+;; just type M-x customize-group RET sci-wolfram-mode RET
 ;;
-;; 1. sci-wolfram-formula-type
-;;
-;; For emacs, formula output types:
-;;
-;; "latex" or "image" (by default)
-;;
-;; You can also specify it by
-;;
-;; (custom-set-variables
-;;  '(sci-wolfram-formula-type "latex"))
-;;
-;; 2. sci-wolfram-image-dpi
-;;
-;; Image output resolution:
-;;
-;; 150 DPI in "emacs" by default
-;;
-;; You can specify it by
-;;
-;; (custom-set-variables
-;;  '(sci-wolfram-image-dpi 150))
-;;
-;; 3. sci-wolfram-orig-expr
-;;
-;; Whether to display both inline images and original expression:
-;;
-;; "yes" (Enable) or "no" (disable by default)
-;;
-;; You can specify it by
-;;
-;; (custom-set-variables
-;;  '(sci-wolfram-orig-expr "yes"))
-;;
-;; 4. sci-wolfram-play
-;;
-;; Whether to use `wolframplayer' to view `.cdf' files:
-;;
-;; "yes" (Enable) or "no" (disable by default)
-;;
-;; You can specify it by
-;;
-;; (custom-set-variables
-;;  '(sci-wolfram-play "yes"))
-;;
-;; 5. sci-wolfram-player
-;;
-;; Path to the Wolfram Player, which is set as
-;;
-;; (string-trim-right
-;;    (shell-command-to-string
-;;     "wolframscript -code 'FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]]'"))
-;;
-;; You can also specify the path by
-;;
-;; for linux:
-;;
-;; (custom-set-variables
-;;  '(sci-wolfram-player "/path/to/wolframplayer"))
-;;
-;; for windows:
-;; (custom-set-variables
-;;  '(sci-wolfram-player "/path/to/wolframplayer.exe"))
-;;
-;; 6. Notes: 
-;;
-;; (1) In repl environment (such as jupyter repl, jupyter org block),
-;;
-;; if you want to restore `$Post` to its original state, just execute
-;;
-;; $Post=.
-;;
-;; (2) `%` operator works only in repl env
+;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
 (require 'org)
 (require 'org-element)
+(require 'comint)
+(require 'sci-wolfram-repl)
 
 ;;;###autoload
-(defgroup sci-wolfram-mode nil "Major mode for wolfram scripts.")
+(defgroup sci-wolfram-mode nil "Major mode for wolfram script")
 
 (defcustom sci-wolfram-image-dpi 150
-  "Image resolution"
+  "Wolfram image resolution"
   :type 'number
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-formula-type "image"
-  "Formula output type: image (default) or latex"
+  "Wolfram output type: image (default) or latex"
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-orig-expr "no"
-  "Whether to display both images and original expression: yes or no (default)"
+  "Whether to display original raw results: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
@@ -141,97 +69,40 @@
   :group 'sci-wolfram-mode)
 
 (setq sci-wolfram-path-script (expand-file-name
-			      "sci-wolfram-path.wl"
-			      (file-name-directory (or load-file-name buffer-file-name))))
+			       "sci-wolfram-path.wl"
+			       (file-name-directory (or load-file-name buffer-file-name))))
 
 (unless (file-exists-p (concat (file-name-sans-extension sci-wolfram-path-script) ".el"))
-	(shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
-
+  (shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
 (require 'sci-wolfram-path)
 
-(defmacro sci-wolfram-region-or-buffer-marco (name-1 name-2 body doc)
-  "Use marco to define a function to process wolfram region or buffer code."
-  `(defun ,(intern (format "sci-wolfram-%s-region-or-buffer%s" name-1 name-2)) (Begin End &optional Xinsert)
-     ,doc
-     (interactive
-      (append
-       (if (region-active-p)
-	   (list (region-beginning) (region-end))
-	 (list (point-min) (point-max)))
-       current-prefix-arg nil))
-     ;; (when (not buffer-file-name)
-     ;;   (user-error "Buffer is not a file. Save it first!"))
-     (let* ((state
-	     (if (region-active-p)
-		 "region"
-	       "buffer"))
-	    (buffer-type (if buffer-file-name
-			     "file"
-			   "not-file"))
-	    (Begin (if (and (string= state "buffer")
-			    (eq major-mode 'org-mode)
-			    (string= (org-element-property :language (org-element-at-point))
-                                     "jupyter-Wolfram-Language"))
-                       (save-excursion
-			 (org-babel-goto-src-block-head)
-			 (forward-line 1)
-			 (point))
-                     Begin))
-	    (End (if (and (string= state "buffer")
-			  (eq major-mode 'org-mode)
-			  (string= (org-element-property :language (org-element-at-point))
-				   "jupyter-Wolfram-Language"))
-                     (save-excursion
-                       (org-babel-goto-src-block-head)
-                       (re-search-forward "^[ \t]*#\\+end_src" nil t)
-                       (forward-line -1)
-                       (end-of-line)
-                       (point))
-		   End))
-	    (code (buffer-substring-no-properties Begin End))
-	    (file (if (string= buffer-type "file")
-		      buffer-file-name
-		    ;; for edit org-src block, where buffer is not a file
-		    (let* ((dir default-directory)
-			   (filename (expand-file-name
-				      (format "%s-%s-%x.wl"
-					      (replace-regexp-in-string
-					       "^-\\|-$"
-					       ""
-					       (replace-regexp-in-string
-						"[^a-z0-9]+"
-						"-"
-						(downcase (buffer-name))))
-					      (format-time-string "%Y%m%d-%H%M%S")
-					      (random #xfffff))
-				      dir)))
-		      (unless (file-directory-p dir)
-			(make-directory dir t))
-		      (with-temp-file filename
-			(insert code))
-		      filename)))
-	    (dir (file-name-directory file))
-	    (tmpfile (expand-file-name
-		      (format "%s-%s-%x.wl"
-			      (file-name-base file)
-			      (format-time-string "%Y%m%d%-H%M%S")
-			      (random #xfffff))
-		      dir))) 
-       (when (and (string= state "buffer")
-		  (not (eq major-mode 'org-mode)) 
-		  (not (eq major-mode 'sci-wolfram-mode)))
-	 (user-error "Buffer is not a wolfram script!"))
-       ;; send region or buffer to tmp file
-       (with-temp-file tmpfile (insert code))
-       ;; (sci-wolfram-format Begin End buffer-type file tmpfile)
-       ;; (sci-wolfram-eval state buffer-type file tmpfile)
-       ;; (sci-wolfram-to-pdf-and-notebook state buffer-type file tmpfile dir)
-       ,body)))
-
 ;; format region or buffer
-(setq sci-wolfram-format-script
-      (expand-file-name "sci-wolfram-format.wl"
-			(file-name-directory (or load-file-name buffer-file-name))))
+(defun sci-wolfram-format-code ()
+  "Format wolfram codes"
+  (interactive)
+  (sci-wolfram-make-repl)
+
+  (let* ((beg (if (region-active-p)
+		  (region-beginning)
+		(point-min)))
+	 (end (if (region-active-p)
+		  (region-end)
+		(point-max)))
+	 (code (buffer-substring-no-properties beg end))
+	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (result
+	  (org-babel-comint-with-output
+	      (sci-wolfram-repl-buffer eoe)
+	    (comint-send-string
+	     sci-wolfram-repl-buffer
+	     (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"]];\n" "1+1"))
+	    (comint-send-string
+	     sci-wolfram-repl-buffer
+	     (format "WriteString[\"stdout\", \"\n%s\n\"]\n" eoe)))))
+
+    (delete-region beg end)
+    (insert (substring-no-properties
+	     (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result))))))
 
 (defun sci-wolfram-format (Begin End buffer-type file tmpfile)
   (let ((formatted-code
@@ -339,7 +210,7 @@ to format wolfram region or buffer code.")
        (lambda (process event)
 	 (when (string-match "finished\\|exited" event)
 	   (if (string= buffer-type "not-file")
-               (delete-file file))
+	       (delete-file file))
 	   (delete-file tmpfile)
 	   (with-current-buffer outbuf
 	     (goto-char (point-max))
@@ -575,14 +446,14 @@ Then use `wolframplayer' (free to use) (https://www.wolfram.com/player/) to view
 
 ;; lsp server
 (defun sci-wolfram-setup-lsp-server ()
-    "Set up wolfram lsp server by removing local version if needed."
-    (call-process-shell-command
-     (concat
-      "wolframscript -code "
-      "'"
-      "PacletUninstall[\"LSPServer\"];"
-      "'")
-     nil 0))
+  "Set up wolfram lsp server by removing local version if needed."
+  (call-process-shell-command
+   (concat
+    "wolframscript -code "
+    "'"
+    "PacletUninstall[\"LSPServer\"];"
+    "'")
+   nil 0))
 
 (add-hook 'eglot-managed-mode-hook
 	  (lambda ()
