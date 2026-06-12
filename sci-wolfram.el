@@ -83,6 +83,7 @@
   (sci-wolfram-make-repl)
   (switch-to-buffer-other-window sci-wolfram-repl-buffer))
 
+;; run wolfram script region or buffer code
 (defun sci-wolfram-region-or-buffer-code ()
   "Return code in region or buffer without space lines"
   (let* ((beg (if (region-active-p)
@@ -94,28 +95,7 @@
 	 (code (buffer-substring-no-properties beg end)))
     (sci-wolfram-remove-space-lines code)))
 
-;; format region or buffer
-(defun sci-wolfram-format-code ()
-  "Format wolfram codes"
-  (interactive)
-  (sci-wolfram-make-repl)
-  (let* ((eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
-	 (code (concat
-		(format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n"
-			(sci-wolfram-region-or-buffer-code))
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
-	 (result
-	  (org-babel-comint-with-output
-	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string sci-wolfram-repl-buffer code))))
-    (save-excursion
-      (if (region-active-p)
-	  (delete-region (region-beginning) (region-end))
-	(erase-buffer))
-      (insert (sci-wolfram-remove-eoe eoe result)))))
-
-;; eval region or buffer
-(setq sci-wolfram-image-script
+(defvar sci-wolfram-image-script
       (expand-file-name "sci-wolfram-image.wl"
 			(file-name-directory (or load-file-name buffer-file-name))))
 
@@ -153,6 +133,31 @@
 (setq sci-wolfram-pdf-script (expand-file-name
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
+
+(defun sci-wolfram-convert-to-pdf-and-notebook ()
+  "Convert wolfram script to PDF and Mathematica notebook"
+  (interactive)
+  )
+
+;; format region or buffer
+(defun sci-wolfram-format-code ()
+  "Format wolfram codes"
+  (interactive)
+  (sci-wolfram-make-repl)
+  (let* ((eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (code (concat
+		(format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n"
+			(sci-wolfram-region-or-buffer-code))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
+	 (result
+	  (org-babel-comint-with-output
+	      (sci-wolfram-repl-buffer eoe)
+	    (comint-send-string sci-wolfram-repl-buffer code))))
+    (save-excursion
+      (if (region-active-p)
+	  (delete-region (region-beginning) (region-end))
+	(erase-buffer))
+      (insert (sci-wolfram-remove-eoe eoe result)))))
 
 ;; doc lookup
 (defun sci-wolfram-doc-lookup ()
