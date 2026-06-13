@@ -96,8 +96,8 @@
     (sci-wolfram-remove-space-lines code)))
 
 (defvar sci-wolfram-image-script
-      (expand-file-name "sci-wolfram-image.wl"
-			(file-name-directory (or load-file-name buffer-file-name))))
+  (expand-file-name "sci-wolfram-image.wl"
+		    (file-name-directory (or load-file-name buffer-file-name))))
 
 (defmacro sci-wolfram-run-region-or-buffer-macro (func-name func-doc lang)
   "Define a function to run wolfram script region or buffer code"
@@ -111,7 +111,7 @@
 	   (org-mode))
 	 (erase-buffer)
 	 (insert (concat
-		  "#+name: sci-wolfram-import-image-package\n"
+		  "#+name: import-sci-wolfram-image-package\n"
 		  (format "#+begin_src %s\n" ,lang)
 		  (sci-wolfram-image-package)
 		  "#+end_src\n\n"))
@@ -134,10 +134,32 @@
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
-(defun sci-wolfram-convert-to-pdf-and-notebook ()
-  "Convert wolfram script to PDF and Mathematica notebook"
-  (interactive)
-  )
+(defmacro sci-wolfram-run-region-or-buffer-macro (func-name func-doc lang)
+  "Define a function to run wolfram script region or buffer code"
+  `(defun ,func-name ()
+     ,func-doc
+     (interactive)
+     (let ((file (buffer-file-name))
+	   (outbuf (get-buffer-create "*Sci-Wolfram Convert Result*")))
+       (with-current-buffer outbuf
+	 (unless (eq major-mode 'org-mode)
+	   (org-mode))
+	 (erase-buffer)
+	 (insert (concat
+		  "#+name: import-sci-wolfram-convert-to-notebook-package\n"
+		  (format "#+begin_src %s\n" ,lang)
+		  (sci-wolfram-image-package)
+		  "#+end_src\n\n"))
+	 (insert (concat
+		  "#+name: sci-wolfram-convert\n"
+		  (format "#+begin_src %s\n" ,lang)
+		  (format "sciWolframConvertToNotebook[\"%s\"];" file)
+		  "\n#+end_src\n\n"))
+	 (org-fold-hide-block-all)
+	 (org-babel-execute-buffer))
+       (display-buffer outbuf))))
+
+"Convert wolfram script to PDF and Mathematica notebook"
 
 ;; format region or buffer
 (defun sci-wolfram-format-code ()
@@ -157,7 +179,7 @@
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
 	(erase-buffer))
-      (insert (sci-wolfram-remove-eoe eoe result)))))
+      (insert (sci-wolfram-remove-eoe result eoe)))))
 
 ;; doc lookup
 (defun sci-wolfram-doc-lookup ()
@@ -320,8 +342,9 @@
    (,(regexp-opt BadSymbols 'symbols) . font-lock-warning-face)
    (,(regexp-opt UnsupportedCharacters) . font-lock-comment-face)
    (,(regexp-opt UnsupportedLongNames 'symbols) . font-lock-comment-face)
-   ("\\b[a-z][A-Za-z0-9]*" . font-lock-variable-name-face)
-   ("\\b[A-Z][A-Za-z0-9]*" . font-lock-type-face)))
+   ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\[" 1 font-lock-function-name-face)
+   ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)
+ ))
 
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"

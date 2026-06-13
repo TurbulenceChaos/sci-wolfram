@@ -2,20 +2,11 @@
 
 BeginPackage["sciWolframConvertToNotebook`"];
 
-sciWolframConvertToNotebook::usage = "sciWolframConvertToNoteBook[file];
-Auto use Wolfram Player to view Mathematica notbook:
-sciWolframPlay = \"yes\";
-sciWolframConvertToNoteBook[file, sciWolframPlay];
-Manually specify Wolfram Player path:
-sciWolframPlay = \"yes\";
-sciWolframPlayer = \"/path/to/wolframplayer\" for linux or \"/path/to/wolframplayer.exe\" for windows;
-sciWolframConvertToNoteBook[file, sciWolframPlay, sciWolframPlayer];";
+sciWolframConvertToNotebook::usage = "sciWolframConvertToNoteBook[file];"
 
 Begin["`Private`"];
 
-sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]];
-
-sciWolframConvertToNotebook[file_, sciWolframPlay_: "no", sciWolframPlayer_: sciWolframPlayer] :=
+sciWolframConvertToNotebook[file_] :=
 
 Module[{fileBaseName, dir, filePDF, fileNB, exprs, cells, notebook},
 SetOptions[First[$Output], FormatType -> StandardForm]; (* Ref: https://mathematica.stackexchange.com/a/133058/95308 *)
@@ -54,16 +45,17 @@ UsingFrontEnd[
     NotebookEvaluate[notebook, InsertResults -> True];
     Export[filePDF, notebook];
     Export[fileNB, notebook];
+    SystemOpen[filePDF];
+    SystemOpen[fileNB];
     NotebookClose[notebook];
 ];
 
-If[sciWolframPlay == "yes",
-    StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> dir]
-];
+WriteString["stdout", "Convert ", file, " -> ", filePDF, "\n"];
+WriteString["stdout", "Convert ", file, " -> ", fileNB, "\n"];
 
 (* Add below code to stop frontend if you use: wolframscript -f /path/to/sci-wolfram-pdf.wl /path/to/file.wl *)
 
-(* Developer`UninstallFrontEnd[]; *)
+Developer`UninstallFrontEnd[];
 ]
 
 End[];

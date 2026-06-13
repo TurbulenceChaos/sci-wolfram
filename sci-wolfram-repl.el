@@ -42,7 +42,7 @@
 (require 'comint)
 (require 'sci-wolfram-display-images)
 
-(defvar sci-wolfram-repl-buffer "*sci-wolfram-repl*")
+(defvar sci-wolfram-repl-buffer "*Wolfram REPL*")
 
 (defvar sci-wolfram-org-babel--initiated nil)
 
@@ -77,7 +77,7 @@
   (substring-no-properties
    (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
 
-(defun sci-wolfram-remove-eoe (eoe result)
+(defun sci-wolfram-remove-eoe (result eoe)
   "Remove EOE from result"
   (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result)))
 
@@ -95,12 +95,12 @@
 	    (org-babel-comint-with-output
 		(sci-wolfram-repl-buffer eoe)
 	      (comint-send-string sci-wolfram-repl-buffer code)))))
-    (sci-wolfram-remove-eoe eoe result)))
+    (sci-wolfram-remove-eoe result eoe)))
 
 (defun sci-wolfram-result-clean (result)
   (prog1
       result ; (replace-regexp-in-string "^ \n \n" "" result)
-    (run-at-time 0.1 nil 'sci-wolfram-display-images)))
+    (run-at-time 0 nil 'sci-wolfram-display-images)))
 
 (defun sci-wolfram-org-babel-register-async ()
   (unless sci-wolfram-org-babel-async--registered
