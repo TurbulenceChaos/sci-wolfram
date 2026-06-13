@@ -4,7 +4,7 @@
 ;; Created: 2025-05-20
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Requires: ((emacs "29.1"))
-;; Keywords: languages processes tools 
+;; Keywords: languages processes tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
@@ -67,14 +67,45 @@
   (add-to-list 'org-src-lang-modes '("Wolfram-Language" . sci-wolfram))
   (add-to-list 'org-src-lang-modes '("jupyter-Wolfram-Language" . sci-wolfram)))
 
+(defvar sci-wolfram-jupyter-repl-buffer "*jupyter-repl[Wolfram-Language 12.0]*")
+
+;; run region or buffer code
 (sci-wolfram-run-region-or-buffer-macro
  sci-wolfram-jupyter-run-region-or-buffer
  "Run wolfram script region or buffer code with jupyter"
  "jupyter-Wolfram-Language")
 
-(add-to-list 'sci-wolfram-key-map '(sci-wolfram-jupyter-run-region-or-buffer . "j") t)
+(add-to-list 'sci-wolfram-key-map '(sci-wolfram-jupyter-run-region-or-buffer . "j r") t)
 
-;; org-babel block tools
+(sci-wolfram-convert-to-notebook-macro
+ sci-wolfram-jupyter-convert-to-notebook
+ "Convert wolfram script to PDF and Mathematica notebook"
+ "jupyter-Wolfram-Language")
+
+(add-to-list 'sci-wolfram-key-map '(sci-wolfram-jupyter-convert-to-notebook . "j n") t)
+
+;; format region or buffer
+(defun sci-wolfram-jupyter-format-code ()
+  "jupyter format wolfram codes"
+  (interactive)
+  ;; (call-interactively 'jupyter-run-repl)
+
+  (let* ((eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (code (concat
+		(format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n"
+			(sci-wolfram-region-or-buffer-code))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
+	 (result
+	  (org-babel-comint-with-output
+	      (sci-wolfram-jupyter-repl-buffer eoe)
+	    (comint-send-string sci-wolfram-jupyter-repl-buffer code))))
+    (save-excursion
+      (if (region-active-p)
+	  (delete-region (region-beginning) (region-end))
+	(erase-buffer))
+      (insert (sci-wolfram-remove-eoe result eoe)))))
+
+;; jupyter-Wolfram-Language block tools
 (dolist (key-map sci-wolfram-key-map)
   (jupyter-org-define-key
    (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr sci-wolfram-key-map)))
@@ -90,7 +121,7 @@
 
 (defun sci-wolfram-jupyter-add-completion ()
   (add-hook 'completion-at-point-functions
-            #'sci-wolfram-jupyter-completion-at-point nil t))
+	    #'sci-wolfram-jupyter-completion-at-point nil t))
 
 (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
 
@@ -100,7 +131,7 @@
     (when-let* ((beg (org-babel-where-is-src-block-result))
 		(end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
       (save-restriction
-        (narrow-to-region (min beg end) (max beg end))
+	(narrow-to-region (min beg end) (max beg end))
 	(goto-char (point-min))
 	(replace-regexp "^: " "")))))
 

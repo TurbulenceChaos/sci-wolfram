@@ -134,7 +134,7 @@
 			      "sci-wolfram-pdf.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
-(defmacro sci-wolfram-run-region-or-buffer-macro (func-name func-doc lang)
+(defmacro sci-wolfram-convert-to-notebook-macro (func-name func-doc lang)
   "Define a function to run wolfram script region or buffer code"
   `(defun ,func-name ()
      ,func-doc
@@ -151,7 +151,7 @@
 		  (sci-wolfram-image-package)
 		  "#+end_src\n\n"))
 	 (insert (concat
-		  "#+name: sci-wolfram-convert\n"
+		  "#+name: sci-wolfram-convert-to-notebook\n"
 		  (format "#+begin_src %s\n" ,lang)
 		  (format "sciWolframConvertToNotebook[\"%s\"];" file)
 		  "\n#+end_src\n\n"))
@@ -159,7 +159,10 @@
 	 (org-babel-execute-buffer))
        (display-buffer outbuf))))
 
-"Convert wolfram script to PDF and Mathematica notebook"
+(sci-wolfram-convert-to-notebook-macro
+ sci-wolfram-convert-to-notebook
+ "Convert wolfram script to PDF and Mathematica notebook"
+ "wolfram")
 
 ;; format region or buffer
 (defun sci-wolfram-format-code ()
@@ -344,7 +347,7 @@
    (,(regexp-opt UnsupportedLongNames 'symbols) . font-lock-comment-face)
    ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\[" 1 font-lock-function-name-face)
    ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)
- ))
+   ))
 
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
@@ -363,10 +366,10 @@
 (defcustom sci-wolfram-key-map
   '((sci-wolfram-complete-symbol . "c")
     (sci-wolfram-doc-lookup . "h")
-    (sci-wolfram-import-pkg . "i")
+    (sci-wolfram-import-image-pkg . "i")
+    (sci-wolfram-import-convert-to-notebook-pkg . "n")
     (sci-wolfram-format-region-or-buffer . "f")
-    (sci-wolfram-eval-region-or-buffer . "e")
-    (sci-wolfram-convert-region-or-buffer-to-pdf-and-notebook . "p"))
+    (sci-wolfram-run-region-or-buffer . "e"))
   "sci-wolfram key map"
   :type '(alist :key-type symbol :value-type string)
   :group 'sci-wolfram-mode)

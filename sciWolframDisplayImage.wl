@@ -5,16 +5,16 @@ BeginPackage["sciWolframDisplayImage`"];
 sciWolframDisplayImage::usage = "Display wolfram script image.
 Usage:
 Default:
-$Post = sciWolframDisplayImage[#]&;
+$Post = sciWolframDisplayImage[#] &;
 All options:
 $Post = sciWolframDisplayImage[#,
-sciWolframEnv		-> \"emacs\" or \"vscode\",
-sciWolframFormulaType	-> \"image\" or \"latex\",
+sciWolframEnv		-> \"emacs\" or \"vscode\" (If[Environment[\"TERM_PROGRAM\"] === \"vscode\", \"vscode\", \"emacs\"]),
+sciWolframFormulaType	-> \"image\" (default) or \"latex\",
 sciWolframImageDir	-> \"image output direcory\",
-sciWolframImageDPI	-> 150,
-sciWolframPlay		-> \"yes\" or \"no\"
+sciWolframImageDPI	->  default 150 for emacs and 100 for vscode,
+sciWolframPlay		-> \"yes\" or \"no\" (default) to convert to CDF interactive file
 ] &;
-Tyep below code restore $Post original value:
+Tyep below code to reset $Post:
 $Post = .
 ";
 
@@ -44,8 +44,7 @@ sciWolframTeX[expr_] :=
 
 (* Display Image output *)
 
-sciWolframImage[expr_, sciWolframEnv_, sciWolframImageDir_, sciWolframImageDPI_,
-	 playCDF_] :=
+sciWolframImage[expr_, sciWolframEnv_, sciWolframImageDir_, sciWolframImageDPI_, playCDF_] :=
 	Module[{filePNG, fileCDF},
 		If[Not @ DirectoryQ[sciWolframImageDir],
 			CreateDirectory[sciWolframImageDir, CreateIntermediateDirectories -> True]
