@@ -159,8 +159,10 @@
   :type '(alist :key-type symbol :value-type string)
   :group 'sci-wolfram-mode)
 
+(defvar sci-wolfram-org-src-block-name "wolfram")
+
 (with-eval-after-load 'org-src
-  (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
+  (add-to-list 'org-src-lang-modes `(,sci-wolfram-org-src-block-name . sci-wolfram)))
 
 (defun sci-wolfram-auto-display-images ()
   "Auto display latex or images after executing wolfram session block."
@@ -168,34 +170,11 @@
 	 (lang (nth 0 info))
 	 (params (nth 2 info))
 	 (async (cdr (assq :async params))))
-    (when (string= lang "wolfram")
+    (when (string= lang sci-wolfram-org-src-block-name)
       (unless (string-match-p "yes" async)
 	(sci-wolfram-display-images)))))
 
 (add-hook 'org-babel-after-execute-hook 'sci-wolfram-auto-display-images)
-
-(defun sci-wolfram-image-package ()
-  "sci-wolfram-image.wl package"
-  (concat
-   (format "Get[\"%s\"];\n\n" sci-wolfram-image-script)
-   (format "sciWolframImageDPI = %s;\n\n" sci-wolfram-image-dpi)
-   "(* Output type: image or latex *)\n\n"
-   (format "sciWolframFormulaType = \"%s\";\n\n" sci-wolfram-formula-type)
-   "(* if or not show original expression *)\n\n"
-   (format "sciWolframOrigExpr = \"%s\";\n\n" sci-wolfram-orig-expr)
-   "(* if or not auto use Wolfram Player to view CDF interactive file *)\n\n"
-   (format "sciWolframPlay = \"%s\";\n\n" sci-wolfram-play)
-   (format "sciWolframPlayer = \"%s\";\n" sci-wolfram-player)))
-
-(defun sci-wolfram-import-image-package ()
-  "Import sci-wolfram-image.wl package"
-  (interactive)
-  (let ((pkg (sci-wolfram-image-package)))
-    (save-excursion
-      (forward-line 1)
-      (insert pkg)
-      (if (eq major-mode 'org-mode)
-	  (org-element-cache-reset)))))
 
 
 (provide 'sci-wolfram-repl)

@@ -42,6 +42,7 @@
 
 (defun sci-wolfram-display-images ()
   "Display latex or images"
+  (interactive)
   (unless (or
 	   ;; Ref: Doom Emacs org mode module config
 	   ;; ...but not while Emacs is exporting an org buffer (where

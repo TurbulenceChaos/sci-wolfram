@@ -10,11 +10,13 @@ Support session and async run
 ** sciWolframDisplayImage.wl package
 #+name: import-sci-wolfram-image-package
 #+begin_src wolfram
-(* Please run M-x sci-wolfram-import-pkg from this line *)
+(* Please run M-x sci-wolfram-import-display-image-package from this line *)
 
 Get["/home/peng/.emacs.d/elpa/sci-wolfram/sciWolframDisplayImage.wl"];
 
-(* usage:
+(* Display wolfram script image.
+
+Usage:
 
 Default:
 $Post = sciWolframDisplayImage[#] &;
@@ -22,7 +24,7 @@ $Post = sciWolframDisplayImage[#] &;
 All options:
 $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType	-> "image" (default) or "latex",
-sciWolframImageDPI	->  default 150 for emacs and 100 for vscode,
+sciWolframImageDPI		-> 150 for emacs and 100 for vscode by default,
 sciWolframPlay		-> "yes" or "no" (default) to convert plots to CDF interactive file
 ] &;
 
@@ -61,6 +63,8 @@ MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 (* Please run M-x sci-wolfram-import-convert-to-notebook-pkg from this line *)
 
 Get["/home/peng/.emacs.d/elpa/sci-wolfram/sciWolframConvertToNotebook.wl"];
+
+(* Usage: sciWolframConvertToNoteBook["/path/to/your-file-to-convert-to-notebook.wl"] *)
 
 #+end_src
 
@@ -136,31 +140,12 @@ WriteString["stdout", str, "\n"];
 #+RESULTS: sci-wolfram-print-vs-writestring
 :results:
 For over three decades, Mathematica has defined the state of the art in\
-
+ 
 >   technical computing and provided the principal computation environment\
-
+ 
 >   for millions of innovators, educators, students and others around the\
-
+ 
 >   world.
 For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.
 :end:
-
-* For jupyter-Wolfram-Language Block
-#+name: jupyter-import-sci-wolfram-image-package
-#+begin_src jupyter-Wolfram-Language
-(* Please run `M-x sci-wolfram-import-image-pkg` from this line *)
-#+end_src
-
-#+name: sci-wolfram-jupyter-run-code
-#+begin_src jupyter-Wolfram-Language
-sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] ==
-    Cos[t]}, y[x, t], {x, t}]
-
-sol2 = sol1[[1, 1, 2]]
-
-Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
-
-MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
-
-#+end_src
 

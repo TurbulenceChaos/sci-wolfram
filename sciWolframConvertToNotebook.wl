@@ -2,7 +2,7 @@
 
 BeginPackage["sciWolframConvertToNotebook`"];
 
-sciWolframConvertToNotebook::usage = "sciWolframConvertToNoteBook[file];"
+sciWolframConvertToNotebook::usage = "Usage: sciWolframConvertToNoteBook[\"/path/to/your-file-to-convert-to-notebook.wl\"];"
 
 Begin["`Private`"];
 
