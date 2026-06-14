@@ -21,11 +21,9 @@ $Post = sciWolframDisplayImage[#] &;
 
 All options:
 $Post = sciWolframDisplayImage[#,
-sciWolframEnv		-> "emacs" or "vscode" (If[Environment["TERM_PROGRAM"] === "vscode", "vscode", "emacs"]),
 sciWolframFormulaType	-> "image" (default) or "latex",
-sciWolframImageDir	-> "image output direcory",
 sciWolframImageDPI	->  default 150 for emacs and 100 for vscode,
-sciWolframPlay		-> "yes" or "no" (default) to convert to CDF interactive file
+sciWolframPlay		-> "yes" or "no" (default) to convert plots to CDF interactive file
 ] &;
 
 Tyep below code to reset $Post:
@@ -34,12 +32,11 @@ $Post = .
 *)
 
 $Post = sciWolframDisplayImage[#,
-sciWolframEnv		-> "emacs",
 sciWolframFormulaType	-> "image",
-sciWolframImageDir	-> "/home/peng/.emacs.d/elpa/sci-wolfram/tmp/wolfram/",
 sciWolframImageDPI	-> 150,
 sciWolframPlay		-> "no"
 ] &;
+
 #+end_src
 
 #+RESULTS: import-sci-wolfram-image-package
@@ -57,18 +54,6 @@ Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 
 MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 #+end_src
-
-#+RESULTS: sci-wolfram-run-code
-:results:
-: Out[5]=
-[[file:/home/peng/.emacs.d/elpa/sci-wolfram/tmp/wolfram/wolfram-1c7b70da-bf40-4e16-845a-2c71ae586047.png]]
-: Out[6]=
-[[file:/home/peng/.emacs.d/elpa/sci-wolfram/tmp/wolfram/wolfram-99e7307a-1789-46ad-ba02-0e7750354505.png]]
-: Out[7]=
-[[file:/home/peng/.emacs.d/elpa/sci-wolfram/tmp/wolfram/wolfram-d42d3f0d-6bcd-40a8-9c5f-88b4864f2d3e.png]]
-: Out[8]=
-[[file:/home/peng/.emacs.d/elpa/sci-wolfram/tmp/wolfram/wolfram-a549a934-edbe-40ec-b5bc-50b85efed941.png]]
-:end:
 
 ** sciWolframConvertToNotebook.wl package
 #+name: import-sci-wolfram-convert-to-notebook-package
@@ -176,4 +161,6 @@ sol2 = sol1[[1, 1, 2]]
 Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 
 MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
+
 #+end_src
+

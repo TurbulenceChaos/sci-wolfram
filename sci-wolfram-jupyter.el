@@ -123,7 +123,7 @@
   (add-hook 'completion-at-point-functions
 	    #'sci-wolfram-jupyter-completion-at-point nil t))
 
-(add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
+;; (add-hook 'jupyter-org-interaction-mode-hook #'sci-wolfram-jupyter-add-completion)
 
 (defun sci-wolfram-jupyter-clean-results ()
   "Clean jupyter-Wolfram-Language results."

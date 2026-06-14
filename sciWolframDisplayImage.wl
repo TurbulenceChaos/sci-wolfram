@@ -8,11 +8,9 @@ Default:
 $Post = sciWolframDisplayImage[#] &;
 All options:
 $Post = sciWolframDisplayImage[#,
-sciWolframEnv		-> \"emacs\" or \"vscode\" (If[Environment[\"TERM_PROGRAM\"] === \"vscode\", \"vscode\", \"emacs\"]),
 sciWolframFormulaType	-> \"image\" (default) or \"latex\",
-sciWolframImageDir	-> \"image output direcory\",
 sciWolframImageDPI	->  default 150 for emacs and 100 for vscode,
-sciWolframPlay		-> \"yes\" or \"no\" (default) to convert to CDF interactive file
+sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to CDF interactive file
 ] &;
 Tyep below code to reset $Post:
 $Post = .
@@ -42,9 +40,30 @@ sciWolframTeX[expr_] :=
 		WriteString["stdout", "\\end{equation*}", "\n"];
 	];
 
+sciWolframEnv =
+	If[SameQ[Environment["TERM_PROGRAM"], "vscode"],
+		"vscode"
+		,
+		"emacs"
+	];
+
+dir =
+	Which[
+		SameQ[$InputFileName, ""],
+			Quiet @ Check[NotebookDirectory[], Directory[]]
+		,
+		StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
+			Directory[]
+		,
+		True,
+			DirectoryName[$InputFileName]
+	];
+
+sciWolframImageDir = FileNameJoin[{dir, "tmp", "wolfram"}];
+
 (* Display Image output *)
 
-sciWolframImage[expr_, sciWolframEnv_, sciWolframImageDir_, sciWolframImageDPI_, playCDF_] :=
+sciWolframImage[expr_, sciWolframImageDPI_, playCDF_] :=
 	Module[{filePNG, fileCDF},
 		If[Not @ DirectoryQ[sciWolframImageDir],
 			CreateDirectory[sciWolframImageDir, CreateIntermediateDirectories -> True]
@@ -67,30 +86,9 @@ sciWolframImage[expr_, sciWolframEnv_, sciWolframImageDir_, sciWolframImageDPI_,
 		];
 	];
 
-dir =
-	Which[
-		SameQ[$InputFileName, ""],
-			Quiet @ Check[NotebookDirectory[], Directory[]]
-		,
-		StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
-			Directory[]
-		,
-		True,
-			DirectoryName[$InputFileName]
-	];
-
 Options[sciWolframDisplayImage] =
 	{
-		sciWolframEnv ->
-			If[SameQ[Environment["TERM_PROGRAM"], "vscode"],
-				"vscode"
-				,
-				"emacs"
-			]
-		,
 		sciWolframFormulaType -> "image"
-		,
-		sciWolframImageDir -> FileNameJoin[{dir, "tmp", "wolfram"}]
 		,
 		sciWolframImageDPI ->
 			If[SameQ[Environment["TERM_PROGRAM"], "vscode"],
@@ -131,10 +129,6 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 									sciWolframImage[
 										expr
 										,
-										OptionValue @ sciWolframEnv
-										,
-										OptionValue @ sciWolframImageDir
-										,
 										OptionValue @ sciWolframImageDPI
 										,
 										playCDF = OptionValue @ sciWolframPlay
@@ -146,10 +140,6 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 							"image",
 								sciWolframImage[
 									expr
-									,
-									OptionValue @ sciWolframEnv
-									,
-									OptionValue @ sciWolframImageDir
 									,
 									OptionValue @ sciWolframImageDPI
 									,
@@ -165,10 +155,6 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 					"vscode",
 						sciWolframImage[
 							expr
-							,
-							OptionValue @ sciWolframEnv
-							,
-							OptionValue @ sciWolframImageDir
 							,
 							OptionValue @ sciWolframImageDPI
 							,

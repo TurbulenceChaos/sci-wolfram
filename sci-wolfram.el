@@ -48,23 +48,18 @@
 ;;;###autoload
 (defgroup sci-wolfram-mode nil "Major mode for wolfram script")
 
-(defcustom sci-wolfram-image-dpi 150
-  "Wolfram image resolution"
-  :type 'number
-  :group 'sci-wolfram-mode)
-
 (defcustom sci-wolfram-formula-type "image"
-  "Wolfram output type: image (default) or latex"
+  "Wolfram fomula output type: image (default) or latex"
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
-(defcustom sci-wolfram-orig-expr "no"
-  "Whether to display original raw results: yes or no (default)"
-  :type '(choice (const "yes") (const "no"))
+(defcustom sci-wolfram-image-dpi 150
+  "Wolfram image resolution: default 150 for emacs and 100 for vscode"
+  :type 'number
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-play "no"
-  "Use Wolfram Player to view CDF interactive files: yes or no (default)"
+  "Convert plots to CDF interactive file: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
@@ -75,13 +70,6 @@
 (unless (file-exists-p (concat (file-name-sans-extension sci-wolfram-path-script) ".el"))
   (shell-command (format "wolframscript -script %s" sci-wolfram-path-script)))
 (require 'sci-wolfram-path)
-
-;;;###autoload
-(defun sci-wolfram-run-repl ()
-  "Run wolfram repl"
-  (interactive)
-  (sci-wolfram-make-repl)
-  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
 
 ;; run wolfram script region or buffer code
 (defun sci-wolfram-region-or-buffer-code ()
@@ -96,7 +84,7 @@
     (sci-wolfram-remove-space-lines code)))
 
 (defvar sci-wolfram-image-script
-  (expand-file-name "sci-wolfram-image.wl"
+  (expand-file-name "sciWolframDisplayImage.wl"
 		    (file-name-directory (or load-file-name buffer-file-name))))
 
 (defmacro sci-wolfram-run-region-or-buffer-macro (func-name func-doc lang)
@@ -131,7 +119,7 @@
 
 ;; Convert wolfram script to PDF and Mathematica notebook
 (setq sci-wolfram-pdf-script (expand-file-name
-			      "sci-wolfram-pdf.wl"
+			      "sciWolframConvertToNotebook.wl"
 			      (file-name-directory (or load-file-name buffer-file-name))))
 
 (defmacro sci-wolfram-convert-to-notebook-macro (func-name func-doc lang)
@@ -198,69 +186,37 @@
 ;; completion
 (require 'sci-wolfram-all-symbols)
 
-(defun sci-wolfram-complete-symbol ()
-  "Do keyword completion on current symbol."
-  (interactive)
-  (let ((xp0 (point)) xbeg xend xword xresultW)
-    (save-excursion
-      (skip-chars-backward "$A-Za-z0-9") (setq xbeg (point))
-      (goto-char xp0)
-      (skip-chars-forward "$A-Za-z0-9") (setq xend (point)))
-    (setq xword (buffer-substring-no-properties xbeg xend))
-    (setq xresultW (completing-read "keyword:" sci-wolfram-all-symbols nil t xword))
-    (delete-region xbeg xend)
-    (goto-char xbeg)
-    (insert xresultW)))
-
 (defun sci-wolfram-completion-at-point ()
-  "Provide completion for completion-at-point."
+  "Add wolfram LSP symbols to completion-at-point."
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
     (when bounds
       (list (car bounds)
 	    (cdr bounds)
 	    sci-wolfram-all-symbols
+	    ;; (completion-table-dynamic
+	    ;;  (lambda (_string)
+	    ;;    (unless (eglot or lsp) sci-wolfram-all-symbols nil)))
 	    :exclusive 'no))))
 
-(defun sci-wolfram-mode-add-completion ()
-  "Add completion of wolfram symbols in sci-wolfram-mode."
-  (add-hook 'completion-at-point-functions
-	    #'sci-wolfram-completion-at-point nil t))
+(add-hook 'sci-wolfram-mode-hook
+	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-completion-at-point nil t)))
 
-(defun sci-wolfram-mode-remove-completion ()
-  "Remove completion of wolfram symbols in sci-wolfram-mode."
-  (remove-hook 'completion-at-point-functions
-	       #'sci-wolfram-completion-at-point t))
+(defun sci-wolfram-org-block-completion-at-point ()
+  "Provide completion in wolfram org block"
+  (when (and (org-in-src-block-p)
+             (string=
+              (car (org-babel-get-src-block-info))
+              "wolfram"))
+    (sci-wolfram-completion-at-point)))
 
-(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-mode-add-completion)
+(add-hook 'org-mode-hook
+	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-org-block-completion-at-point nil t)))
 
 ;; lsp server
 (defun sci-wolfram-remove-local-lsp-server ()
+  (interactive)
   "Remove local installed LSPServer if needed."
-  (call-process-shell-command
-   "wolframscript -code 'PacletUninstall[\"LSPServer\"];'"
-   nil 0))
-
-(add-hook 'eglot-managed-mode-hook
-	  (lambda ()
-	    (when (derived-mode-p 'sci-wolfram-mode)
-	      (sci-wolfram-mode-remove-completion)
-	      (sci-wolfram-remove-local-lsp-server))))
-
-(add-hook 'eglot-shutdown-hook
-	  (lambda ()
-	    (when (derived-mode-p 'sci-wolfram-mode)
-	      (sci-wolfram-mode-add-completion))))
-
-(add-hook 'lsp-mode-hook
-	  (lambda ()
-	    (when (derived-mode-p 'sci-wolfram-mode)
-	      (sci-wolfram-mode-remove-completion)
-	      (sci-wolfram-remove-local-lsp-server))))
-
-(add-hook 'lsp-after-uninitialized-functions
-	  (lambda (_workspace)
-	    (when (derived-mode-p 'sci-wolfram-mode)
-	      (sci-wolfram-mode-add-completion))))
+  (async-shell-command "wolframscript -code 'PacletUninstall[\"LSPServer\"];'"))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
@@ -275,11 +231,11 @@
 		     `(,sci-wolfram-kernel
 		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
 		       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
-    :major-modes '(sci-wolfram-mode)
+    :major-modes '(sci-wolfram-mode) ; '(sci-wolfram-mode sci-wolfram-ts-mode)
     :server-id 'wolfram-lsp)))
 
 ;; syntax table
-(defvar sci-wolfram-mode-syntax-table nil "Syntax table for sci-wolfram-mode")
+(defvar sci-wolfram-mode-syntax-table nil)
 
 (setq
  sci-wolfram-mode-syntax-table
@@ -317,8 +273,8 @@
    (modify-syntax-entry ?\\ "." synTable)
    synTable))
 
-;; syntax coloring related
-(defvar sci-wolfram-font-lock-keywords nil "Value for `font-lock-defaults'")
+;; font-lock color
+(defvar sci-wolfram-font-lock-keywords nil)
 
 (setq
  sci-wolfram-font-lock-keywords
@@ -346,12 +302,12 @@
    (,(regexp-opt UnsupportedCharacters) . font-lock-comment-face)
    (,(regexp-opt UnsupportedLongNames 'symbols) . font-lock-comment-face)
    ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\[" 1 font-lock-function-name-face)
-   ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)
-   ))
+   ("\\b\\([A-Za-z][A-Za-z0-9]*]\\)\\s-*@" 1 font-lock-function-name-face)
+   ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)))
 
-;;;###autoload
+;; sci-wolfram-mode
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
-  "A major mode for Wolfram Language."
+  "Major mode for Wolfram Language"
   :syntax-table sci-wolfram-mode-syntax-table
   (setq font-lock-defaults '((sci-wolfram-font-lock-keywords)))
   (setq-local comment-start "(*")
@@ -359,7 +315,7 @@
 
 ;; keybinding
 (defcustom sci-wolfram-mode-leader-key "<f6>"
-  "sci-wolfram-mode leader key"
+  "leader key for sci-wolfram-mode"
   :type 'string
   :group 'sci-wolfram-mode)
 
@@ -379,167 +335,16 @@
 	      (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr sci-wolfram-key-map)))
 	      (car sci-wolfram-key-map)))
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.wl\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.wls\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.nb\\'" . sci-wolfram-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.cdf\\'" . sci-wolfram-mode))
-
 ;; prettify symbols
-(defcustom sci-wolfram-symbol-alist
-  '(;; Greek letters
-    ("\\[Alpha]" . "α")
-    ("\\[Beta]" . "β")
-    ("\\[Gamma]" . "γ")
-    ("\\[Delta]" . "δ")
-    ("\\[Epsilon]" . "ε")
-    ("\\[Zeta]" . "ζ")
-    ("\\[Eta]" . "η")
-    ("\\[Theta]" . "θ")
-    ("\\[Iota]" . "ι")
-    ("\\[Kappa]" . "κ")
-    ("\\[Lambda]" . "λ")
-    ("\\[Mu]" . "μ")
-    ("\\[Nu]" . "ν")
-    ("\\[Xi]" . "ξ")
-    ("\\[Omicron]" . "ο")
-    ("\\[Pi]" . "π")
-    ("\\[Rho]" . "ρ")
-    ("\\[Sigma]" . "σ")
-    ("\\[Tau]" . "τ")
-    ("\\[Upsilon]" . "υ")
-    ("\\[Phi]" . "φ")
-    ("\\[Chi]" . "χ")
-    ("\\[Psi]" . "ψ")
-    ("\\[Omega]" . "ω")
-    ;; Capital Greek letters
-    ("\\[CapitalAlpha]" . "Α")
-    ("\\[CapitalBeta]" . "Β")
-    ("\\[CapitalGamma]" . "Γ")
-    ("\\[CapitalDelta]" . "Δ")
-    ("\\[CapitalEpsilon]" . "Ε")
-    ("\\[CapitalZeta]" . "Ζ")
-    ("\\[CapitalEta]" . "Η")
-    ("\\[CapitalTheta]" . "Θ")
-    ("\\[CapitalIota]" . "Ι")
-    ("\\[CapitalKappa]" . "Κ")
-    ("\\[CapitalLambda]" . "Λ")
-    ("\\[CapitalMu]" . "Μ")
-    ("\\[CapitalNu]" . "Ν")
-    ("\\[CapitalXi]" . "Ξ")
-    ("\\[CapitalOmicron]" . "Ο")
-    ("\\[CapitalPi]" . "Π")
-    ("\\[CapitalRho]" . "Ρ")
-    ("\\[CapitalSigma]" . "Σ")
-    ("\\[CapitalTau]" . "Τ")
-    ("\\[CapitalUpsilon]" . "Υ")
-    ("\\[CapitalPhi]" . "Φ")
-    ("\\[CapitalChi]" . "Χ")
-    ("\\[CapitalPsi]" . "Ψ")
-    ("\\[CapitalOmega]" . "Ω")
-    ;; Mathematical operators
-    ("\\[Plus]" . "+")
-    ("\\[Minus]" . "−")
-    ("\\[Times]" . "×")
-    ("\\[Divide]" . "÷")
-    ("\\[PlusMinus]" . "±")
-    ("\\[MinusPlus]" . "∓")
-    ("\\[Sum]" . "∑")
-    ("\\[Product]" . "∏")
-    ("\\[Integral]" . "∫")
-    ("\\[PartialD]" . "∂")
-    ("\\[Del]" . "∇")
-    ("\\[Square]" . "□")
-    ("\\[Diamond]" . "◊")
-    ("\\[Circle]" . "○")
-    ("\\[CircleTimes]" . "⊗")
-    ("\\[CirclePlus]" . "⊕")
-    ("\\[CircleDot]" . "⊙")
-    ("\\[Cross]" . "⨯")
-    ("\\[Star]" . "⋆")
-    ("\\[Wedge]" . "∧")
-    ("\\[Vee]" . "∨")
-    ("\\[And]" . "∧")
-    ("\\[Or]" . "∨")
-    ("\\[Not]" . "¬")
-    ("\\[Implies]" . "⟹")
-    ("\\[Equivalent]" . "⇔")
-    ("\\[ForAll]" . "∀")
-    ("\\[Exists]" . "∃")
-    ("\\[NotExists]" . "∄")
-    ("\\[Element]" . "∈")
-    ("\\[NotElement]" . "∉")
-    ("\\[Subset]" . "⊂")
-    ("\\[Superset]" . "⊃")
-    ("\\[SubsetEqual]" . "⊆")
-    ("\\[SupersetEqual]" . "⊇")
-    ("\\[Union]" . "∪")
-    ("\\[Intersection]" . "∩")
-    ("\\[EmptySet]" . "∅")
-    ("\\[Infinity]" . "∞")
-    ("\\[Degree]" . "°")
-    ("\\[Therefore]" . "∴")
-    ("\\[Because]" . "∵")
-    ("\\[Proportional]" . "∝")
-    ("\\[ApproximatelyEqual]" . "≈")
-    ("\\[NotEqual]" . "≠")
-    ("\\[LessEqual]" . "≤")
-    ("\\[GreaterEqual]" . "≥")
-    ("\\[MuchLess]" . "≪")
-    ("\\[MuchGreater]" . "≫")
-    ;; Arrows
-    ("\\[Rule]" . "→")
-    ("\\[RuleDelayed]" . "⧴")
-    ("\\[LeftArrow]" . "←")
-    ("\\[RightArrow]" . "→")
-    ("\\[UpArrow]" . "↑")
-    ("\\[DownArrow]" . "↓")
-    ("\\[LeftRightArrow]" . "↔")
-    ("\\[UpDownArrow]" . "↕")
-    ("\\[DoubleLeftArrow]" . "⇐")
-    ("\\[DoubleRightArrow]" . "⇒")
-    ("\\[DoubleLeftRightArrow]" . "⇔")
-    ("\\[DoubleUpArrow]" . "⇑")
-    ("\\[DoubleDownArrow]" . "⇓")
-    ("\\[DoubleUpDownArrow]" . "⇕")
-    ;; Common mathematical symbols
-    ("\\[Sqrt]" . "√")
-    ("\\[CubeRoot]" . "∛")
-    ("\\[FourthRoot]" . "∜")
-    ("\\[Angle]" . "∠")
-    ("\\[MeasuredAngle]" . "∡")
-    ("\\[SphericalAngle]" . "∢")
-    ("\\[Perpendicular]" . "⊥")
-    ("\\[Parallel]" . "∥")
-    ("\\[NotParallel]" . "∦")
-    ;; Special brackets
-    ("\\[LeftDoubleBracket]" . "⟦")
-    ("\\[RightDoubleBracket]" . "⟧")
-    ("\\[LeftAngleBracket]" . "⟨")
-    ("\\[RightAngleBracket]" . "⟩")
-    ("\\[LeftCeiling]" . "⌈")
-    ("\\[RightCeiling]" . "⌉")
-    ("\\[LeftFloor]" . "⌊")
-    ("\\[RightFloor]" . "⌋"))
-  "Mapping of Wolfram symbols to Unicode."
-  :type '(alist :key-type string :value-type string)
-  :group 'sci-wolfram-mode)
+(require 'sci-wolfram-prettify-symbols)
 
 ;;;###autoload
-(defun sci-wolfram-prettify-symbols ()
-  "Set up prettify-symbols for Wolfram language."
-  (setq-local prettify-symbols-alist sci-wolfram-symbol-alist)
-  (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
-  (setq-local prettify-symbols-unprettify-at-point nil)
-  (prettify-symbols-mode 1))
-
-;;;###autoload
-(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-prettify-symbols)
+(dolist (file '("\\.wl\\'"
+		"\\.wls\\'"
+		"\\.nb\\'"
+		"\\.cdf\\'"))
+  (add-to-list 'auto-mode-alist `(,file . sci-wolfram-mode)))
 
 
 (provide 'sci-wolfram)
-
 ;;; sci-wolfram.el ends here

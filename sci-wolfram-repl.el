@@ -64,6 +64,13 @@
     (setq sci-wolfram-org-babel--initiated nil)
     (setq sci-wolfram-org-babel-async--registered nil)))
 
+;;;###autoload
+(defun sci-wolfram-run-repl ()
+  "Run wolfram repl"
+  (interactive)
+  (sci-wolfram-make-repl)
+  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+
 (defun sci-wolfram-initiate-session ()
   (unless sci-wolfram-org-babel--initiated
     (let* ((eoe (format "ob_comint_session_wolfram_started_%s" (org-id-uuid))))
