@@ -3,52 +3,18 @@
 #+Email: 211110103110@stu.just.edu.cn
 #+GitHub: https://github.com/TurbulenceChaos
 
-* For Wolfram Block
-
+* For Wolfram Src-block
 Support session and async run
 
-** sciWolframDisplayImage.wl package
+** sciWolframDisplayImage.wl Package
 #+name: import-sci-wolfram-image-package
 #+begin_src wolfram
 (* Please run M-x sci-wolfram-import-display-image-package from this line *)
-
-Get["/home/peng/.emacs.d/elpa/sci-wolfram/sciWolframDisplayImage.wl"];
-
-(* Display wolfram script image.
-
-Usage:
-
-Default:
-$Post = sciWolframDisplayImage[#] &;
-
-All options:
-$Post = sciWolframDisplayImage[#,
-sciWolframFormulaType	-> "image" (default) or "latex",
-sciWolframImageDPI		-> 100 (default),
-sciWolframPlay		-> "yes" or "no" (default) to convert plots to CDF interactive file
-] &;
-
-Tyep below code to reset $Post:
-$Post = .
-
-*)
-
-$Post = sciWolframDisplayImage[#,
-sciWolframFormulaType	-> "image",
-sciWolframImageDPI	-> 100,
-sciWolframPlay		-> "no"
-] &;
-
 #+end_src
-
-#+RESULTS: import-sci-wolfram-image-package
-:results:
-:end:
 
 #+name: sci-wolfram-run-code
 #+begin_src wolfram
-sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] ==
-    Cos[t]}, y[x, t], {x, t}]
+sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == Cos[t]}, y[x, t], {x, t}]
 
 sol2 = sol1[[1, 1, 2]]
 
@@ -57,35 +23,43 @@ Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
 MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 #+end_src
 
-#+RESULTS: sci-wolfram-run-code
-
+** sciWolframConvertToNotebook.wl Package
 #+name: import-sci-wolfram-convert-to-notebook-package
 #+begin_src wolfram
 (* Please run M-x sci-wolfram-import-convert-to-notebook-pkg from this line *)
-
-Get["/home/peng/.emacs.d/elpa/sci-wolfram/sciWolframConvertToNotebook.wl"];
-
-(* Usage: sciWolframConvertToNoteBook["/path/to/your-file-to-convert-to-notebook.wl"] *)
-
 #+end_src
-
-#+RESULTS: import-sci-wolfram-convert-to-notebook-package
-:results:
-:end:
 
 #+name: sci-wolfram-convert-to-notebook
 #+begin_src wolfram
 (* sciWolframConvertToNotebook["Test.wl"]; *)
 #+end_src
 
-#+RESULTS: sci-wolfram-convert-to-notebook
+* Important Notes
+** Note 1
+~WriteString~ vs ~Print~:
+~Print~ will automatically truncate strings while ~WriteString~ will keep the original string style.
+
+#+name: sci-wolfram-print-vs-writestring
+#+begin_src wolfram
+str = "For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.";
+Print[str];
+WriteString["stdout", str, "\n"];
+#+end_src
+
+#+RESULTS: sci-wolfram-print-vs-writestring
 :results:
-Convert Test.wl -> /home/peng/.emacs.d/elpa/sci-wolfram/Test/Test-convert.pdf
-Convert Test.wl -> /home/peng/.emacs.d/elpa/sci-wolfram/Test/Test-convert.nb
+For over three decades, Mathematica has defined the state of the art in\
+ 
+>   technical computing and provided the principal computation environment\
+ 
+>   for millions of innovators, educators, students and others around the\
+ 
+>   world.
+For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.
 :end:
 
-** Important Notes
-For emacs, the Wolfram REPL use wolframscript -rawterm, where space lines in string are not allowed.
+** Note 2
+For emacs, the Wolfram REPL use ~wolframscript -rawterm~, where space lines in string are not allowed.
 All space lines are automatically removed from strings before running codes.
 
 #+name: sci-wolfram-space-lines-in-string
@@ -112,6 +86,7 @@ Or to take arms against a sea of troubles,
 And by opposing end them?
 :end:
 
+** Note 3
 For org version < 9.8, the spaces before a string in session async running will be automatically removed.
 For org version >= 9.8, the emacs ~org-babel-comint-async-register~ introduced a new option ~disable-prompt-filtering~ to avoid this situation.
 #+begin_src python :session :results output
@@ -128,24 +103,3 @@ print("         String with spaces before")
 #+RESULTS:
 : String with spaces before
 
-~WriteString~ vs ~Print~:
-~Print~ will automatically truncate strings while ~WriteString~ will keep the original string style.
-
-#+name: sci-wolfram-print-vs-writestring
-#+begin_src wolfram
-str = "For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.";
-Print[str];
-WriteString["stdout", str, "\n"];
-#+end_src
-
-#+RESULTS: sci-wolfram-print-vs-writestring
-:results:
-For over three decades, Mathematica has defined the state of the art in\
- 
->   technical computing and provided the principal computation environment\
- 
->   for millions of innovators, educators, students and others around the\
- 
->   world.
-For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.
-:end:

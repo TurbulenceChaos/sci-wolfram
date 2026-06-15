@@ -73,23 +73,24 @@
   "sciWolframDisplayImage.wl package"
   (concat
    (format "\nGet[\"%s\"];\n\n" sci-wolfram-display-image-script)
-   "(* Display wolfram script image.\n\n"
+   "(* sciWolframDisplayImage.wl\n\n"
+   "Display wolfram script image.\n\n"
    "Usage:\n\n"
    "Default:\n"
    "$Post = sciWolframDisplayImage[#] &;\n\n"
    "All options:\n"
    "$Post = sciWolframDisplayImage[#,\n"
-   "sciWolframFormulaType	-> \"image\" (default) or \"latex\",\n"
-   "sciWolframImageDPI		-> 100 (default),\n"
-   "sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to CDF interactive file\n"
+   "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
+   "sciWolframImageDPI    -> 100 (default),\n"
+   "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to CDF interactive file\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
    "$Post = .\n\n"
    "*)\n\n"
    "$Post = sciWolframDisplayImage[#,\n"
-   (format "sciWolframFormulaType	-> \"%s\",\n" sci-wolfram-formula-type)
-   (format "sciWolframImageDPI	-> %s,\n" sci-wolfram-image-dpi)
-   (format "sciWolframPlay		-> \"%s\"\n" sci-wolfram-play)
+   (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
+   (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
+   (format "sciWolframPlay        -> \"%s\"\n" sci-wolfram-play)
    "] &;\n\n"))
 
 (defmacro sci-wolfram-import-package-macro (func-name func-doc pkg)
@@ -171,7 +172,11 @@
   "sciWolframConvertToNotebook.wl package"
   (concat
    (format "\nGet[\"%s\"];\n\n" sci-wolfram-convert-to-notebook-script)
-   "(* Usage: sciWolframConvertToNoteBook[\"/path/to/your-file-to-convert-to-notebook.wl\"] *)\n\n"))
+   "(* sciWolframConvertToNotebook.wl\n\n"
+   "Convert wolfram script to PDF and Mathematica notebook.\n\n"
+   "Usage:\n\n"
+   "sciWolframConvertToNoteBook[\"/path/to/your-file-to-convert-to-notebook.wl\"];\n\n"
+   "*)\n\n"))
 
 (sci-wolfram-import-package-macro
  sci-wolfram-import-convert-to-notebook-package
