@@ -120,10 +120,9 @@
 	 (code (buffer-substring-no-properties beg end)))
     (sci-wolfram-remove-space-lines code)))
 
-(defun sci-wolfram-run-region-or-buffer ()
+(defun sci-wolfram-mode-run-region-or-buffer (&option code)
   "Run wolfram script region or buffer code"
-  (interactive)
-  (let ((code (sci-wolfram-get-region-or-buffer-code))
+  (let ((code (or code (sci-wolfram-get-region-or-buffer-code)))
 	(outbuf (get-buffer-create "*Sci-Wolfram Run Result*"))
 	(lang sci-wolfram-org-src-block-name))
     (with-current-buffer outbuf
@@ -144,6 +143,24 @@
       (org-babel-execute-buffer))
     (display-buffer outbuf)))
 
+(defun sci-wolfram-run-region-or-buffer ()
+  "Run wolfram script region or buffer code"
+  (interactive)
+  (cond
+   ((or (region-active-p)
+	(derived-mode-p 'sci-wolfram-mode))
+    (sci-wolfram-mode-run-region-or-buffer))
+   ((and (derived-mode-p 'org-mode)
+	 (org-in-src-block-p)
+	 (let* ((info (org-babel-get-src-block-info))
+		(lang (nth 0 info)))
+	   (string= lang sci-wolfram-org-src-block-name)))
+    (let ((code (prog2 (org-edit-src-code)
+		    (sci-wolfram-get-region-or-buffer-code)
+		  (org-edit-src-exit))))
+      (sci-wolfram-mode-run-region-or-buffer code))
+    (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!")))))
+
 ;; Convert wolfram script to PDF and Mathematica notebook
 (defvar sci-wolfram-convert-to-notebook-script
   (expand-file-name
@@ -156,67 +173,102 @@
    (format "\nGet[\"%s\"];\n\n" sci-wolfram-convert-to-notebook-script)
    "(* Usage: sciWolframConvertToNoteBook[\"/path/to/your-file-to-convert-to-notebook.wl\"] *)\n\n"))
 
-(defun sci-wolfram-import-convert-to-notebook-package ()
-  "Import sciWolframConvertToNotebook.wl package"
-  (interactive)
-  (let ((pkg (sci-wolfram-convert-to-notebook-image-package)))
-    (save-excursion
-      (forward-line 1)
-      (insert pkg)
-      (if (eq major-mode 'org-mode)
-	  (org-element-cache-reset)))))
-
 (sci-wolfram-import-package-macro
  sci-wolfram-import-convert-to-notebook-package
  "Import sciWolframDisplayImage.wl package"
  sci-wolfram-convert-to-notebook-package)
 
+(defun sci-wolfram-mode-convert-to-notebook (&optional file)
+  "Convert wolfram script to PDF and Mathematica notebook"
+  (let ((file (or file (buffer-file-name)))
+	(outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
+	(lang sci-wolfram-org-src-block-name)
+	(with-current-buffer outbuf
+	  (unless (eq major-mode 'org-mode)
+	    (org-mode))
+	  (erase-buffer)
+	  (insert (concat
+		   "#+name: import-sci-wolfram-convert-to-notebook-package\n"
+		   (format "#+begin_src %s\n" lang)
+		   (sci-wolfram-convert-to-notebook-package)
+		   "#+end_src\n\n"))
+	  (insert (concat
+		   "#+name: sci-wolfram-convert-to-notebook\n"
+		   (format "#+begin_src %s\n" lang)
+		   (format "sciWolframConvertToNotebook[\"%s\"];" file)
+		   "\n#+end_src\n\n"))
+	  (org-fold-hide-block-all)
+	  (org-babel-execute-buffer))
+	(display-buffer outbuf))))
+
 (defun sci-wolfram-convert-to-notebook ()
   "Convert wolfram script to PDF and Mathematica notebook"
   (interactive)
-  (if (and (derived-mode-p 'sci-wolfram-mode)
-	   (buffer-file-name))
-      (let ((file (buffer-file-name))
-	    (outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
-	    (lang sci-wolfram-org-src-block-name)
-	    (with-current-buffer outbuf
-	      (unless (eq major-mode 'org-mode)
-		(org-mode))
-	      (erase-buffer)
-	      (insert (concat
-		       "#+name: import-sci-wolfram-convert-to-notebook-package\n"
-		       (format "#+begin_src %s\n" lang)
-		       (sci-wolfram-convert-to-notebook-package)
-		       "#+end_src\n\n"))
-	      (insert (concat
-		       "#+name: sci-wolfram-convert-to-notebook\n"
-		       (format "#+begin_src %s\n" lang)
-		       (format "sciWolframConvertToNotebook[\"%s\"];" file)
-		       "\n#+end_src\n\n"))
-	      (org-fold-hide-block-all)
-	      (org-babel-execute-buffer))
-	    (display-buffer outbuf))))
-  (message "You should run in a wolfram script file!"))
+  (cond
+   ((and (buffer-file-name)
+	 (derived-mode-p 'sci-wolfram-mode))
+    (sci-wolfram-mode-convert-to-notebook))
+   ((and (derived-mode-p 'org-mode)
+	 (org-in-src-block-p)
+	 (let* ((info (org-babel-get-src-block-info))
+		(lang (nth 0 info)))
+	   (string= lang sci-wolfram-org-src-block-name)))
+    (let* ((code (prog2 (org-edit-src-code)
+		     (sci-wolfram-get-region-or-buffer-code)
+		   (org-edit-src-exit)))
+	   (info (org-babel-get-src-block-info))
+	   (lang (nth 0 info))
+	   (src-block-name (or (nth 4 info) lang))
+	   (file-name (format "%s-org-src-block.wl"
+			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (buffer-name))))
+	   (file (expand-file-name file-name default-directory)))
+      (write-region code nil file)
+      (sci-wolfram-mode-convert-to-notebook file)))
+   ((or (region-active-p)
+	(derived-mode-p 'sci-wolfram-mode))
+    (let* ((code (sci-wolfram-get-region-or-buffer-code))
+	   (file-name (format "%s-region-or-buffer.wl"
+			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (buffer-name))))
+	   (file (expand-file-name file-name default-directory)))
+      (write-region code nil file)
+      (sci-wolfram-mode-convert-to-notebook file)))
+   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
 
 ;; format region or buffer
-(defun sci-wolfram-format-region-or-buffer ()
+(defun sci-wolfram-mode-format-region-or-buffer ()
   "Format wolfram codes"
-  (interactive)
   (sci-wolfram-make-repl)
-  (let* ((eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
-	 (code (concat
-		(format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n"
-			(sci-wolfram-get-region-or-buffer-code))
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
+  (let* ((code (sci-wolfram-get-region-or-buffer-code))
+	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
+	 (format-code (concat
+		       (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n" code)
+		       (format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (org-babel-comint-with-output
 	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string sci-wolfram-repl-buffer code))))
+	    (comint-send-string sci-wolfram-repl-buffer format-code))))
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
 	(erase-buffer))
       (insert (sci-wolfram-remove-eoe result eoe)))))
+
+(defun sci-wolfram-format-region-or-buffer ()
+  "Format wolfram codes"
+  (interactive)
+  (cond
+   ((or (region-active-p)
+	(derived-mode-p 'sci-wolfram-mode))
+    (sci-wolfram-mode-format-region-or-buffer))
+   ((and (derived-mode-p 'org-mode)
+	 (org-in-src-block-p)
+	 (let* ((info (org-babel-get-src-block-info))
+		(lang (nth 0 info)))
+	   (string= lang sci-wolfram-org-src-block-name)))
+    (org-edit-src-code)
+    (sci-wolfram-format-region-or-buffer)
+    (org-edit-src-exit))
+   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
 
 ;; doc lookup
 (defun sci-wolfram-doc-lookup ()
@@ -248,7 +300,8 @@
 (defun sci-wolfram-org-block-completion-at-point ()
   "Provide completion in wolfram org block"
   (when (org-in-src-block-p 1)
-    (let ((lang (nth 0 (org-babel-get-src-block-info))))
+    (let* ((info (org-babel-get-src-block-info))
+	   (lang (nth 0 info)))
       (when (string= lang sci-wolfram-org-src-block-name)
 	(sci-wolfram-completion-at-point)))))
 
