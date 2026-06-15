@@ -159,7 +159,7 @@
 		    (sci-wolfram-get-region-or-buffer-code)
 		  (org-edit-src-exit))))
       (sci-wolfram-mode-run-region-or-buffer code)))
-   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
+   (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; Convert wolfram script to PDF and Mathematica notebook
 (defvar sci-wolfram-convert-to-notebook-script
@@ -231,12 +231,13 @@
 	   (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
-   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
+   (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; format region or buffer
 (defun sci-wolfram-mode-format-region-or-buffer ()
   "Format wolfram codes"
   (sci-wolfram-make-repl)
+  (sci-wolfram-initiate-session)
   (let* ((code (sci-wolfram-get-region-or-buffer-code))
 	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
 	 (format-code (concat
@@ -267,7 +268,7 @@
     (org-edit-src-code)
     (sci-wolfram-format-region-or-buffer)
     (org-edit-src-exit))
-   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
+   (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; doc lookup
 (defun sci-wolfram-doc-lookup ()
