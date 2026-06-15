@@ -9,7 +9,7 @@ $Post = sciWolframDisplayImage[#] &;
 All options:
 $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType	-> \"image\" (default) or \"latex\",
-sciWolframImageDPI	-> 150 for emacs and 100 for vscode by default,
+sciWolframImageDPI	-> 100 (default),
 sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to CDF interactive file
 ] &;
 Tyep below code to reset $Post:
@@ -90,12 +90,7 @@ Options[sciWolframDisplayImage] =
 	{
 		sciWolframFormulaType -> "image"
 		,
-		sciWolframImageDPI ->
-			If[sciWolframEnv == "vscode",
-				100
-				,
-				150
-			]
+		sciWolframImageDPI -> 100
 		,
 		sciWolframPlay -> "no"
 	};

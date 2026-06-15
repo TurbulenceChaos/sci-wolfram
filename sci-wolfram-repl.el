@@ -104,31 +104,39 @@
 	      (comint-send-string sci-wolfram-repl-buffer code)))))
     (sci-wolfram-remove-eoe result eoe)))
 
-(defun sci-wolfram-result-clean (result)
+(defun sci-wolfram-clean-result (result)
   (prog1
       result ; (replace-regexp-in-string "^ \n \n" "" result)
-    (run-at-time 0 nil 'sci-wolfram-display-images)))
+    (let ((buf (car sci-wolfram-async-block-info))
+	  (pos (cdr sci-wolfram-async-block-info)))
+      (run-at-time 0 nil (lambda ()
+			   (with-current-buffer buf
+			     (save-excursion
+			       ;; (message "buffer: %s and pos: %s" buf pos)
+			       (goto-char pos)
+			       (sci-wolfram-display-images))))))))
 
 (defun sci-wolfram-org-babel-register-async ()
-  (unless sci-wolfram-org-babel-async--registered
-    (if (version<= "9.8" (org-version))
-        (org-babel-comint-async-register
-         sci-wolfram-repl-buffer (current-buffer)
-         "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-	 'sci-wolfram-result-clean ; 'org-babel-chomp
-         'org-babel-eval-read-file
-         'disable-prompt-filtering)
-      (org-babel-comint-async-register
-       sci-wolfram-repl-buffer (current-buffer)
-       "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-       'sci-wolfram-result-clean ; 'org-babel-chomp
-       'org-babel-eval-read-file))
-    (setq sci-wolfram-org-babel-async--registered t)))
+  (let ((buf (current-buffer)))
+    (unless (and sci-wolfram-org-babel-async--registered
+		 (eq buf (car sci-wolfram-async-block-info)))
+      (if (version<= "9.8" (org-version))
+          (org-babel-comint-async-register
+           sci-wolfram-repl-buffer buf
+           "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
+	   'sci-wolfram-clean-result ; 'org-babel-chomp
+           'org-babel-eval-read-file
+           'disable-prompt-filtering)
+	(org-babel-comint-async-register
+	 sci-wolfram-repl-buffer buf
+	 "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
+	 'sci-wolfram-clean-result ; (lambda (result) (sci-wolfram-clean-result result buf pos))
+	 'org-babel-eval-read-file))
+      (setq sci-wolfram-org-babel-async--registered t))))
 
 (defun sci-wolfram-async-evaluate-session (body)
   "wolfram org-babel block async execute session"
   (sci-wolfram-org-babel-register-async)
-
   (let* ((uuid (org-id-uuid))
          (start (format "ob_comint_async_wolfram_start_%s" uuid))
          (end   (format "ob_comint_async_wolfram_end_%s" uuid))
@@ -138,6 +146,19 @@
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
     (comint-send-string sci-wolfram-repl-buffer code)
     uuid))
+
+(defvar sci-wolfram-async-block-info nil)
+
+(defun sci-wolfram-async-block-get-info ()
+  (let ((buf (current-buffer))
+	(pos (point)))
+    (setq sci-wolfram-async-block-info (cons buf pos))
+    ;; (message "buffer: %s and pos: %s"
+    ;; 	     (car sci-wolfram-async-block-info)
+    ;; 	     (cdr sci-wolfram-async-block-info))
+    ))
+
+(add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-block-get-info)
 
 (defun org-babel-execute:wolfram (body params)
   "wolfram org-babel block sync/async execute session"

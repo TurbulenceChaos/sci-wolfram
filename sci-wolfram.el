@@ -54,8 +54,8 @@
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
-(defcustom sci-wolfram-image-dpi 150
-  "Wolfram image resolution: 150 for emacs and 100 for vscode by default"
+(defcustom sci-wolfram-image-dpi 100
+  "Wolfram image resolution: 100 (default)"
   :type 'number
   :group 'sci-wolfram-mode)
 
@@ -80,7 +80,7 @@
    "All options:\n"
    "$Post = sciWolframDisplayImage[#,\n"
    "sciWolframFormulaType	-> \"image\" (default) or \"latex\",\n"
-   "sciWolframImageDPI		-> 150 for emacs and 100 for vscode by default,\n"
+   "sciWolframImageDPI		-> 100 (default),\n"
    "sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to CDF interactive file\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
@@ -120,7 +120,7 @@
 	 (code (buffer-substring-no-properties beg end)))
     (sci-wolfram-remove-space-lines code)))
 
-(defun sci-wolfram-mode-run-region-or-buffer (&option code)
+(defun sci-wolfram-mode-run-region-or-buffer (&optional code)
   "Run wolfram script region or buffer code"
   (let ((code (or code (sci-wolfram-get-region-or-buffer-code)))
 	(outbuf (get-buffer-create "*Sci-Wolfram Run Result*"))
@@ -158,8 +158,8 @@
     (let ((code (prog2 (org-edit-src-code)
 		    (sci-wolfram-get-region-or-buffer-code)
 		  (org-edit-src-exit))))
-      (sci-wolfram-mode-run-region-or-buffer code))
-    (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!")))))
+      (sci-wolfram-mode-run-region-or-buffer code)))
+   (t (user-error "You are not in sci-wolfram-mode buffer or wolfram org-src block!"))))
 
 ;; Convert wolfram script to PDF and Mathematica notebook
 (defvar sci-wolfram-convert-to-notebook-script
@@ -182,24 +182,24 @@
   "Convert wolfram script to PDF and Mathematica notebook"
   (let ((file (or file (buffer-file-name)))
 	(outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
-	(lang sci-wolfram-org-src-block-name)
-	(with-current-buffer outbuf
-	  (unless (eq major-mode 'org-mode)
-	    (org-mode))
-	  (erase-buffer)
-	  (insert (concat
-		   "#+name: import-sci-wolfram-convert-to-notebook-package\n"
-		   (format "#+begin_src %s\n" lang)
-		   (sci-wolfram-convert-to-notebook-package)
-		   "#+end_src\n\n"))
-	  (insert (concat
-		   "#+name: sci-wolfram-convert-to-notebook\n"
-		   (format "#+begin_src %s\n" lang)
-		   (format "sciWolframConvertToNotebook[\"%s\"];" file)
-		   "\n#+end_src\n\n"))
-	  (org-fold-hide-block-all)
-	  (org-babel-execute-buffer))
-	(display-buffer outbuf))))
+	(lang sci-wolfram-org-src-block-name))
+    (with-current-buffer outbuf
+      (unless (eq major-mode 'org-mode)
+	(org-mode))
+      (erase-buffer)
+      (insert (concat
+	       "#+name: import-sci-wolfram-convert-to-notebook-package\n"
+	       (format "#+begin_src %s\n" lang)
+	       (sci-wolfram-convert-to-notebook-package)
+	       "#+end_src\n\n"))
+      (insert (concat
+	       "#+name: sci-wolfram-convert-to-notebook\n"
+	       (format "#+begin_src %s\n" lang)
+	       (format "sciWolframConvertToNotebook[\"%s\"];" file)
+	       "\n#+end_src\n\n"))
+      (org-fold-hide-block-all)
+      (org-babel-execute-buffer))
+    (display-buffer outbuf)))
 
 (defun sci-wolfram-convert-to-notebook ()
   "Convert wolfram script to PDF and Mathematica notebook"
@@ -217,8 +217,7 @@
 		     (sci-wolfram-get-region-or-buffer-code)
 		   (org-edit-src-exit)))
 	   (info (org-babel-get-src-block-info))
-	   (lang (nth 0 info))
-	   (src-block-name (or (nth 4 info) lang))
+	   (src-block-name (or (nth 4 info) sci-wolfram-org-src-block-name))
 	   (file-name (format "%s-org-src-block.wl"
 			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (buffer-name))))
 	   (file (expand-file-name file-name default-directory)))
@@ -421,10 +420,11 @@
 
 (defcustom sci-wolfram-key-map
   '((sci-wolfram-doc-lookup . "h")
+    (sci-wolfram-run-repl . "r")
     (sci-wolfram-import-display-image-package . "i")
     (sci-wolfram-import-convert-to-notebook-package . "n")
     (sci-wolfram-format-region-or-buffer . "f")
-    (sci-wolfram-run-region-or-buffer . "r")
+    (sci-wolfram-run-region-or-buffer . "e")
     (sci-wolfram-convert-to-notebook . "c"))
   "sci-wolfram key map"
   :type '(alist :key-type symbol :value-type string)
