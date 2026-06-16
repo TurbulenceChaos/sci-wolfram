@@ -293,10 +293,7 @@
     (when bounds
       (list (car bounds)
 	    (cdr bounds)
-	    sci-wolfram-lsp-symbols
-	    ;; (completion-table-dynamic
-	    ;;  (lambda (_string)
-	    ;;    (unless (eglot or lsp) sci-wolfram-lsp-symbols nil)))
+	    sci-wolfram-lsp-symbols ; completion-table-dynamic
 	    :exclusive 'no))))
 
 (add-hook 'sci-wolfram-mode-hook
@@ -344,7 +341,7 @@
 		     `(,sci-wolfram-kernel
 		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
 		       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
-    :major-modes '(sci-wolfram-mode) ; '(sci-wolfram-mode sci-wolfram-ts-mode)
+    :major-modes '(sci-wolfram-mode)
     :server-id 'wolfram-lsp)))
 
 ;; syntax table
@@ -419,31 +416,26 @@
    ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)))
 
 ;; keybinding
-(defcustom sci-wolfram-mode-leader-key "<f6>"
-  "leader key for sci-wolfram-mode"
-  :type 'string
-  :group 'sci-wolfram-mode)
+(defvar sci-wolfram-mode-leader-key "C-c" "leader key for sci-wolfram-mode")
 
-(defcustom sci-wolfram-key-map
+(defvar sci-wolfram-key-map
   '((sci-wolfram-doc-lookup . "h")
-    (sci-wolfram-run-repl . "r")
+    (sci-wolfram-run-repl . "t")
     (sci-wolfram-import-display-image-package . "i")
     (sci-wolfram-import-convert-to-notebook-package . "n")
     (sci-wolfram-format-region-or-buffer . "f")
-    (sci-wolfram-run-region-or-buffer . "e")
+    (sci-wolfram-run-region-or-buffer . "r")
     (sci-wolfram-convert-to-notebook . "c"))
-  "sci-wolfram key map"
-  :type '(alist :key-type symbol :value-type string)
-  :group 'sci-wolfram-mode)
+  "sci-wolfram key map")
 
-(defvar sci-wolfram-mode-map
-  (let ((map (make-sparse-keymap)))
-    (dolist (key-map sci-wolfram-key-map)
-      (define-key map
-		  (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr key-map)))
-		  (car key-map)))
-    map)
-  "keymap for sci-wolfram-mode.")
+(defvar sci-wolfram-mode-map nil "keymap for sci-wolfram-mode.")
+
+(setq sci-wolfram-mode-map (make-sparse-keymap))
+
+(dolist (key-map sci-wolfram-key-map)
+  (define-key sci-wolfram-mode-map
+	      (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr key-map)))
+	      (car key-map)))
 
 ;; sci-wolfram-mode
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"

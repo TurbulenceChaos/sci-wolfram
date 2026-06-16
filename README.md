@@ -1,9 +1,12 @@
 # sci-wolfram
-Author: Peng Peng  \
-Email: [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)  \
+Author: Peng Peng
+
+Email: [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)
+
 GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wolfram)
 
-# Table of contents
+# Table of Contents
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 - [Introduction](#introduction)
 - [Features for Emacs](#features-for-emacs)
 - [Features for VSCode](#features-for-vscode)
@@ -12,15 +15,18 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
   - [Configuration](#configuration)
 - [Usage for Emacs](#usage-for-emacs)
   - [For Wolfram Script File](#for-wolfram-script-file)
-  - [For src-block in Org mode](#for-src-block-in-org-mode)
+  - [For Wolfram Src-block in Org-mode](#for-wolfram-src-block-in-org-mode)
 - [Installation for VSCode](#installation-for-vscode)
   - [Prerequisites](#prerequisites-1)
   - [Configuration](#configuration-1)
 - [Usage for VSCode](#usage-for-vscode)
-  - [For Repl](#for-repl)
-  - [For Command Line](#for-command-line)
+  - [For Wolfram REPL](#for-wolfram-repl)
   - [Convert Wolfram Script to PDF and Mathematica Notebook](#convert-wolfram-script-to-pdf-and-mathematica-notebook)
+- [Change Log](#change-log)
+  - [v3.0.0](#v300)
 - [Reference](#reference)
+
+<!-- markdown-toc end -->
 
 # Introduction
 An all-in-one Wolfram Mathematica package for Emacs.
@@ -88,9 +94,9 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ```
 
 # Usage for Emacs
-Default leader key in `sci-wolfram-mode` is `F6`.
+Default leader key in `sci-wolfram-mode` is `C-c`.
 
-Or just type `M-x sci-wolfram-` to use all interactive functions.
+Or You can just type `M-x sci-wolfram-` to use all interactive functions.
 
 ## For Wolfram Script File
 `sci-wolfram-run-region-or-buffer`
@@ -110,6 +116,8 @@ Support auto-completion and formatting.
 `sci-wolfram-convert-to-notebook`
 
 Convert region or buffer code to PDF and Mathematica notebook.
+
+You can using `TextCell` to add title, subtitle, section, text, formula, etc to Mathematica notebook.
 
 
 
@@ -150,36 +158,43 @@ Format region or wolfram src-block code.
 
 Convert region or wolfram src-block code to PDF and Mathematica notebook.
 
+You can using `TextCell` to add title, subtitle, section, text, formula, etc to Mathematica notebook.
+
 
 
 > [!IMPORTANT]
-> `Print[code]` will truncate string lines in Wolfram REPL. Consider using `WriteString` instead:
-> ```Mathematica
-> WriteString["stdout", code, "\n"];
-> ```
->
-> For emacs, Wolfram REPL use `wolframscript -rawterm`, where space lines in string are not allowed.\
+> 1. `Print[code]` will truncate string lines in Wolfram REPL. Consider using `WriteString["stdout", code, "\n"]` instead.
+> 2. For emacs, Wolfram REPL use `wolframscript -rawterm`, where space lines in string are not allowed:\
+```Mathematica
+str="First line
+
+Second line"
+```
 > All space lines are automatically removed from strings before running codes.
->
-> For org version < 9.8, spaces before a string in session async running will be automatically removed.\
-> For org version >= 9.8, the emacs `org-babel-comint-async-register` introduced a new option `disable-prompt-filtering` to avoid this situation.
->
+> 3. For org-mode version < 9.8, spaces before a string (i.e. "   Hello") in src-block session async running will be automatically removed.\
+> For org-mode version >= 9.8, `org-babel-comint-async-register` function introduced a new option `disable-prompt-filtering` to avoid this situation.
+
 > Please read [Test.org](Test/Test.org) for more details.
 
 # Installation for VSCode
 ## Prerequisites
+
 - **Wolfram Engine** (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
 Required for running wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en
-- `imgcat`\
-Display images in VSCode Terminal.\
+- [`imgcat`](https://github.com/wookayin/python-imgcat)\
+Enable image display in VSCode Terminal.\
 Install with `pip install imgcat`
 
 ## Configuration
-- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in vscode settings, and **make sure your system is using a discrete graphics card!**
 
+**Make sure your system is using a discrete graphics card!**
 
+- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VSCode settings, and 
+
+![vscode-official-wolfram-extension.png](Images/vscode-terminal-enable-display-images.png "title")
 
 - Install the official [wolfram language extension](https://github.com/WolframResearch/vscode-wolfram) from vscode extension marketplace.
+
 ![vscode-official-wolfram-extension.png](Images/vscode-official-wolfram-extension.png)
 
 # Usage for VSCode
@@ -194,7 +209,7 @@ $Post = sciWolframDisplayImage[#] &;
 ```
 3. Select codes in wolfram script file and send them into REPL by `Terminal: Run Selected Text In Active Terminal`
 
-See [Test.wl](Test/Test.wl) for more details about configurable parameters of `sciWolframDisplayImage` package.
+See [TestDisplayImages.wl](Test/TestDisplayImages.wl) for more details about configurable parameters of `sciWolframDisplayImage` package.
 
 
 
@@ -203,13 +218,13 @@ You can using `TextCell` to add title, subtitle, section, text, formula, etc to 
 
 Steps:
 1. `Ctrl+Shift+P`: `Wolfram Language: Start Wolfram in Terminal`
-2. Modify and paste below code into REPL::
+2. Modify and paste below code into REPL:
 ```Mathematica
 Get["/path/to/sciWolframConvertToNotebook.wl"];
 
 sciWolframConvertToNotebook["/path/to/file.wl"];
 ```
-See [convertToNotebook.wl](Test/convertToNotebook.wl) and [script.wl](Test/script.wl) for details.
+See [TestConvertToNotebook.wl](Test/TestConvertToNotebook.wl) and [file.wl](Test/file.wl) for details.
 
 # Change Log
 ## v3.0.0
@@ -220,13 +235,13 @@ See [convertToNotebook.wl](Test/convertToNotebook.wl) and [script.wl](Test/scrip
 # Reference
 For `sciWolframDisplayImage.wl`:\
 Thanks to the following two discussions for guidance on displaying wolfram images and interactive CDF files:
-- [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)\
+- [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 - [How to set up a Plot viewer for Wolfram Engine from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
 
 For `sci-wolfram-mode`:\
 Thanks to `xah-wolfram-mode` by Xah Lee, `wolfram-mode` by Kawabata, and `wolfram-mode` by Daniel Nicolai for their inspiration and valuable references.
-- [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)\
-- [wolfram-mode](https://github.com/kawabata/wolfram-mode)\
+- [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
+- [wolfram-mode](https://github.com/kawabata/wolfram-mode)
 - [wolfram-mode](https://github.com/dalanicolai/wolfram-mode/tree/master)
 
 For `LSPServer`:\

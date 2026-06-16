@@ -37,7 +37,7 @@
 ;;; Code:
 
 (require 'org)
-(require 'org-element)
+;; (require 'org-element)
 (require 'org-src)
 (require 'comint)
 (require 'sci-wolfram-display-images)
@@ -48,8 +48,8 @@
 
 (defvar sci-wolfram-org-babel-async--registered nil)
 
-(defun sci-wolfram-preoutput-filter-function (input-string)
-  (replace-regexp-in-string " *\r" "" input-string))
+;; (defun sci-wolfram-preoutput-filter-function (input-string)
+;;   (replace-regexp-in-string " *\r" "" input-string))
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
@@ -86,7 +86,7 @@
 
 (defun sci-wolfram-remove-eoe (result eoe)
   "Remove EOE from result"
-  (mapconcat 'identity (cl-remove-if (lambda (s) (string-match-p eoe s)) result)))
+  (mapconcat 'identity (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
 
 (defun sci-wolfram-evaluate-session (body)
   "wolfram org-babel block execute session"
@@ -112,7 +112,6 @@
       (run-at-time 0 nil (lambda ()
 			   (with-current-buffer buf
 			     (save-excursion
-			       ;; (message "buffer: %s and pos: %s" buf pos)
 			       (goto-char pos)
 			       (sci-wolfram-display-images))))))))
 
@@ -152,11 +151,7 @@
 (defun sci-wolfram-async-block-get-info ()
   (let ((buf (current-buffer))
 	(pos (point)))
-    (setq sci-wolfram-async-block-info (cons buf pos))
-    ;; (message "buffer: %s and pos: %s"
-    ;; 	     (car sci-wolfram-async-block-info)
-    ;; 	     (cdr sci-wolfram-async-block-info))
-    ))
+    (setq sci-wolfram-async-block-info (cons buf pos))))
 
 (add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-block-get-info)
 
@@ -176,11 +171,13 @@
     (:comments . "link")
     (:eval . "never-export")
     (:exports . "both"))
-  "Default header arguments for wolfram org-babel block."
+  "Default header arguments for wolfram src-block in org-mode"
   :type '(alist :key-type symbol :value-type string)
   :group 'sci-wolfram-mode)
 
-(defvar sci-wolfram-org-src-block-name "wolfram")
+(defvar sci-wolfram-org-src-block-name nil "wolfram src-block name in org-mode")
+
+(setq sci-wolfram-org-src-block-name "wolfram")
 
 (with-eval-after-load 'org-src
   (add-to-list 'org-src-lang-modes `(,sci-wolfram-org-src-block-name . sci-wolfram)))
