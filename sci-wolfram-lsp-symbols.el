@@ -9,6 +9,8 @@
 
 (let* ((dir (file-name-directory (or load-file-name buffer-file-name)))
        (lsp-symbols-dir (expand-file-name "LSPSymbols" dir)))
+  (unless (file-directory-p lsp-symbols-dir)
+    (make-directory lsp-symbols-dir))
   (unless (directory-files lsp-symbols-dir nil "\\.el\\'")
     (message "Convert Wolfram LSPServer symbols to emacs lisp")
     (shell-command (format "wolframscript -script %s" sci-wolfram-lsp-symbols-script))))

@@ -103,7 +103,7 @@ Or You can just type `M-x sci-wolfram-` to use all interactive functions.
 
 Display images, latex fragments, and Wolfram Player interactive files.
 
-Support async Wolfram REPL session calc.
+**Support async Wolfram REPL session calc.**
 
 
 
