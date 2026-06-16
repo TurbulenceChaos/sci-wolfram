@@ -320,7 +320,12 @@
 	  "sci-wolfram-kernel-location.el"))
 
 (unless (file-exists-p (concat (file-name-sans-extension sci-wolfram-kernel-location-elisp) ".el"))
-  (shell-command (format "wolframscript -script %s" sci-wolfram-kernel-location-script)))
+  (call-process
+   "wolframscript"
+   nil nil nil
+   "-script"
+   sci-wolfram-kernel-location-script))
+
 (require 'sci-wolfram-kernel-location)
 
 ;; (defun sci-wolfram-remove-local-lsp-server ()

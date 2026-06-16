@@ -155,6 +155,7 @@
 
 (add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-block-get-info)
 
+;;;###autoload
 (defun org-babel-execute:wolfram (body params)
   "wolfram org-babel block sync/async execute session"
   (sci-wolfram-make-repl)
@@ -179,6 +180,7 @@
 
 (setq sci-wolfram-org-src-block-name "wolfram")
 
+;;;###autoload
 (with-eval-after-load 'org-src
   (add-to-list 'org-src-lang-modes `(,sci-wolfram-org-src-block-name . sci-wolfram)))
 
