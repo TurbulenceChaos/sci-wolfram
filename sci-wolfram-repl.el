@@ -178,6 +178,7 @@
 
 (defvar sci-wolfram-org-src-block-name nil "wolfram src-block name in org-mode")
 
+;;;###autoload
 (setq sci-wolfram-org-src-block-name "wolfram")
 
 ;;;###autoload
