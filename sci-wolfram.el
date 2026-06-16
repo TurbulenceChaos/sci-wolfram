@@ -311,23 +311,7 @@
 	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-org-block-completion-at-point nil t)))
 
 ;; lsp server
-(defvar sci-wolfram-kernel-location-script
-  (concat (file-name-directory (or load-file-name buffer-file-name))
-	  "sciWolframKernelLocation.wl"))
-
-(defvar sci-wolfram-kernel-location-elisp
-  (concat (file-name-directory (or load-file-name buffer-file-name))
-	  "sci-wolfram-kernel-location.el"))
-
-(if (file-exists-p (concat (file-name-sans-extension sci-wolfram-kernel-location-elisp) ".el"))
-    (require 'sci-wolfram-kernel-location)
-  (progn
-    (call-process
-     "wolframscript"
-     nil nil nil
-     "-script"
-     sci-wolfram-kernel-location-script)
-    (require 'sci-wolfram-kernel-location)))
+(require 'sci-wolfram-kernel)
 
 ;; (defun sci-wolfram-remove-local-lsp-server ()
 ;;   (interactive)
