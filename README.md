@@ -36,12 +36,12 @@ Display wolfram script images in Visual Studio Code Terminal.
 # Features for Emacs
 - [x] **Display wolfram script as images, LaTeX, and Wolfram Player interactive files**
 - [x] **Support async Wolfram REPL session calc**
-- [x] Automatic completion and formatting with `LSPServer`
+- [x] Automatic completion and formatting with LSPServer
 - [x] Convert wolfram script to PDF and Mathematica notebook
 - [x] Prettify Mathematica symbols
 
 # Features for VSCode
-- [x] **Display wolfram script images in VSCode Terminal using `imgcat`**
+- [x] **Display wolfram script images in VSCode Terminal using imgcat**
 - [x] Convert wolfram script to PDF and Mathematica notebook
 
 # Installation for Emacs
@@ -94,7 +94,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ```
 
 # Usage for Emacs
-Default leader key in `sci-wolfram-mode` is `C-c`.
+Default leader key in sci-wolfram-mode is `Ctrl-c`.
 
 Or You can just type `M-x sci-wolfram-` to use all interactive functions.
 
@@ -164,32 +164,30 @@ You can using `TextCell` to add title, subtitle, section, text, formula, etc to 
 
 > [!IMPORTANT]
 > 1. `Print[code]` will truncate string lines in Wolfram REPL. Consider using `WriteString["stdout", code, "\n"]` instead.
-> 2. For emacs, Wolfram REPL use `wolframscript -rawterm`, where space lines in string are not allowed:\
-```Mathematica
-str="First line
-
-Second line"
-```
-> All space lines are automatically removed from strings before running codes.
-> 3. For org-mode version < 9.8, spaces before a string (i.e. "   Hello") in src-block session async running will be automatically removed.\
-> For org-mode version >= 9.8, `org-babel-comint-async-register` function introduced a new option `disable-prompt-filtering` to avoid this situation.
-
-> Please read [Test.org](Test/Test.org) for more details.
+> 2. For emacs, Wolfram REPL use `wolframscript -rawterm`, where space lines in string are not allowed.\
+> **All space lines in string will be automatically removed before running codes.**
+> ```wolfram
+> str="First line
+>
+> Second line"
+> ```
+> 3. For org-mode version < 9.8, spaces before a string (i.e. `str="   Hello"`) in src-block session async running will be automatically removed.
+> From org version 9.8, `org-babel-comint-async-register` function introduced a new option `disable-prompt-filtering` to avoid this situation.
+>
+> **Please read [Test.org](Test/Test.org) for more details.**
 
 # Installation for VSCode
 ## Prerequisites
 
 - **Wolfram Engine** (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
 Required for running wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en
-- [`imgcat`](https://github.com/wookayin/python-imgcat)\
+- [imgcat](https://github.com/wookayin/python-imgcat)\
 Enable image display in VSCode Terminal.\
 Install with `pip install imgcat`
 
 ## Configuration
 
-**Make sure your system is using a discrete graphics card!**
-
-- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VSCode settings, and 
+- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VSCode settings, and **make sure your system is using a discrete graphics card!**
 
 ![vscode-official-wolfram-extension.png](Images/vscode-terminal-enable-display-images.png "title")
 
@@ -200,16 +198,16 @@ Install with `pip install imgcat`
 # Usage for VSCode
 ## For Wolfram REPL
 Steps:
-1. `Ctrl+Shift+P`: `Wolfram Language: Start Wolfram in Terminal`
+1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
-```Mathematica
+```wolfram
 Get["/path/to/sciWolframDisplayImage.wl"];
 
 $Post = sciWolframDisplayImage[#] &;
 ```
-3. Select codes in wolfram script file and send them into REPL by `Terminal: Run Selected Text In Active Terminal`
+3. Select codes in wolfram script file and send them into REPL by `Ctrl+Shift+p: Terminal: Run Selected Text In Active Terminal`
 
-See [TestDisplayImages.wl](Test/TestDisplayImages.wl) for more details about configurable parameters of `sciWolframDisplayImage` package.
+Read [TestDisplayImages.wl](Test/TestDisplayImages.wl) for more details about configurable parameters of `sciWolframDisplayImage` package.
 
 
 
@@ -217,14 +215,14 @@ See [TestDisplayImages.wl](Test/TestDisplayImages.wl) for more details about con
 You can using `TextCell` to add title, subtitle, section, text, formula, etc to Mathematica notebook.
 
 Steps:
-1. `Ctrl+Shift+P`: `Wolfram Language: Start Wolfram in Terminal`
+1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
-```Mathematica
+```wolfram
 Get["/path/to/sciWolframConvertToNotebook.wl"];
 
 sciWolframConvertToNotebook["/path/to/file.wl"];
 ```
-See [TestConvertToNotebook.wl](Test/TestConvertToNotebook.wl) and [file.wl](Test/file.wl) for details.
+Read [TestConvertToNotebook.wl](Test/TestConvertToNotebook.wl) and [file.wl](Test/file.wl) for more details.
 
 # Change Log
 ## v3.0.0
