@@ -438,6 +438,7 @@
 	      (car key-map)))
 
 ;; sci-wolfram-mode
+;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
   "Major mode for Wolfram Language"
   :syntax-table sci-wolfram-mode-syntax-table
