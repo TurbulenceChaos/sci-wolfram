@@ -1,0 +1,11 @@
+tmp/
+logs/
+*.elc
+/Data/
+sci-wolfram-autoloads.el
+sci-wolfram-pkg.el
+sci-wolfram-path.el
+ltximg/
+LSPSymbols/*
+/sci-wolfram-kernel-location.el
+/README.html
