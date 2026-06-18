@@ -245,7 +245,7 @@
 	(derived-mode-p 'sci-wolfram-mode))
     (let* ((code (sci-wolfram-get-region-or-buffer-code))
 	   (file-name (format "%s-region-or-buffer.wl"
-			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (buffer-name))))
+			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))))
 	   (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
