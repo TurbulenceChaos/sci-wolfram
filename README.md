@@ -131,6 +131,14 @@ Search wolfram doc in web.
 
 https://github.com/user-attachments/assets/3d2d058b-d847-43f0-a774-1a526992aadd
 
+> [!NOTE]
+> For **any selected region in any buffer**, you can evaluate it, format it, or convert it to a Mathematica notebook.\
+> For example, you can run Wolfram code in a LaTeX file and insert the generated LaTeX fragments back into the document.
+> 
+> Wolfram expressions are converted to Mathematica notebook images by default. To convert them to LaTeX fragments instead, run `M-x customize-group RET sci-wolfram-mode RET` and set `sci-wolfram-formula-type` to latex.
+
+https://github.com/user-attachments/assets/1d226657-a3a3-4145-95df-f2a5b7348ecd
+
 ## For Wolfram Src-block in Org-mode
 
 `org-babel-execute:wolfram`
