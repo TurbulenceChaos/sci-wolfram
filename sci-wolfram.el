@@ -1,6 +1,6 @@
 ;;; sci-wolfram.el --- Major mode for editing Wolfram Language. -*- lexical-binding: t -*-
 ;;
-;; Copyright (C) 2025 Peng Peng
+;; Copyright (C) 2025-2026 Peng Peng
 ;;
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Created: 2025-05-20

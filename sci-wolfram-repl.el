@@ -1,6 +1,6 @@
 ;;; sci-wolfram-repl.el --- Wolfram Mathematica repl -*- lexical-binding: t -*-
 ;;
-;; Copyright (C) 2025 Peng Peng
+;; Copyright (C) 2025-2026 Peng Peng
 ;; Created: 2025-05-20
 ;; Author: Peng Peng <211110103110@stu.just.edu.cn>
 ;; Package-Requires: ((emacs "29.1"))
