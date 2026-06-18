@@ -51,22 +51,6 @@ sciWolframLSPSymbols["BuiltinFunctions", 5];
 
 sciWolframLSPSymbols["Constants", 1];
 
-sciWolframLSPSymbols["SystemLongNames", 1];
-
-sciWolframLSPSymbols["SpecialLongNames", 1];
-
-sciWolframLSPSymbols["UndocumentedLongNames", 1];
-
-sciWolframLSPSymbols["FreeLongNames", 1];
-
-sciWolframLSPSymbols["SystemCharacters", 1];
-
-sciWolframLSPSymbols["SpecialCharacters", 1];
-
-sciWolframLSPSymbols["UndocumentedCharacters", 1];
-
-sciWolframLSPSymbols["FreeCharacters", 1];
-
 sciWolframLSPSymbols["Options", 1];
 
 sciWolframLSPSymbols["SessionSymbols", 1];
@@ -79,7 +63,18 @@ sciWolframLSPSymbols["ObsoleteSymbols", 1];
 
 sciWolframLSPSymbols["BadSymbols", 1];
 
-sciWolframLSPSymbols["UnsupportedCharacters", 1];
+(* sciWolframLSPSymbols["SystemCharacters", 1]; *)
+sciWolframLSPSymbols["SystemLongNames", 1];
 
+(* sciWolframLSPSymbols["FreeCharacters", 1]; *)
+sciWolframLSPSymbols["FreeLongNames", 1];
+
+(* sciWolframLSPSymbols["SpecialCharacters", 1]; *)
+sciWolframLSPSymbols["SpecialLongNames", 1];
+
+(* sciWolframLSPSymbols["UndocumentedCharacters", 1]; *)
+sciWolframLSPSymbols["UndocumentedLongNames", 1];
+
+(* sciWolframLSPSymbols["UnsupportedCharacters", 1]; *)
 sciWolframLSPSymbols["UnsupportedLongNames", 1];
 

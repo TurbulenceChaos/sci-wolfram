@@ -228,7 +228,7 @@ https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 # Change Log
 ## v3.0.0
 - **Add Wolfram REPL async session calc support**
-- **Remove `emacs-jupyter` dependency**
+- **Remove emacs-jupyter package dependency**
 - Refactor `sciWolframDisplayImage.wl` and `sciWolframConvertToNotebook.wl` package
 
 # Reference
@@ -238,14 +238,14 @@ Thanks to the following two discussions for guidance on displaying wolfram image
 - [How to set up a Plot viewer for Wolfram Engine from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
 
 For `sci-wolfram-mode`:\
-Thanks to `xah-wolfram-mode` by Xah Lee, `wolfram-mode` by Kawabata, and `wolfram-mode` by Daniel Nicolai for their inspiration and valuable references.
+Thanks to xah-wolfram-mode by Xah Lee, wolfram-mode by Kawabata, and wolfram-mode by Daniel Nicolai for their inspiration and valuable references.
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 - [wolfram-mode](https://github.com/kawabata/wolfram-mode)
 - [wolfram-mode](https://github.com/dalanicolai/wolfram-mode/tree/master)
 
 For `LSPServer`:\
-Thanks to `wolfram-language-mode` by Oliver Grasl and `vscode-wolfram` by Wolfram Research for valuable references on `LSPServer`:
-- [wolfram-language-mode](https://github.com/transentis/wolfram-language-modse)
+Thanks to wolfram-language-mode by Oliver Grasl and vscode-wolfram by Wolfram Research for valuable references on LSPServer:
+- [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
 - [vscode-wolfram](https://github.com/WolframResearch/vscode-wolfram)
 
 For `sciWolframConvertToNotebook.wl`:\

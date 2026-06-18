@@ -49,22 +49,18 @@
        BuiltinFunctions-4
        BuiltinFunctions-5
        Constants
-       SystemLongNames
-       SpecialLongNames
-       UndocumentedLongNames
-       FreeLongNames
-       SystemCharacters
-       SpecialCharacters
-       UndocumentedCharacters
-       FreeCharacters
        Options
        SessionSymbols
        ExperimentalSymbols
        UndocumentedSymbols
        ObsoleteSymbols
        BadSymbols
-       UnsupportedCharacters
-       UnsupportedLongNames))
+       SystemLongNames ; SystemCharacters
+       FreeLongNames ; FreeCharacters
+       SpecialLongNames ; SpecialCharacters
+       UndocumentedLongNames ; UndocumentedCharacters
+       UnsupportedLongNames ; UnsupportedCharacters
+       ))
 
 
 (provide 'sci-wolfram-lsp-symbols)

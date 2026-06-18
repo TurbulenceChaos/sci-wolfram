@@ -384,27 +384,22 @@
    (,(regexp-opt BuiltinFunctions-3 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-4 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
+
    (,(regexp-opt Constants 'symbols) . font-lock-constant-face)
-   (,(regexp-opt SystemLongNames 'symbols) . font-lock-constant-face)
-   (,(regexp-opt SpecialLongNames 'symbols) . font-lock-constant-face)
-   (,(regexp-opt UndocumentedLongNames 'symbols) . font-lock-type-face)
-   (,(regexp-opt FreeLongNames 'symbols) . font-lock-variable-name-face)
-   (,(regexp-opt SystemCharacters) . font-lock-constant-face)
-   (,(regexp-opt SpecialCharacters) . font-lock-keyword-face)
-   (,(regexp-opt UndocumentedCharacters) . font-lock-type-face)
-   (,(regexp-opt FreeCharacters) . font-lock-variable-name-face)
    (,(regexp-opt Options 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt SessionSymbols 'symbols) . font-lock-preprocessor-face)
+   (,(regexp-opt SessionSymbols 'symbols) . font-lock-keyword-face)
    (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-warning-face)
-   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-type-face)
+   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-doc-face)
    (,(regexp-opt ObsoleteSymbols 'symbols) . font-lock-comment-face)
-   (,(regexp-opt BadSymbols 'symbols) . font-lock-warning-face)
-   (,(regexp-opt UnsupportedCharacters) . font-lock-comment-face)
-   (,(regexp-opt UnsupportedLongNames 'symbols) . font-lock-comment-face)
-   ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\s-*@" 1 font-lock-function-name-face)
-   ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\[\\[" 1 font-lock-variable-name-face)
-   ("\\b\\([A-Za-z][A-Za-z0-9]*\\)\\[" 1 font-lock-function-name-face)
-   ("\\b[A-Za-z][A-Za-z0-9]*\\b" . font-lock-variable-name-face)))
+   (,(regexp-opt BadSymbols 'symbols) . font-lock-negation-char-face)
+
+   (,(concat "\\\\\\[" (regexp-opt SystemLongNames) "\\]") . font-lock-constant-face) ; SystemCharacters
+   (,(concat "\\\\\\[" (regexp-opt FreeLongNames) "\\]") . font-lock-constant-face) ; FreeCharacters
+   (,(concat "\\\\\\[" (regexp-opt SpecialLongNames) "\\]") . font-lock-builtin-face) ; SpecialCharacters
+   (,(concat "\\\\\\[" (regexp-opt UndocumentedLongNames) "\\]") . font-lock-doc-face) ; UndocumentedCharacters
+   (,(concat "\\\\\\[" (regexp-opt UnsupportedLongNames) "\\]") . font-lock-warning-face) ; UnsupportedCharacters
+
+   ("[A-Za-z][A-Za-z0-9]*" . font-lock-variable-name-face)))
 
 ;; keybinding
 (defvar sci-wolfram-mode-leader-key "C-c" "leader key for sci-wolfram-mode")
