@@ -65,6 +65,13 @@
   :group 'sci-wolfram-mode)
 
 ;; run wolfram script region or buffer code
+;;;###autoload
+(defun sci-wolfram-run-repl ()
+  "Run wolfram repl"
+  (interactive)
+  (sci-wolfram-make-repl)
+  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+
 (defvar sci-wolfram-display-image-script
   (expand-file-name "sciWolframDisplayImage.wl"
 		    (file-name-directory (or load-file-name buffer-file-name))))
@@ -93,6 +100,7 @@
    (format "sciWolframPlay        -> \"%s\"\n" sci-wolfram-play)
    "] &;\n\n"))
 
+;;;###autoload
 (defmacro sci-wolfram-import-package-macro (func-name func-doc pkg)
   "Define a function to import sci-wolfram package"
   `(defun ,func-name ()
@@ -105,6 +113,7 @@
 	 (if (eq major-mode 'org-mode)
 	     (org-element-cache-reset))))))
 
+;;;###autoload
 (sci-wolfram-import-package-macro
  sci-wolfram-import-display-image-package
  "Import sciWolframDisplayImage.wl package"
@@ -144,6 +153,7 @@
       (org-babel-execute-buffer))
     (display-buffer outbuf)))
 
+;;;###autoload
 (defun sci-wolfram-run-region-or-buffer ()
   "Run wolfram script region or buffer code"
   (interactive)
@@ -178,6 +188,7 @@
    "sciWolframConvertToNoteBook[\"/path/to/file.wl\"];\n\n"
    "*)\n\n"))
 
+;;;###autoload
 (sci-wolfram-import-package-macro
  sci-wolfram-import-convert-to-notebook-package
  "Import sciWolframDisplayImage.wl package"
@@ -206,6 +217,7 @@
       (org-babel-execute-buffer))
     (display-buffer outbuf)))
 
+;;;###autoload
 (defun sci-wolfram-convert-to-notebook ()
   "Convert wolfram script to PDF and Mathematica notebook"
   (interactive)
@@ -259,6 +271,7 @@
 	(erase-buffer))
       (insert (sci-wolfram-remove-eoe result eoe)))))
 
+;;;###autoload
 (defun sci-wolfram-format-region-or-buffer ()
   "Format wolfram codes"
   (interactive)
@@ -277,6 +290,7 @@
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; doc lookup
+;;;###autoload
 (defun sci-wolfram-doc-lookup ()
   "Look up wolfram doc in web browser."
   (interactive)
