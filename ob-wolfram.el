@@ -92,7 +92,8 @@
 	 (result
 	  (if (version<= "9.8" (org-version))
 	      (org-babel-comint-with-output
-		  (sci-wolfram-repl-buffer eoe nil nil 'disable-prompt-filtering)
+		  ;; (sci-wolfram-repl-buffer eoe nil nil 'disable-prompt-filtering)
+		  (sci-wolfram-repl-buffer eoe)
 		(comint-send-string sci-wolfram-repl-buffer code))
 	    (org-babel-comint-with-output
 		(sci-wolfram-repl-buffer eoe)
@@ -120,7 +121,8 @@
            "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
 	   'sci-wolfram-clean-result ; 'org-babel-chomp
            'org-babel-eval-read-file
-           'disable-prompt-filtering)
+           ;; 'disable-prompt-filtering
+	   )
 	(org-babel-comint-async-register
 	 sci-wolfram-repl-buffer buf
 	 "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
