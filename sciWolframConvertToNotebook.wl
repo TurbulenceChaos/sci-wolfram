@@ -6,7 +6,14 @@ sciWolframConvertToNotebook::usage = "Usage: sciWolframConvertToNoteBook[\"/path
 
 Begin["`Private`"];
 
-sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory,2][[1]];
+sciWolframPlayer =
+  First[
+    FileNames["*wolframplayer*", $InstallationDirectory, 2],
+    First[
+      FileNames["*WolframNB*", $InstallationDirectory, 2],
+      Null
+    ]
+  ];
 
 sciWolframConvertToNotebook[file_] :=
 	Block[{$Post},
@@ -54,7 +61,11 @@ sciWolframConvertToNotebook[file_] :=
 				NotebookClose[notebook];
 				If[StringQ @ Environment["WSL_DISTRO_NAME"],
 					StartProcess[{"explorer.exe", FileNameTake[filePDF]}, ProcessDirectory -> dir];
-					StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> dir];
+                                        If[StringQ[sciWolframPlayer],
+                                            StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> sciWolframImageDir]
+                                            ,
+                                            WriteString["stdout", "Wolfram Player or Mathematica not found"]
+                                        ];
 					,
 					SystemOpen[filePDF];
 					SystemOpen[fileNB];

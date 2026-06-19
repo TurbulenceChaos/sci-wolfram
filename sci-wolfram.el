@@ -256,7 +256,8 @@
   "Format wolfram codes"
   (sci-wolfram-make-repl)
   (sci-wolfram-initiate-session)
-  (let* ((code (sci-wolfram-get-region-or-buffer-code))
+  (let* ((code (replace-regexp-in-string "\"" "\\\\\""
+					 (sci-wolfram-get-region-or-buffer-code)))
 	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
 	 (format-code (concat
 		       (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n" code)

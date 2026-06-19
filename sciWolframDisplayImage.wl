@@ -47,7 +47,14 @@ sciWolframEnv =
 		"emacs"
 	];
 
-sciWolframPlayer = FileNames["*wolframplayer*", $InstallationDirectory, 2][[1]];
+sciWolframPlayer =
+  First[
+    FileNames["*wolframplayer*", $InstallationDirectory, 2],
+    First[
+      FileNames["*WolframNB*", $InstallationDirectory, 2],
+      Null
+    ]
+  ];
 
 (* Display Image output *)
 
@@ -85,7 +92,11 @@ sciWolframImage[expr_, sciWolframImageDPI_, playNB_] :=
 			fileNB = StringReplace[filePNG, ".png" -> ".nb"];
 			Export[fileNB, Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}]];
                         If[StringQ @ Environment["WSL_DISTRO_NAME"],
-                        	StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> sciWolframImageDir];
+                                If[StringQ[sciWolframPlayer],
+                                    StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> sciWolframImageDir]
+                                    ,
+                                    WriteString["stdout", "Wolfram Player or Mathematica not found"]
+                                ];
                         	,
                         	UsingFrontEnd @ SystemOpen[fileNB];
                         ];
