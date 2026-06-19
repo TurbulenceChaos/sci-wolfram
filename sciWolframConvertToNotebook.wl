@@ -62,7 +62,7 @@ sciWolframConvertToNotebook[file_] :=
 				If[StringQ @ Environment["WSL_DISTRO_NAME"],
 					StartProcess[{"explorer.exe", FileNameTake[filePDF]}, ProcessDirectory -> dir];
                                         If[StringQ[sciWolframPlayer],
-                                            StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> sciWolframImageDir]
+                                            StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> dir]
                                             ,
                                             WriteString["stdout", "Wolfram Player or Mathematica not found"]
                                         ];
