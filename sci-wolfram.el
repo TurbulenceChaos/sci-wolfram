@@ -73,7 +73,7 @@
   "Run wolfram repl"
   (interactive)
   (sci-wolfram-make-repl)
-  (switch-to-buffer-other-window org-babel-wolfram-buffer))
+  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
 
 (defvar sci-wolfram-display-image-script
   (expand-file-name "sciWolframDisplayImage.wl"
@@ -267,8 +267,8 @@
 		       (format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (org-babel-comint-with-output
-	      (org-babel-wolfram-buffer eoe)
-	    (comint-send-string org-babel-wolfram-buffer format-code))))
+	      (sci-wolfram-repl-buffer eoe)
+	    (comint-send-string sci-wolfram-repl-buffer format-code))))
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
