@@ -40,7 +40,7 @@
 ;; (require 'org-element)
 ;; (require 'org-src)
 ;; (require 'ob-core)
-;; (require 'ob-comint)
+(require 'ob-comint)
 ;; (require 'comint)
 (require 'sci-wolfram-display-images)
 
