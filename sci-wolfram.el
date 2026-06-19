@@ -40,11 +40,13 @@
 
 ;;; Code:
 
-(require 'org)
-(require 'org-element)
-(require 'comint)
-(require 'sci-wolfram-repl)
+;; (require 'org)
+;; (require 'org-element)
+;; (require 'comint)
+(require 'ob-wolfram)
 (require 'sci-wolfram-lsp-symbols)
+(require 'sci-wolfram-kernel)
+(require 'sci-wolfram-prettify-symbols)
 
 ;;;###autoload
 (defgroup sci-wolfram-mode nil "Major mode for wolfram script")
@@ -65,12 +67,13 @@
   :group 'sci-wolfram-mode)
 
 ;; run wolfram script region or buffer code
+
 ;;;###autoload
 (defun sci-wolfram-run-repl ()
   "Run wolfram repl"
   (interactive)
   (sci-wolfram-make-repl)
-  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+  (switch-to-buffer-other-window org-babel-wolfram-buffer))
 
 (defvar sci-wolfram-display-image-script
   (expand-file-name "sciWolframDisplayImage.wl"
@@ -264,8 +267,8 @@
 		       (format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (org-babel-comint-with-output
-	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string sci-wolfram-repl-buffer format-code))))
+	      (org-babel-wolfram-buffer eoe)
+	    (comint-send-string org-babel-wolfram-buffer format-code))))
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
@@ -327,8 +330,6 @@
 	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-org-block-completion-at-point nil t)))
 
 ;; lsp server
-(require 'sci-wolfram-kernel)
-
 ;; (defun sci-wolfram-remove-local-lsp-server ()
 ;;   (interactive)
 ;;   "Remove local installed LSPServer if needed."
@@ -449,7 +450,8 @@
   (setq-local comment-end "*)"))
 
 ;; prettify symbols
-(require 'sci-wolfram-prettify-symbols)
+(add-hook 'sci-wolfram-mode-hook 'sci-wolfram-prettify-symbols)
+
 
 ;;;###autoload
 (dolist (file '("\\.wl\\'"

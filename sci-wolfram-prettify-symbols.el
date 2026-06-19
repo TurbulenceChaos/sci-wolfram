@@ -1,4 +1,4 @@
-;;; sci-wolfram-repl.el --- Prettify wolfram symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-prettify-symbols.el --- Prettify wolfram symbols -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025-2026 Peng Peng
 ;; Created: 2025-05-20
@@ -181,8 +181,6 @@
   (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
   ;; (setq-local prettify-symbols-unprettify-at-point nil)
   (prettify-symbols-mode 1))
-
-(add-hook 'sci-wolfram-mode-hook 'sci-wolfram-prettify-symbols)
 
 
 (provide 'sci-wolfram-prettify-symbols)

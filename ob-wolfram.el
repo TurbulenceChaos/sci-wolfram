@@ -1,4 +1,4 @@
-;;; sci-wolfram-repl.el --- Wolfram Mathematica repl -*- lexical-binding: t -*-
+;;; ob-wolfram.el --- Wolfram Mathematica repl -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025-2026 Peng Peng
 ;; Created: 2025-05-20
@@ -36,10 +36,12 @@
 
 ;;; Code:
 
-(require 'org)
+;; (require 'org)
 ;; (require 'org-element)
-(require 'org-src)
-(require 'comint)
+;; (require 'org-src)
+;; (require 'ob-core)
+;; (require 'ob-comint)
+;; (require 'comint)
 (require 'sci-wolfram-display-images)
 
 (defvar sci-wolfram-repl-buffer "*Wolfram REPL*")
@@ -53,8 +55,8 @@
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
-    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
-    ;; (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript")
+    (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
+    ;; (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript")
     (with-current-buffer sci-wolfram-repl-buffer
       (setq-local comint-prompt-regexp "^In\\[[0-9]+\\]:= *")
       ;; (setq-local comint-process-echoes t)
@@ -160,8 +162,12 @@
 
 (defvar org-babel-default-header-args:wolfram nil "Default header arguments for wolfram src-block in org-mode")
 
+;;;###autoload
+(setq sci-wolfram-org-src-block-name "wolfram")
+
 (setq org-babel-default-header-args:wolfram
-      '((:async . "yes")
+      `((:session . ,sci-wolfram-org-src-block-name)
+        (:async . "yes")
 	(:results . "value drawer")
 	(:display . "text")
 	(:comments . "link")
@@ -169,9 +175,6 @@
 	(:exports . "both")))
 
 (defvar sci-wolfram-org-src-block-name nil "wolfram src-block name in org-mode")
-
-;;;###autoload
-(setq sci-wolfram-org-src-block-name "wolfram")
 
 ;;;###autoload
 (with-eval-after-load 'org-src
@@ -190,5 +193,5 @@
 (add-hook 'org-babel-after-execute-hook 'sci-wolfram-auto-display-images)
 
 
-(provide 'sci-wolfram-repl)
-;;; sci-wolfram-repl.el ends here
+(provide 'ob-wolfram)
+;;; ob-wolfram.el ends here
