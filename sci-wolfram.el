@@ -453,8 +453,9 @@
 ;;;###autoload
 (dolist (file '("\\.wl\\'"
 		"\\.wls\\'"
-		"\\.nb\\'"
-		"\\.cdf\\'"))
+		;; "\\.nb\\'"
+		;; "\\.cdf\\'"
+		))
   (add-to-list 'auto-mode-alist `(,file . sci-wolfram-mode)))
 
 
