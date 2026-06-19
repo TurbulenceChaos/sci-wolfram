@@ -55,7 +55,7 @@
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
-    (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
+    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
     ;; (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript")
     (with-current-buffer sci-wolfram-repl-buffer
       (setq-local comint-prompt-regexp "^In\\[[0-9]+\\]:= *")
@@ -160,21 +160,18 @@
 	(sci-wolfram-async-evaluate-session body)
       (sci-wolfram-evaluate-session body))))
 
-(defvar org-babel-default-header-args:wolfram nil "Default header arguments for wolfram src-block in org-mode")
-
 ;;;###autoload
-(setq sci-wolfram-org-src-block-name "wolfram")
+(defvar sci-wolfram-org-src-block-name "wolfram" "wolfram src-block name in org-mode")
 
-(setq org-babel-default-header-args:wolfram
-      `((:session . ,sci-wolfram-org-src-block-name)
-        (:async . "yes")
-	(:results . "value drawer")
-	(:display . "text")
-	(:comments . "link")
-	(:eval . "never-export")
-	(:exports . "both")))
-
-(defvar sci-wolfram-org-src-block-name nil "wolfram src-block name in org-mode")
+(defvar org-babel-default-header-args:wolfram
+  `((:session . ,sci-wolfram-org-src-block-name)
+    (:async . "yes")
+    (:results . "value drawer")
+    (:display . "text")
+    (:comments . "link")
+    (:eval . "never-export")
+    (:exports . "both"))
+  "Default header arguments for wolfram src-block in org-mode")
 
 ;;;###autoload
 (with-eval-after-load 'org-src
