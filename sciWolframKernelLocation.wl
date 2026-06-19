@@ -18,11 +18,9 @@ elisp = StringTemplate[
 ";;; sci-wolfram-kernel-location.el --- Wolfram kernel location -*- lexical-binding: t -*-\n
 ;;; Commentary:
 ;;; Code:\n
-(defcustom sci-wolfram-kernel
+(defvar sci-wolfram-kernel
   \"`1`\"
-  \"Wolfram kernel location\"
-  :type 'string
-  :group 'sci-wolfram-mode)\n\n
+  \"Wolfram kernel location\")\n\n
 (provide 'sci-wolfram-kernel-location)
 ;;; sci-wolfram-kernel-location.el ends here\n"
 ][sciWolframKernel];

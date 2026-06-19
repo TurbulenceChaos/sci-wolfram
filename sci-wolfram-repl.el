@@ -158,16 +158,15 @@
 	(sci-wolfram-async-evaluate-session body)
       (sci-wolfram-evaluate-session body))))
 
-(defcustom org-babel-default-header-args:wolfram
-  '((:async . "yes")
-    (:results . "value drawer")
-    (:display . "text")
-    (:comments . "link")
-    (:eval . "never-export")
-    (:exports . "both"))
-  "Default header arguments for wolfram src-block in org-mode"
-  :type '(alist :key-type symbol :value-type string)
-  :group 'sci-wolfram-mode)
+(defvar org-babel-default-header-args:wolfram nil "Default header arguments for wolfram src-block in org-mode")
+
+(setq org-babel-default-header-args:wolfram
+      '((:async . "yes")
+	(:results . "value drawer")
+	(:display . "text")
+	(:comments . "link")
+	(:eval . "never-export")
+	(:exports . "both")))
 
 (defvar sci-wolfram-org-src-block-name nil "wolfram src-block name in org-mode")
 
