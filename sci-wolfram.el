@@ -222,6 +222,14 @@
   "Convert wolfram script to PDF and Mathematica notebook"
   (interactive)
   (cond
+   ((or (region-active-p)
+	(derived-mode-p 'sci-wolfram-mode))
+    (let* ((code (sci-wolfram-get-region-or-buffer-code))
+	   (file-name (format "%s-region-or-buffer.wl"
+			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))))
+	   (file (expand-file-name file-name default-directory)))
+      (write-region code nil file)
+      (sci-wolfram-mode-convert-to-notebook file)))
    ((and (buffer-file-name)
 	 (derived-mode-p 'sci-wolfram-mode))
     (sci-wolfram-mode-convert-to-notebook))
@@ -238,14 +246,6 @@
 	   (file-name (format "%s-%s.wl"
 			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))
 			      src-block-name))
-	   (file (expand-file-name file-name default-directory)))
-      (write-region code nil file)
-      (sci-wolfram-mode-convert-to-notebook file)))
-   ((or (region-active-p)
-	(derived-mode-p 'sci-wolfram-mode))
-    (let* ((code (sci-wolfram-get-region-or-buffer-code))
-	   (file-name (format "%s-region-or-buffer.wl"
-			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))))
 	   (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
