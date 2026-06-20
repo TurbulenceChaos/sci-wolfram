@@ -21,7 +21,7 @@
 		  (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
 	(save-restriction
           (narrow-to-region (min beg end) (max beg end))
-	  (when (executable-find "pdflatex") ; (string= sci-wolfram-formula-type "latex")
+	  (when (string= sci-wolfram-formula-type "latex") ; (executable-find "pdflatex")
 	    (org-latex-preview))
 	  (org-display-inline-images))))))
 
