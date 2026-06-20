@@ -84,16 +84,16 @@
    "Display wolfram script image.\n\n"
    "Usage:\n\n"
    "Default:\n"
-   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#] &;\n\n"
+   "$Post = sciWolframDisplayImage[#] &;\n\n"
    "All options:\n"
-   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#,\n"
+   "$Post = sciWolframDisplayImage[#,\n"
    "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
    "sciWolframImageDPI    -> 100 (default),\n"
    "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
    "$Post = .\n\n*)\n\n"
-   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#,\n"
+   "$Post = sciWolframDisplayImage[#,\n"
    (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
    (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
    (format "sciWolframPlay        -> \"%s\"\n" sci-wolfram-play)
@@ -122,7 +122,7 @@
  "Import sciWolframDisplayImage.wl package"
  sci-wolfram-display-image-package)
 
-(defun sci-wolfram-get-region-or-buffer-code ()
+(defun sci-wolfram-get-region-or-buffer-code (&optional orig-code)
   "Return code in region or buffer without space lines"
   (let* ((beg (if (region-active-p)
 		  (region-beginning)
@@ -131,7 +131,9 @@
 		  (region-end)
 		(point-max)))
 	 (code (buffer-substring-no-properties beg end)))
-    (sci-wolfram-remove-space-lines code)))
+    (if orig-code
+	code
+      (sci-wolfram-remove-space-lines code))))
 
 (defun sci-wolfram-mode-run-region-or-buffer (&optional code)
   "Run wolfram script region or buffer code"
@@ -188,7 +190,7 @@
    "(* sciWolframConvertToNotebook.wl\n\n"
    "Convert wolfram script to PDF and Mathematica notebook.\n\n"
    "Usage:\n\n"
-   "sciWolframConvertToNoteBook`sciWolframConvertToNoteBook[\"/path/to/file.wl\"]; *)\n\n"))
+   "sciWolframConvertToNoteBook[\"/path/to/file.wl\"]; *)\n\n"))
 
 ;;;###autoload
 (sci-wolfram-import-package-macro
@@ -213,7 +215,7 @@
       (insert (concat
 	       "#+name: sci-wolfram-convert-to-notebook\n"
 	       (format "#+begin_src %s\n" lang)
-	       (format "sciWolframConvertToNotebook`sciWolframConvertToNotebook[\"%s\"];" file)
+	       (format "sciWolframConvertToNotebook[\"%s\"];" file)
 	       "\n#+end_src\n\n"))
       (org-fold-hide-block-all)
       (org-babel-execute-buffer))
@@ -258,21 +260,16 @@
   "Format wolfram codes"
   (sci-wolfram-make-repl)
   (sci-wolfram-initiate-session)
-  (let* ((code (replace-regexp-in-string "\"" "\\\\\""
-					 (sci-wolfram-get-region-or-buffer-code)))
-	 (eoe (format "comint_wolfram_format_%s" (org-id-uuid)))
-	 (format-code (concat
-		       (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[\"%s\"], \"\\n\"];\n" code)
-		       (format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
-	 (result
-	  (org-babel-comint-with-output
-	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string sci-wolfram-repl-buffer format-code))))
+  (let* ((code (sci-wolfram-get-region-or-buffer-code t))
+	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
+	 (format-code (progn (with-temp-file tmp-src-file (insert code))
+			(format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"String\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
+	 (result (sci-wolfram-evaluate-session format-code)))
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
 	(erase-buffer))
-      (insert (sci-wolfram-remove-eoe result eoe)))))
+      (insert result))))
 
 ;;;###autoload
 (defun sci-wolfram-format-region-or-buffer ()

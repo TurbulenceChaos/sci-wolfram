@@ -47,21 +47,11 @@
 
 (defvar sci-wolfram-prompt-regexp "^In\\[[0-9]+\\]:= ")
 
-;; (defun sci-wolfram-preoutput-filter-function (string)
-;;   (message "%s" string)
-;;   (replace-regexp-in-string "\r\n" "" (concat (string-trim-right string) " ")))
-
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
     (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
-    ;; (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript")
     (with-current-buffer sci-wolfram-repl-buffer
-      (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp)
-      ;; (setq-local comint-process-echoes nil)
-      ;; (setq-local comint-prompt-read-only t)
-      ;; (add-hook 'comint-preoutput-filter-functions
-      ;; 		'sci-wolfram-preoutput-filter-function nil t)
-      )
+      (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp))
     (setq sci-wolfram-org-babel--initiated nil)
     (setq sci-wolfram-org-babel-async--registered nil)))
 
@@ -76,11 +66,12 @@
 (defun sci-wolfram-remove-space-lines (body)
   "Remove code string space lines"
   (substring-no-properties
-   (replace-regexp-in-string "\n[ \t]*\n" "\n" body)))
+   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
 
 (defun sci-wolfram-remove-eoe (result eoe)
   "Remove EOE from result"
-  (mapconcat 'identity (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
+  (mapconcat 'identity
+	     (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
 
 (defun sci-wolfram-evaluate-session (body)
   "wolfram org-babel block execute session"
@@ -96,9 +87,7 @@
 
 (defun sci-wolfram-clean-result (result)
   (prog1
-      (if (version<= "9.8" (org-version))
-	  (replace-regexp-in-string "\nIn\\[[0-9]+\\]:= *\\n?" "" result)
-	result)
+      result
     (let ((buf (car sci-wolfram-async-block-info))
 	  (pos (cdr sci-wolfram-async-block-info)))
       (run-at-time 0 nil (lambda ()
@@ -113,19 +102,11 @@
   (let ((buf (current-buffer)))
     (unless (and sci-wolfram-org-babel-async--registered
 		 (eq buf (car sci-wolfram-async-block-info)))
-      (if (version<= "9.8" (org-version))
-          (org-babel-comint-async-register
-           sci-wolfram-repl-buffer buf
-           "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-	   'sci-wolfram-clean-result ; 'org-babel-chomp
-           'org-babel-eval-read-file
-           'disable-prompt-filtering
-	   )
-	(org-babel-comint-async-register
+      (org-babel-comint-async-register
 	 sci-wolfram-repl-buffer buf
 	 "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-	 'sci-wolfram-clean-result ; (lambda (result) (sci-wolfram-clean-result result buf pos))
-	 'org-babel-eval-read-file))
+	 'sci-wolfram-clean-result
+	 'org-babel-eval-read-file)
       (setq sci-wolfram-org-babel-async--registered t))))
 
 (defun sci-wolfram-async-evaluate-session (body)
@@ -136,23 +117,9 @@
          (end   (format "ob_comint_async_wolfram_end_%s" uuid))
          (code (concat
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" start)
-		;; (format "%s\n" (sci-wolfram-remove-space-lines body))
-		(format "%s\n" body)
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end)))
-	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl")))
-    (with-temp-file tmp-src-file (insert code))
-    (comint-send-string sci-wolfram-repl-buffer
-			(concat (format "code=Import[\"%s\",\"HeldExpressions\"];\n" tmp-src-file)
-				(let* ((n (string-to-number
-					   (substring-no-properties
-					    (sci-wolfram-evaluate-session
-					     (format "code = Import[\"%s\", \"HeldExpressions\"]; WriteString[\"stdout\", Length[code], \"\\n\"];\n"
-						     tmp-src-file))))))
-				  (mapconcat
-				   (lambda (i)
-				     (format "ReleaseHold[code[[%d]]]\n" i))
-				   (number-sequence 1 n)
-				   ""))))
+		(format "%s\n" (sci-wolfram-remove-space-lines body))
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
+    (comint-send-string sci-wolfram-repl-buffer code)
     uuid))
 
 (defun sci-wolfram-async-block-get-info ()
