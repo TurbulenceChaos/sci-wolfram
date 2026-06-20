@@ -40,9 +40,6 @@
 
 ;;; Code:
 
-;; (require 'org)
-;; (require 'org-element)
-;; (require 'comint)
 (require 'ob-wolfram)
 (require 'sci-wolfram-lsp-symbols)
 (require 'sci-wolfram-kernel)
@@ -87,17 +84,16 @@
    "Display wolfram script image.\n\n"
    "Usage:\n\n"
    "Default:\n"
-   "$Post = sciWolframDisplayImage[#] &;\n\n"
+   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#] &;\n\n"
    "All options:\n"
-   "$Post = sciWolframDisplayImage[#,\n"
+   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#,\n"
    "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
    "sciWolframImageDPI    -> 100 (default),\n"
    "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
-   "$Post = .\n\n"
-   "*)\n\n"
-   "$Post = sciWolframDisplayImage[#,\n"
+   "$Post = .\n\n*)\n\n"
+   "$Post = sciWolframDisplayImage`sciWolframDisplayImage[#,\n"
    (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
    (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
    (format "sciWolframPlay        -> \"%s\"\n" sci-wolfram-play)
@@ -111,10 +107,14 @@
      (interactive)
      (let ((pkg (,pkg)))
        (save-excursion
-	 (forward-line 1)
-	 (insert pkg)
-	 (if (eq major-mode 'org-mode)
-	     (org-element-cache-reset))))))
+	 (if (and (derived-mode-p 'org-mode)
+		  (org-in-src-block-p))
+	     (progn (org-edit-src-code)
+		    (forward-line 1)
+		    (insert pkg)
+		    (org-edit-src-exit))
+	   (progn (forward-line 1)
+		  (insert pkg)))))))
 
 ;;;###autoload
 (sci-wolfram-import-package-macro
@@ -188,8 +188,7 @@
    "(* sciWolframConvertToNotebook.wl\n\n"
    "Convert wolfram script to PDF and Mathematica notebook.\n\n"
    "Usage:\n\n"
-   "sciWolframConvertToNoteBook[\"/path/to/file.wl\"];\n\n"
-   "*)\n\n"))
+   "sciWolframConvertToNoteBook`sciWolframConvertToNoteBook[\"/path/to/file.wl\"]; *)\n\n"))
 
 ;;;###autoload
 (sci-wolfram-import-package-macro
@@ -214,7 +213,7 @@
       (insert (concat
 	       "#+name: sci-wolfram-convert-to-notebook\n"
 	       (format "#+begin_src %s\n" lang)
-	       (format "sciWolframConvertToNotebook[\"%s\"];" file)
+	       (format "sciWolframConvertToNotebook`sciWolframConvertToNotebook[\"%s\"];" file)
 	       "\n#+end_src\n\n"))
       (org-fold-hide-block-all)
       (org-babel-execute-buffer))

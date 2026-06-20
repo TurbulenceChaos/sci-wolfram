@@ -36,12 +36,7 @@
 
 ;;; Code:
 
-;; (require 'org)
-;; (require 'org-element)
-;; (require 'org-src)
-;; (require 'ob-core)
 (require 'ob-comint)
-;; (require 'comint)
 (require 'sci-wolfram-display-images)
 
 (defvar sci-wolfram-repl-buffer "*Wolfram REPL*")
@@ -50,16 +45,20 @@
 
 (defvar sci-wolfram-org-babel-async--registered nil)
 
-;; (defun sci-wolfram-preoutput-filter-function (input-string)
-;;   (replace-regexp-in-string " *\r" "" input-string))
+(defvar sci-wolfram-prompt-regexp "^In\\[[0-9]+\\]:= ")
+
+;; (defun sci-wolfram-preoutput-filter-function (string)
+;;   (message "%s" string)
+;;   (replace-regexp-in-string "\r\n" "" (concat (string-trim-right string) " ")))
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
     (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
     ;; (make-comint-in-buffer "org-babel-wolfram" sci-wolfram-repl-buffer "wolframscript")
     (with-current-buffer sci-wolfram-repl-buffer
-      (setq-local comint-prompt-regexp "^In\\[[0-9]+\\]:= *")
-      ;; (setq-local comint-process-echoes t)
+      (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp)
+      ;; (setq-local comint-process-echoes nil)
+      ;; (setq-local comint-prompt-read-only t)
       ;; (add-hook 'comint-preoutput-filter-functions
       ;; 		'sci-wolfram-preoutput-filter-function nil t)
       )
@@ -77,7 +76,7 @@
 (defun sci-wolfram-remove-space-lines (body)
   "Remove code string space lines"
   (substring-no-properties
-   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
+   (replace-regexp-in-string "\n[ \t]*\n" "\n" body)))
 
 (defun sci-wolfram-remove-eoe (result eoe)
   "Remove EOE from result"
@@ -90,19 +89,16 @@
 		(format "%s\n" (sci-wolfram-remove-space-lines body))
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
-	  (if (version<= "9.8" (org-version))
-	      (org-babel-comint-with-output
-		  ;; (sci-wolfram-repl-buffer eoe nil nil 'disable-prompt-filtering)
-		  (sci-wolfram-repl-buffer eoe)
-		(comint-send-string sci-wolfram-repl-buffer code))
-	    (org-babel-comint-with-output
+	  (org-babel-comint-with-output
 		(sci-wolfram-repl-buffer eoe)
-	      (comint-send-string sci-wolfram-repl-buffer code)))))
+	      (comint-send-string sci-wolfram-repl-buffer code))))
     (sci-wolfram-remove-eoe result eoe)))
 
 (defun sci-wolfram-clean-result (result)
   (prog1
-      result ; (replace-regexp-in-string "^ \n \n" "" result)
+      (if (version<= "9.8" (org-version))
+	  (replace-regexp-in-string "\nIn\\[[0-9]+\\]:= *\\n?" "" result)
+	result)
     (let ((buf (car sci-wolfram-async-block-info))
 	  (pos (cdr sci-wolfram-async-block-info)))
       (run-at-time 0 nil (lambda ()
@@ -110,6 +106,8 @@
 			     (save-excursion
 			       (goto-char pos)
 			       (sci-wolfram-display-images))))))))
+
+(defvar sci-wolfram-async-block-info nil)
 
 (defun sci-wolfram-org-babel-register-async ()
   (let ((buf (current-buffer)))
@@ -121,7 +119,7 @@
            "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
 	   'sci-wolfram-clean-result ; 'org-babel-chomp
            'org-babel-eval-read-file
-           ;; 'disable-prompt-filtering
+           'disable-prompt-filtering
 	   )
 	(org-babel-comint-async-register
 	 sci-wolfram-repl-buffer buf
@@ -138,12 +136,24 @@
          (end   (format "ob_comint_async_wolfram_end_%s" uuid))
          (code (concat
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" start)
-		(format "%s\n" (sci-wolfram-remove-space-lines body))
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
-    (comint-send-string sci-wolfram-repl-buffer code)
+		;; (format "%s\n" (sci-wolfram-remove-space-lines body))
+		(format "%s\n" body)
+		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end)))
+	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl")))
+    (with-temp-file tmp-src-file (insert code))
+    (comint-send-string sci-wolfram-repl-buffer
+			(concat (format "code=Import[\"%s\",\"HeldExpressions\"];\n" tmp-src-file)
+				(let* ((n (string-to-number
+					   (substring-no-properties
+					    (sci-wolfram-evaluate-session
+					     (format "code = Import[\"%s\", \"HeldExpressions\"]; WriteString[\"stdout\", Length[code], \"\\n\"];\n"
+						     tmp-src-file))))))
+				  (mapconcat
+				   (lambda (i)
+				     (format "ReleaseHold[code[[%d]]]\n" i))
+				   (number-sequence 1 n)
+				   ""))))
     uuid))
-
-(defvar sci-wolfram-async-block-info nil)
 
 (defun sci-wolfram-async-block-get-info ()
   (let ((buf (current-buffer))

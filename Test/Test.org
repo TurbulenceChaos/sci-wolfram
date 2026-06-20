@@ -33,7 +33,7 @@ MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 
 #+name: sci-wolfram-convert-to-notebook
 #+begin_src wolfram
-(* sciWolframConvertToNotebook["Test.wl"]; *)
+(* sciWolframConvertToNotebook["file.wl"]; *)
 #+end_src
 
 * Important Notes
@@ -61,34 +61,6 @@ For over three decades, Mathematica has defined the state of the art in technica
 :end:
 
 ** Note 2
-For emacs, the Wolfram REPL use ~wolframscript -rawterm~, where space lines in string are not allowed.
-All space lines are automatically removed from strings before running codes.
-
-#+name: sci-wolfram-space-lines-in-string
-#+begin_src wolfram
-str = "To be, or not to be, that is the question:
-
-Whether 'tis nobler in the mind to suffer
-
-The slings and arrows of outrageous fortune,
-
-Or to take arms against a sea of troubles,
-
-And by opposing end them?";
-
-WriteString["stdout", str, "\n"];
-#+end_src
-
-#+RESULTS: sci-wolfram-space-lines-in-string
-:results:
-To be, or not to be, that is the question:
-Whether 'tis nobler in the mind to suffer
-The slings and arrows of outrageous fortune,
-Or to take arms against a sea of troubles,
-And by opposing end them?
-:end:
-
-** Note 3
 For org version < 9.8, the spaces before a string in session async running will be automatically removed.
 For org version >= 9.8, the emacs ~org-babel-comint-async-register~ introduced a new option ~disable-prompt-filtering~ to avoid this situation.
 #+begin_src python :session :results output
