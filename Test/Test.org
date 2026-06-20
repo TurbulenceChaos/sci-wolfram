@@ -39,12 +39,15 @@ MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 * Important Notes
 ** Note 1
 ~WriteString~ vs ~Print~:
-~Print~ will automatically truncate strings while ~WriteString~ will keep the original string style.
+
+~Print[code]~ will truncate string lines in Wolfram REPL. Consider using ~WriteString["stdout", code, "\n"]~ instead.
 
 #+name: sci-wolfram-print-vs-writestring
 #+begin_src wolfram
 str = "For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.";
+
 Print[str];
+
 WriteString["stdout", str, "\n"];
 #+end_src
 
@@ -61,8 +64,9 @@ For over three decades, Mathematica has defined the state of the art in technica
 :end:
 
 ** Note 2
-For emacs, the Wolfram REPL use ~wolframscript -rawterm~, where space lines in string are not allowed.
-All space lines are automatically removed from strings before running codes.
+For emacs, Wolfram REPL use ~wolframscript -rawterm~, where space lines are not allowed.
+
+**All space lines in string will be automatically removed before running codes.**
 
 #+name: sci-wolfram-space-lines-in-string
 #+begin_src wolfram
@@ -89,8 +93,10 @@ And by opposing end them?
 :end:
 
 ** Note 3
-For org version < 9.8, the spaces before a string in session async running will be automatically removed.
-For org version >= 9.8, the emacs ~org-babel-comint-async-register~ introduced a new option ~disable-prompt-filtering~ to avoid this situation.
+For org-mode version < 9.8, spaces before a string (i.e. ~str="    Hello"~) in src-block session async running will be automatically removed.
+
+From org version 9.8, ~org-babel-comint-async-register~ function introduced a new option ~disable-prompt-filtering~ to avoid this situation.
+
 #+begin_src python :session :results output
 print("         String with spaces before")
 #+end_src

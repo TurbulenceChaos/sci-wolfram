@@ -190,7 +190,7 @@
    "(* sciWolframConvertToNotebook.wl\n\n"
    "Convert wolfram script to PDF and Mathematica notebook.\n\n"
    "Usage:\n\n"
-   "sciWolframConvertToNoteBook[\"/path/to/file.wl\"]; *)\n\n"))
+   "sciWolframConvertToNoteBook[\"/path/to/file.wl\"];\n\n*)\n\n"))
 
 ;;;###autoload
 (sci-wolfram-import-package-macro

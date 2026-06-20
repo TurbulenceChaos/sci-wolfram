@@ -5,9 +5,9 @@ BeginPackage["sciWolframDisplayImage`"];
 sciWolframDisplayImage::usage = "Display wolfram script image.
 Usage:
 Default:
-$Post = sciWolframDisplayImage`sciWolframDisplayImage[#] &;
+$Post = sciWolframDisplayImage[#] &;
 All options:
-$Post = sciWolframDisplayImage`sciWolframDisplayImage[#,
+$Post = sciWolframDisplayImage[#,
 sciWolframFormulaType	-> \"image\" (default) or \"latex\",
 sciWolframImageDPI	-> 100 (default),
 sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file
