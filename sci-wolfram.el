@@ -399,18 +399,19 @@
    (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
 
    (,(regexp-opt Constants 'symbols) . font-lock-constant-face)
-   (,(regexp-opt Options 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt SessionSymbols 'symbols) . font-lock-keyword-face)
-   (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-warning-face)
-   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-doc-face)
-   (,(regexp-opt ObsoleteSymbols 'symbols) . font-lock-comment-face)
-   (,(regexp-opt BadSymbols 'symbols) . font-lock-negation-char-face)
+   (,(regexp-opt Options 'symbols) . font-lock-keyword-face)
+
+   (,(regexp-opt SessionSymbols 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt ObsoleteSymbols 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt BadSymbols 'symbols) . font-lock-builtin-face)
 
    (,(concat "\\\\\\[" (regexp-opt SystemLongNames) "\\]") . font-lock-constant-face) ; SystemCharacters
    (,(concat "\\\\\\[" (regexp-opt FreeLongNames) "\\]") . font-lock-constant-face) ; FreeCharacters
-   (,(concat "\\\\\\[" (regexp-opt SpecialLongNames) "\\]") . font-lock-builtin-face) ; SpecialCharacters
-   (,(concat "\\\\\\[" (regexp-opt UndocumentedLongNames) "\\]") . font-lock-doc-face) ; UndocumentedCharacters
-   (,(concat "\\\\\\[" (regexp-opt UnsupportedLongNames) "\\]") . font-lock-warning-face) ; UnsupportedCharacters
+   (,(concat "\\\\\\[" (regexp-opt SpecialLongNames) "\\]") . font-lock-constant-face) ; SpecialCharacters
+   (,(concat "\\\\\\[" (regexp-opt UndocumentedLongNames) "\\]") . font-lock-constant-face) ; UndocumentedCharacters
+   (,(concat "\\\\\\[" (regexp-opt UnsupportedLongNames) "\\]") . font-lock-constant-face) ; UnsupportedCharacters
 
    ("[A-Za-z][A-Za-z0-9]*" . font-lock-variable-name-face)))
 
