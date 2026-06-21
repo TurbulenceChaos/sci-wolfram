@@ -398,9 +398,8 @@
    (,(regexp-opt BuiltinFunctions-4 'symbols) . font-lock-function-name-face)
    (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
 
-   (,(regexp-opt Constants 'symbols) . font-lock-constant-face)
-   (,(regexp-opt Options 'symbols) . font-lock-keyword-face)
-
+   (,(regexp-opt Constants 'symbols) . font-lock-builtin-face)
+   (,(regexp-opt Options 'symbols) . font-lock-builtin-face)
    (,(regexp-opt SessionSymbols 'symbols) . font-lock-builtin-face)
    (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-builtin-face)
    (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-builtin-face)
