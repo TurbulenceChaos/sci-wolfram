@@ -6,14 +6,7 @@ sciWolframConvertToNotebook::usage = "Usage: sciWolframConvertToNoteBook[\"/path
 
 Begin["`Private`"];
 
-sciWolframPlayer =
-  First[
-    FileNames["*wolframplayer*", $InstallationDirectory, 2],
-    First[
-      FileNames["*WolframNB*", $InstallationDirectory, 2],
-      Null
-    ]
-  ];
+sciWolframPlayer = First[FileNames[{"*wolframplayer*", "*WolframNB*"}, $InstallationDirectory, 2], Null];
 
 sciWolframConvertToNotebook[file_] :=
 	Block[{$Post},
