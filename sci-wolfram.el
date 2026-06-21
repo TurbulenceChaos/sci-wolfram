@@ -226,6 +226,10 @@
   "Convert wolfram script to PDF and Mathematica notebook"
   (interactive)
   (cond
+   ((and (not (region-active-p))
+	 (buffer-file-name)
+	 (derived-mode-p 'sci-wolfram-mode))
+    (sci-wolfram-mode-convert-to-notebook))
    ((or (region-active-p)
 	(derived-mode-p 'sci-wolfram-mode))
     (let* ((code (sci-wolfram-get-region-or-buffer-code))
@@ -234,9 +238,6 @@
 	   (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
-   ((and (buffer-file-name)
-	 (derived-mode-p 'sci-wolfram-mode))
-    (sci-wolfram-mode-convert-to-notebook))
    ((and (derived-mode-p 'org-mode)
 	 (org-in-src-block-p)
 	 (let* ((info (org-babel-get-src-block-info))
@@ -263,7 +264,7 @@
   (let* ((code (sci-wolfram-get-region-or-buffer-code t))
 	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
 	 (format-code (progn (with-temp-file tmp-src-file (insert code))
-			(format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"String\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
+			     (format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"String\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
 	 (result (sci-wolfram-evaluate-session format-code)))
     (save-excursion
       (if (region-active-p)

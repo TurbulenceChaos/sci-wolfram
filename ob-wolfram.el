@@ -55,6 +55,16 @@
     (setq sci-wolfram-org-babel--initiated nil)
     (setq sci-wolfram-org-babel-async--registered nil)))
 
+(defun sci-wolfram-remove-space-lines (body)
+  "Remove code string space lines"
+  (substring-no-properties
+   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
+
+(defun sci-wolfram-remove-eoe (result eoe)
+  "Remove EOE from result"
+  (mapconcat 'identity
+	     (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
+
 (defun sci-wolfram-evaluate-session (body)
   "wolfram org-babel block execute session"
   (let* ((eoe (format "ob_comint_session_wolfram_eoe_%s" (org-id-uuid)))
@@ -71,16 +81,6 @@
   (unless sci-wolfram-org-babel--initiated
     (sci-wolfram-evaluate-session "WriteString[\"stdout\", \"Initiate Wolfram REPL\", \"\\n\"];\n"))
   (setq sci-wolfram-org-babel-initiated t))
-
-(defun sci-wolfram-remove-space-lines (body)
-  "Remove code string space lines"
-  (substring-no-properties
-   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
-
-(defun sci-wolfram-remove-eoe (result eoe)
-  "Remove EOE from result"
-  (mapconcat 'identity
-	     (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
 
 (defun sci-wolfram-clean-result (result)
   (prog1
