@@ -73,8 +73,8 @@
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
 	 (result
 	  (org-babel-comint-with-output
-		(sci-wolfram-repl-buffer eoe)
-	      (comint-send-string sci-wolfram-repl-buffer code))))
+	      (sci-wolfram-repl-buffer eoe)
+	    (comint-send-string sci-wolfram-repl-buffer code))))
     (sci-wolfram-remove-eoe result eoe)))
 
 (defun sci-wolfram-initiate-session ()
@@ -82,28 +82,35 @@
     (sci-wolfram-evaluate-session "WriteString[\"stdout\", \"Initiate Wolfram REPL\", \"\\n\"];\n"))
   (setq sci-wolfram-org-babel-initiated t))
 
+(defvar sci-wolfram-async-org-block-info nil "wolfram async org block buffer and position info")
+
+(defun sci-wolfram-async-org-block-get-info ()
+  (let ((buf (current-buffer))
+	(pos (point)))
+    (setq sci-wolfram-async-org-block-info (cons buf pos))))
+
+(add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-org-block-get-info)
+
 (defun sci-wolfram-clean-result (result)
   (prog1
       result
-    (let ((buf (car sci-wolfram-async-block-info))
-	  (pos (cdr sci-wolfram-async-block-info)))
+    (let ((buf (car sci-wolfram-async-org-block-info))
+	  (pos (cdr sci-wolfram-async-org-block-info)))
       (run-at-time 0 nil (lambda ()
 			   (with-current-buffer buf
 			     (save-excursion
 			       (goto-char pos)
 			       (sci-wolfram-display-images))))))))
 
-(defvar sci-wolfram-async-block-info nil)
-
 (defun sci-wolfram-org-babel-register-async ()
   (let ((buf (current-buffer)))
     (unless (and sci-wolfram-org-babel-async--registered
-		 (eq buf (car sci-wolfram-async-block-info)))
+		 (eq buf (car sci-wolfram-async-org-block-info)))
       (org-babel-comint-async-register
-	 sci-wolfram-repl-buffer buf
-	 "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-	 'sci-wolfram-clean-result
-	 'org-babel-eval-read-file)
+       sci-wolfram-repl-buffer buf
+       "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
+       'sci-wolfram-clean-result
+       'org-babel-eval-read-file)
       (setq sci-wolfram-org-babel-async--registered t))))
 
 (defun sci-wolfram-async-evaluate-session (body)
@@ -118,13 +125,6 @@
 		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
     (comint-send-string sci-wolfram-repl-buffer code)
     uuid))
-
-(defun sci-wolfram-async-block-get-info ()
-  (let ((buf (current-buffer))
-	(pos (point)))
-    (setq sci-wolfram-async-block-info (cons buf pos))))
-
-(add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-block-get-info)
 
 ;;;###autoload
 (defun org-babel-execute:wolfram (body params)
