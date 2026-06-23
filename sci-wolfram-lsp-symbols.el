@@ -1,8 +1,8 @@
 ;;; sci-wolfram-lsp-symbols.el --- Wolfram LSPServer symbols for completion -*- lexical-binding: t -*-
 ;;
-;; Copyright (C) 2025-2026 Peng Peng
+;; Copyright (C) 2025-2026 PENG
 ;; Created: 2025-05-20
-;; Author: Peng Peng <211110103110@stu.just.edu.cn>
+;; Author: PENG <p.peng01@outlook.com>
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages processes tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram

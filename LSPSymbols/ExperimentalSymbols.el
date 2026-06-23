@@ -4,7 +4,7 @@
 
 ;; AUTO GENERATED FILE
 
-;; GENERATED WITH: 14.2.1 for Linux x86 (64-bit) (March 25, 2025)
+;; GENERATED WITH: WolframEngine 14.2.1 for Linux x86 (64-bit) (March 25, 2025)
 
 ;;; Code:
 

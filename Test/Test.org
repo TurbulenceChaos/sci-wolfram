@@ -1,6 +1,6 @@
 #+Title: Sci-Wolfram Test
-#+Author: Peng Peng
-#+Email: 211110103110@stu.just.edu.cn
+#+Author: PENG
+#+Email: p.peng01@outlook.com
 #+GitHub: https://github.com/TurbulenceChaos
 
 * For Wolfram Src-block

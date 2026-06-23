@@ -1,7 +1,7 @@
 # sci-wolfram
-Author: Peng Peng
+Author: PENG
 
-Email: [211110103110@stu.just.edu.cn](mailto:211110103110@stu.just.edu.cn)
+Email: [p.peng01@outlook.com](mailto:p.peng01@outlook.com)
 
 GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wolfram)
 

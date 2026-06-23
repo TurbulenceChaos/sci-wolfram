@@ -51,7 +51,7 @@ prettifySymbols = StringTemplate[
 ";;; `1`.el --- Wolfram prettify symbols alist -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `3`\n
+;; GENERATED WITH: `3` `4`\n
 ;;; Code:\n
 (defvar `1` nil)
 (setq `1` '(
@@ -59,7 +59,7 @@ prettifySymbols = StringTemplate[
 ))\n\n
 (provide '`1`)
 ;;; `1`.el ends here\n"
-][fileName, charactersFormat, $Version];
+][fileName, charactersFormat, "ProductIDName" /. $ProductInformation, $Version];
 
 Export[FileNameJoin[{dir, fileName <> ".el"}], prettifySymbols, "Text"];
 

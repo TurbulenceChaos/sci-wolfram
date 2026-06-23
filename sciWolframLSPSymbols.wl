@@ -32,7 +32,7 @@ sciWolframLSPSymbols[fileName_, split_] :=
 ";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `3`\n
+;; GENERATED WITH: `3` `4`\n
 ;;; Code:\n
 (defvar `1` nil)
 (setq `1` '(
@@ -40,7 +40,7 @@ sciWolframLSPSymbols[fileName_, split_] :=
 ))\n\n
 (provide '`1`)
 ;;; `1`.el ends here\n"
-][lispVar, symbolsFormat, $Version];
+][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version];
 			elispFile = FileNameJoin[{dir, "LSPSymbols", lispVar <> ".el"}];
 			Export[elispFile, elisp, "Text"];
 			WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, elispFile], "\n\n"];

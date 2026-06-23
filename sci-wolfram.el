@@ -1,8 +1,8 @@
 ;;; sci-wolfram.el --- Major mode for editing Wolfram Language. -*- lexical-binding: t -*-
 ;;
-;; Copyright (C) 2025-2026 Peng Peng
+;; Copyright (C) 2025-2026 PENG
 ;;
-;; Author: Peng Peng <211110103110@stu.just.edu.cn>
+;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 2025-05-20
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, Wolfram Language, Mathematica
