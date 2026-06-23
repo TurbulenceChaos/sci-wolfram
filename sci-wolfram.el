@@ -63,8 +63,12 @@
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
-;; run wolfram script region or buffer code
+(defcustom sci-wolfram-short-lines 10
+  "Short[expr, n]: prints expr about n lines long, 10 (default)"
+  :type 'number
+  :group 'sci-wolfram-mode)
 
+;; run wolfram script region or buffer code
 ;;;###autoload
 (defun sci-wolfram-run-repl ()
   "Run wolfram repl"
@@ -89,14 +93,16 @@
    "$Post = sciWolframDisplayImage[#,\n"
    "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
    "sciWolframImageDPI    -> 100 (default),\n"
-   "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file\n"
+   "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,\n"
+   "sciWolframShortLines  -> 10 (default): Short[expr, n] to print expr about n lines long\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
    "$Post = .\n\n*)\n\n"
    "$Post = sciWolframDisplayImage[#,\n"
    (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
    (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
-   (format "sciWolframPlay        -> \"%s\"\n" sci-wolfram-play)
+   (format "sciWolframPlay        -> \"%s\",\n" sci-wolfram-play)
+   (format "sciWolframShortLines  -> %s\n" sci-wolfram-short-lines)
    "] &;\n\n"))
 
 ;;;###autoload
@@ -264,8 +270,9 @@
   (let* ((code (sci-wolfram-get-region-or-buffer-code t))
 	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
 	 (format-code (progn (with-temp-file tmp-src-file (insert code))
-			     (format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"String\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
+			     (format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"Text\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
 	 (result (sci-wolfram-evaluate-session format-code)))
+    (message "Format wolfram script code")
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
@@ -378,13 +385,16 @@
    (modify-syntax-entry ?> "." synTable)
    (modify-syntax-entry ?? "." synTable)
    (modify-syntax-entry ?@ "." synTable)
-   ;; (modify-syntax-entry ?\ "." synTable)
+
+   (modify-syntax-entry ?\ "." synTable)
+
    (modify-syntax-entry ?^ "." synTable)
    (modify-syntax-entry ?_ "." synTable)
    (modify-syntax-entry ?` "." synTable)
    (modify-syntax-entry ?| "." synTable)
    (modify-syntax-entry ?~ "." synTable)
-   ;; (modify-syntax-entry ?\\ "." synTable)
+
+   (modify-syntax-entry ?\\ "." synTable)
    synTable))
 
 ;; font-lock color
@@ -445,10 +455,6 @@
   (setq font-lock-defaults '((sci-wolfram-font-lock-keywords)))
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
-
-;; prettify symbols
-(add-hook 'sci-wolfram-mode-hook 'sci-wolfram-prettify-symbols)
-
 
 ;;;###autoload
 (dolist (file '("\\.wl\\'"

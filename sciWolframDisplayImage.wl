@@ -10,7 +10,8 @@ All options:
 $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType	-> \"image\" (default) or \"latex\",
 sciWolframImageDPI	-> 100 (default),
-sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file
+sciWolframPlay		-> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,
+sciWolframShortLines    -> 10 (default): Short[expr, n] to print expr about n lines long
 ] &;
 Tyep below code to reset $Post:
 $Post = .
@@ -22,24 +23,6 @@ Begin["`Private`"];
 
 n = 1;
 
-(* Display plain text output *)
-
-sciWolframText[expr_] :=
-	Module[{},
-		WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
-		WriteString["stdout", expr, "\n"];
-	];
-
-(* Display LaTeX output *)
-
-sciWolframTeX[expr_] :=
-	Module[{},
-		WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
-		WriteString["stdout", "\\begin{equation*}", "\n"];
-		WriteString["stdout", TeXForm[expr], "\n"];
-		WriteString["stdout", "\\end{equation*}", "\n"];
-	];
-
 sciWolframEnv =
 	If[SameQ[Environment["TERM_PROGRAM"], "vscode"],
 		"vscode"
@@ -49,9 +32,30 @@ sciWolframEnv =
 
 sciWolframPlayer = First[FileNames[{"*wolframplayer*", "*WolframNB*"}, $InstallationDirectory, 2], Null];
 
+(* Display plain text output *)
+
+sciWolframText[expr_, sciWolframShortLines_] :=
+	Module[{},
+		WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
+		WriteString["stdout", Short[expr, sciWolframShortLines], "\n"];
+		(* Return orginal value for % calc in REPL *)
+		expr;
+	];
+
+(* Display LaTeX output *)
+
+sciWolframTeX[expr_, sciWolframShortLines_] :=
+	Module[{},
+		WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
+		WriteString["stdout", "\\begin{equation*}", "\n"];
+		WriteString["stdout", TeXForm[Short[expr, sciWolframShortLines]], "\n"];
+		WriteString["stdout", "\\end{equation*}", "\n"];
+		expr;
+	];
+
 (* Display Image output *)
 
-sciWolframImage[expr_, sciWolframImageDPI_, playNB_] :=
+sciWolframImage[expr_, sciWolframImageDPI_, playNB_, sciWolframShortLines_] :=
 	Module[{dir, sciWolframImageDir, filePNG, fileNB},
 		dir =
         	Which[
@@ -71,7 +75,7 @@ sciWolframImage[expr_, sciWolframImageDPI_, playNB_] :=
 			CreateDirectory[sciWolframImageDir, CreateIntermediateDirectories -> True]
 		];
 		filePNG = FileNameJoin[{sciWolframImageDir, StringTemplate["`1`.png"][CreateUUID["wolfram-"]]}];
-		Export[filePNG, Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}], ImageResolution -> sciWolframImageDPI];
+		Export[filePNG, Notebook[{Cell[BoxData @ ToBoxes @ Short[expr, sciWolframShortLines], "Output"]}], ImageResolution -> sciWolframImageDPI];
 		Switch[sciWolframEnv,
 			"emacs",
 				WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
@@ -83,7 +87,7 @@ sciWolframImage[expr_, sciWolframImageDPI_, playNB_] :=
 		];
 		If[playNB == "yes",
 			fileNB = StringReplace[filePNG, ".png" -> ".nb"];
-			Export[fileNB, Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}]];
+			Export[fileNB, Notebook[{Cell[BoxData @ ToBoxes @ Short[expr, sciWolframShortLines], "Output"]}]];
                         If[StringQ @ Environment["WSL_DISTRO_NAME"],
                                 If[StringQ[sciWolframPlayer],
                                     StartProcess[{sciWolframPlayer, FileNameTake[fileNB]}, ProcessDirectory -> sciWolframImageDir]
@@ -94,6 +98,7 @@ sciWolframImage[expr_, sciWolframImageDPI_, playNB_] :=
                         	UsingFrontEnd @ SystemOpen[fileNB];
                         ];
 		];
+		expr;
 	];
 
 Options[sciWolframDisplayImage] =
@@ -103,6 +108,8 @@ Options[sciWolframDisplayImage] =
 		sciWolframImageDPI -> 100
 		,
 		sciWolframPlay -> "no"
+		,
+		sciWolframShortLines -> 10
 	};
 
 sciWolframDisplayImage[expr_, OptionsPattern[]] :=
@@ -117,7 +124,7 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 						If[SameQ[expr, Null],
 							expr
 							,
-							sciWolframText[expr]
+							sciWolframText[expr, OptionValue @ sciWolframShortLines]
 						]
 					,
 					"vscode",
@@ -136,9 +143,11 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 										OptionValue @ sciWolframImageDPI
 										,
 										playNB = OptionValue @ sciWolframPlay
+										,
+										OptionValue @ sciWolframShortLines
 									]
 									,
-									sciWolframTeX[expr]
+									sciWolframTeX[expr, OptionValue @ sciWolframShortLines]
 								]
 							,
 							"image",
@@ -153,6 +162,8 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 											,
 											"no"
 										]
+									,
+									OptionValue @ sciWolframShortLines
 								]
 						]
 					,
@@ -168,6 +179,8 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 									,
 									"no"
 								]
+							,
+							OptionValue @ sciWolframShortLines
 						]
 				]
 		]

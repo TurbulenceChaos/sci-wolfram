@@ -77,7 +77,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 (package! sci-wolfram
   :recipe (:host github
            :repo "TurbulenceChaos/sci-wolfram"
-           :files ("*.el" "*.wl")))
+           :files ("*.el" "*.wl" "LSPSymbols")))
 ```
 
 ```elisp
@@ -132,10 +132,10 @@ Search wolfram doc in web.
 https://github.com/user-attachments/assets/3d2d058b-d847-43f0-a774-1a526992aadd
 
 > [!NOTE]
-> For **any selected region in any buffer**, you can evaluate it, format it, or convert it to a Mathematica notebook.\
+> 1. For **any selected region in any buffer**, you can evaluate it, format it, or convert it to a Mathematica notebook.\
 > For example, you can run Wolfram code in a LaTeX file and insert the generated LaTeX fragments back into the document.
-> 
-> Wolfram expressions are converted to Mathematica notebook images by default. To convert them to LaTeX fragments instead, run `M-x customize-group RET sci-wolfram-mode RET` and set `sci-wolfram-formula-type` to latex.
+> 2. Wolfram expressions are converted to Mathematica notebook images by default. To convert them to LaTeX fragments instead, run `M-x customize-group RET sci-wolfram-mode RET` and set `sci-wolfram-formula-type` to latex.
+> 3. **Long expression results are displayed using `Short[expr, n]`**, where `n` is the number of lines to show. To change the default value (10), run `M-x customize-group RET sci-wolfram-mode RET` and customize `sci-wolfram-short-lines`.
 
 https://github.com/user-attachments/assets/1d226657-a3a3-4145-95df-f2a5b7348ecd
 
@@ -240,24 +240,43 @@ https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 - Refactor `sciWolframDisplayImage.wl` and `sciWolframConvertToNotebook.wl` package
 
 # Reference
-For `sciWolframDisplayImage.wl`:\
+For `sciWolframDisplayImage.wl`:
+
 Thanks to the following two discussions for guidance on displaying wolfram images and Mathematica interactive files:
+
 - [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 - [How to set up a Plot viewer for Wolfram Engine from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
 
-For `sci-wolfram-mode`:\
+For `sci-wolfram-mode`:
+
 Thanks to xah-wolfram-mode by Xah Lee, wolfram-mode by Kawabata, and wolfram-mode by Daniel Nicolai for their inspiration and valuable references.
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 - [wolfram-mode](https://github.com/kawabata/wolfram-mode)
 - [wolfram-mode](https://github.com/dalanicolai/wolfram-mode/tree/master)
 
-For `LSPServer`:\
-Thanks to wolfram-language-mode by Oliver Grasl and vscode-wolfram by Wolfram Research for valuable references on LSPServer:
-- [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
-- [vscode-wolfram](https://github.com/WolframResearch/vscode-wolfram)
+For `LSPServer`:
 
-For `sciWolframConvertToNotebook.wl`:\
+Thanks to wolfram-language-mode by Oliver Grasl and vscode-wolfram by Wolfram Research for valuable references on LSPServer:
+
+- [LSPServer](https://github.com/WolframResearch/LSPServer)
+- [vscode-wolfram](https://github.com/WolframResearch/vscode-wolfram)
+- [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
+
+For `sciWolframConvertToNotebook.wl`:
+
 Thanks to the following two discussions for guidance on converting wolfram scripts to PDF files:
+
 - [Converting Wolfram Language Scripts into PDFs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/293543/converting-wolfram-language-scripts-wls-into-pdfs)
 - [How to get Defer to behave with Manipulate/Dynamic from Wolfram Community](https://community.wolfram.com/groups/-/m/t/37054)
+
+For `sci-wolfram-format-region-or-buffer`:
+
+- [CodeFormatter](https://github.com/WolframResearch/codeformatter)
+
+For `sciWolframPrettifySymbols.wl`:
+
+- [Listing of Named Characters from Wolfram Reference](https://reference.wolfram.com/language/guide/ListingOfNamedCharacters.html)
+- [List all built-in commands and symbols of Mathematica programtically from Wolfram Community](https://community.wolfram.com/groups/-/m/t/2511222)
+- [List of Mathematica glyphs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/7610/list-of-mathematica-glyphs/102079#102079)
+- [Get list of special characters from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/253271/get-list-of-special-characters)
 

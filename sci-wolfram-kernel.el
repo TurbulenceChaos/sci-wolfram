@@ -11,12 +11,8 @@
   (concat (file-name-directory (or load-file-name buffer-file-name))
 	  "sci-wolfram-kernel-location.el"))
 
-(unless (file-exists-p (concat (file-name-sans-extension sci-wolfram-kernel-location-elisp) ".el"))
-  (call-process
-   "wolframscript"
-   nil nil nil
-   "-script"
-   sci-wolfram-kernel-location-script))
+(unless (file-exists-p sci-wolfram-kernel-location-elisp)
+  (shell-command (format "wolframscript -script %s" sci-wolfram-kernel-location-script)))
 
 (require 'sci-wolfram-kernel-location)
 

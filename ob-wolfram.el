@@ -49,6 +49,7 @@
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
+    (message "Starting Wolfram REPL")
     (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
     (with-current-buffer sci-wolfram-repl-buffer
       (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp))

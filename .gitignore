@@ -4,7 +4,6 @@ logs/
 sci-wolfram-autoloads.el
 sci-wolfram-pkg.el
 ltximg/
-/LSPSymbols/
 /sci-wolfram-kernel-location.el
 /README.html
 *.nb
