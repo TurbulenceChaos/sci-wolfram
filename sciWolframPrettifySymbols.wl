@@ -22,9 +22,8 @@ dir =
 (* systemSymbolsLisp = StringRiffle[systemSymbols, "\n"]; *)
 
 replacePrettify[string_] :=
-    Module[{len, stringPrettify},
-        len = StringLength[string];
-        If[len > 1,
+    Module[{stringPrettify},
+        If[StringLength[string] > 1,
 	    stringPrettify = StringTemplate["(`1`)"][StringRiffle[Characters[string],{"?"," (Br . Bl) ?", ""}]];
 	    StringReplace[stringPrettify, {"["->"\\[","]"->"\\]"}]
             ,

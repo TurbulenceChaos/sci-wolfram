@@ -64,7 +64,7 @@
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-short-lines 10
-  "Short[expr, n]: prints expr about n lines long, 10 (default)"
+  "Short[expr, n]: prints as a short form of expr, less than n lines long, 10 (default)"
   :type 'number
   :group 'sci-wolfram-mode)
 

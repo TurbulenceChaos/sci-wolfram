@@ -59,7 +59,7 @@
 (defun sci-wolfram-remove-space-lines (body)
   "Remove code string space lines"
   (substring-no-properties
-   (replace-regexp-in-string "\n[ \t\n]+" "\n" body)))
+   (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
 
 (defun sci-wolfram-remove-eoe (result eoe)
   "Remove EOE from result"

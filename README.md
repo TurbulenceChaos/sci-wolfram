@@ -178,7 +178,7 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 >
 > Second line"
 > ```
-> 3. For org-mode version < 9.8, spaces before a string (i.e. `str="    Hello"`) in src-block session async running will be automatically removed.
+> 3. For org-mode version < 9.8, spaces before a string (i.e. `str="    Hello"`) in src-block **async session** running are automatically removed.
 > From org version 9.8, `org-babel-comint-async-register` function introduced a new option `disable-prompt-filtering` to avoid this situation.
 >
 > **Please read [Test.org](Test/Test.org) for more details.**
