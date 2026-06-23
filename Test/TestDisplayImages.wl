@@ -11,7 +11,8 @@ All options:
 $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType -> "image" (default) or "latex",
 sciWolframImageDPI    -> 100 (default),
-sciWolframPlay        -> "yes" or "no" (default) to convert plots to Mahtematica interactive file
+sciWolframPlay        -> "yes" or "no" (default) to convert plots to Mahtematica interactive file,
+sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show
 ] &;
 
 Tyep below code to reset $Post:
@@ -27,7 +28,8 @@ Get["/path/to/sciWolframDisplayImage.wl"];
 $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType	-> "image",
 sciWolframImageDPI	-> 100,
-sciWolframPlay		-> "no"
+sciWolframPlay		-> "no",
+sciWolframShortLines  -> 10
 ] &;
 
 *)

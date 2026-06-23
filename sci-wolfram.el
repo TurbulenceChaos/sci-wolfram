@@ -94,7 +94,7 @@
    "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
    "sciWolframImageDPI    -> 100 (default),\n"
    "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,\n"
-   "sciWolframShortLines  -> 10 (default): Short[expr, n] to print expr about n lines long\n"
+   "sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show\n"
    "] &;\n\n"
    "Tyep below code to reset $Post:\n"
    "$Post = .\n\n*)\n\n"
