@@ -16,14 +16,16 @@ sciWolframKernel = First[$CommandLine];
 
 elisp = StringTemplate[
 ";;; sci-wolfram-kernel-location.el --- Wolfram kernel location -*- lexical-binding: t -*-\n
-;;; Commentary:
+;;; Commentary:\n
+;; AUTO GENERATED FILE\n
+;; GENERATED WITH: `2` `3`\n
 ;;; Code:\n
 (defvar sci-wolfram-kernel
   \"`1`\"
   \"Wolfram kernel location\")\n\n
 (provide 'sci-wolfram-kernel-location)
 ;;; sci-wolfram-kernel-location.el ends here\n"
-][sciWolframKernel];
+][sciWolframKernel, "ProductIDName" /. $ProductInformation, $Version];
 
 Export[FileNameJoin[{dir, "sci-wolfram-kernel-location.el"}], elisp, "Text"];
 
