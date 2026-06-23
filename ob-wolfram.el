@@ -137,11 +137,8 @@
 	(sci-wolfram-async-evaluate-session body)
       (sci-wolfram-evaluate-session body))))
 
-;;;###autoload
-(defvar sci-wolfram-org-src-block-name "wolfram" "wolfram src-block name in org-mode")
-
 (defvar org-babel-default-header-args:wolfram
-  `((:session . ,sci-wolfram-org-src-block-name)
+  `((:session . ,sci-wolfram-repl-buffer)
     (:async . "yes")
     (:results . "value drawer")
     (:display . "text")
@@ -149,6 +146,9 @@
     (:eval . "never-export")
     (:exports . "both"))
   "Default header arguments for wolfram src-block in org-mode")
+
+;;;###autoload
+(defvar sci-wolfram-org-src-block-name "wolfram" "wolfram src-block name in org-mode")
 
 ;;;###autoload
 (with-eval-after-load 'org-src
