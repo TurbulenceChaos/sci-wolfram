@@ -4,7 +4,8 @@
 
 ;;; Code:
 
-;; (require 'org-core)
+(require 'org)
+(require 'ob-core)
 
 (defun sci-wolfram-display-images ()
   "Display latex or images"

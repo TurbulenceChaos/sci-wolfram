@@ -40,13 +40,16 @@
 
 ;;; Code:
 
+(require 'org-src)
 (require 'ob-wolfram)
 (require 'sci-wolfram-lsp-symbols)
 (require 'sci-wolfram-kernel)
 (require 'sci-wolfram-prettify-symbols)
 
 ;;;###autoload
-(defgroup sci-wolfram-mode nil "Major mode for wolfram script")
+(defgroup sci-wolfram-mode nil
+  "Major mode for wolfram script"
+  :group 'languages)
 
 (defcustom sci-wolfram-formula-type "image"
   "Wolfram fomula output type: image (default) or latex"
