@@ -33,11 +33,12 @@ replacePrettify[string_] :=
 
 characters = Select[Table[{ToString[FullForm[#]], #}&[FromCharacterCode[i]], {i, 65535}], StringContainsQ[#[[1]], "\\["]&];
 
-charactersReplace = StringReplace[#, {"\\" -> "\\\\"}]& /@ MapAt[replaceLongNamePUA, characters, {All, 2}];
+charactersReplace = {StringReplace[#[[1]], {"\\" -> "\\\\"}], replaceLongNamePUA[#[[2]]]}& /@ characters;
 
 charactersIgnore = Select[charactersReplace,
-StringFreeQ[#[[1]], {"Raw","InlinePart", "Continuation"}] &&
-StringFreeQ[#[[2]], {"\n", RegularExpression[" [A-Za-z0-9]+ "]}]&
+StringFreeQ[#[[1]], {"Raw","InlinePart", "Continuation", "LineSeparator", "ParagraphSeparator", "Invisible", "Space]", "Hyphen]"}] &&
+StringFreeQ[#[[2]], {"\n", RegularExpression[" [A-Za-z0-9]+"]}] &&
+Not@StringMatchQ[#[[2]], ""]&
 ];
 
 charactersPrettify = MapAt[replacePrettify, charactersIgnore, {All, 2}];
