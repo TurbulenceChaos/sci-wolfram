@@ -238,6 +238,7 @@
    ((and (not (region-active-p))
 	 (buffer-file-name)
 	 (derived-mode-p 'sci-wolfram-mode))
+    (save-buffer)
     (sci-wolfram-mode-convert-to-notebook))
    ((or (region-active-p)
 	(derived-mode-p 'sci-wolfram-mode))
@@ -323,7 +324,7 @@
 	    :exclusive 'no))))
 
 (add-hook 'sci-wolfram-mode-hook
-	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-completion-at-point nil t)))
+	  (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
 
 (defun sci-wolfram-org-block-completion-at-point ()
   "Provide completion in wolfram org block"
@@ -334,7 +335,7 @@
 	(sci-wolfram-completion-at-point)))))
 
 (add-hook 'org-mode-hook
-	  (lambda () (add-hook 'completion-at-point-functions 'sci-wolfram-org-block-completion-at-point nil t)))
+	  (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-org-block-completion-at-point nil t)))
 
 ;; lsp server
 ;; (defun sci-wolfram-remove-local-lsp-server ()
@@ -389,7 +390,7 @@
    (modify-syntax-entry ?? "." synTable)
    (modify-syntax-entry ?@ "." synTable)
 
-   (modify-syntax-entry ?\ "." synTable)
+   ;; (modify-syntax-entry ?\ "." synTable)
 
    (modify-syntax-entry ?^ "." synTable)
    (modify-syntax-entry ?_ "." synTable)
@@ -397,7 +398,7 @@
    (modify-syntax-entry ?| "." synTable)
    (modify-syntax-entry ?~ "." synTable)
 
-   (modify-syntax-entry ?\\ "." synTable)
+   ;; (modify-syntax-entry ?\\ "." synTable)
    synTable))
 
 ;; font-lock color
@@ -440,14 +441,12 @@
     (sci-wolfram-convert-to-notebook . "c"))
   "sci-wolfram key map")
 
-(defvar sci-wolfram-mode-map nil "keymap for sci-wolfram-mode.")
-
-(setq sci-wolfram-mode-map (make-sparse-keymap))
-
-(dolist (key-map sci-wolfram-key-map)
-  (define-key sci-wolfram-mode-map
-	      (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr key-map)))
-	      (car key-map)))
+(defvar sci-wolfram-mode-map
+  (let ((map (make-sparse-keymap)))
+    (dolist (key-map sci-wolfram-key-map)
+      (define-key map (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr key-map))) (car key-map)))
+    map)
+  "keymap for sci-wolfram-mode")
 
 ;; sci-wolfram-mode
 ;;;###autoload

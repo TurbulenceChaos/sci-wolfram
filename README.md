@@ -59,8 +59,8 @@ Preview latex formula in emacs org-mode:
 (unless (package-installed-p 'sci-wolfram)
   (package-vc-install "https://github.com/TurbulenceChaos/sci-wolfram"))
 
-;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; eglot
-;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or lsp-mode
+;; (add-hook 'sci-wolfram-mode-hook #'eglot-ensure) ; eglot
+;; (add-hook 'sci-wolfram-mode-hook #'lsp-deferred) ; or lsp-mode
 
 ;; or you can manually download the package and add it to `load-path'
 ;; (add-to-list 'load-path "/path/to/sci-wolfram")
@@ -85,8 +85,8 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 (use-package! sci-wolfram
   :defer t
   :config
-  ;; (add-hook 'sci-wolfram-mode-hook 'eglot-ensure) ; eglot
-  ;; (add-hook 'sci-wolfram-mode-hook 'lsp-deferred) ; or lsp-mode
+  ;; (add-hook 'sci-wolfram-mode-hook #'eglot-ensure) ; eglot
+  ;; (add-hook 'sci-wolfram-mode-hook #'lsp-deferred) ; or lsp-mode
   )
 
 ;; to customize all configurable variables of `sci-wolfram' package,

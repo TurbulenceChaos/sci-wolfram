@@ -36,7 +36,7 @@ characters = Select[Table[{ToString[FullForm[#]], #}&[FromCharacterCode[i]], {i,
 charactersReplace = {StringReplace[#[[1]], {"\\" -> "\\\\"}], replaceLongNamePUA[#[[2]]]}& /@ characters;
 
 charactersIgnore = Select[charactersReplace,
-StringFreeQ[#[[1]], {"Raw","InlinePart", "Continuation", "LineSeparator", "ParagraphSeparator", "Invisible", "Space]", "Hyphen]"}] &&
+StringFreeQ[#[[1]], {"Raw","InlinePart", "Continuation", "LineSeparator", "ParagraphSeparator", "Invisible", "Space]", "Hyphen]", "Key]"}] &&
 StringFreeQ[#[[2]], {"\n", RegularExpression[" [A-Za-z0-9]+"]}] &&
 Not@StringMatchQ[#[[2]], ""]&
 ];

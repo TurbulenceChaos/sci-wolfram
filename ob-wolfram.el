@@ -49,7 +49,7 @@
 
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
-    (message "Starting Wolfram REPL")
+    (message "Starting Wolfram REPL ...")
     (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
     (with-current-buffer sci-wolfram-repl-buffer
       (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp))
@@ -90,7 +90,7 @@
 	(pos (point)))
     (setq sci-wolfram-async-org-block-info (cons buf pos))))
 
-(add-hook 'org-babel-after-execute-hook 'sci-wolfram-async-org-block-get-info)
+(add-hook 'org-babel-after-execute-hook #'sci-wolfram-async-org-block-get-info)
 
 (defun sci-wolfram-clean-result (result)
   (prog1
@@ -164,7 +164,7 @@
       (unless (string-match-p "yes" async)
 	(sci-wolfram-display-images)))))
 
-(add-hook 'org-babel-after-execute-hook 'sci-wolfram-auto-display-images)
+(add-hook 'org-babel-after-execute-hook #'sci-wolfram-auto-display-images)
 
 
 (provide 'ob-wolfram)

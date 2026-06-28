@@ -61,7 +61,7 @@
   ;; (setq-local prettify-symbols-unprettify-at-point nil)
   (prettify-symbols-mode 1))
 
-(add-hook 'sci-wolfram-mode-hook 'sci-wolfram-prettify-symbols)
+(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-prettify-symbols)
 
 
 (provide 'sci-wolfram-prettify-symbols)
