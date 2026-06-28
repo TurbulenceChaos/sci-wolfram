@@ -46,8 +46,8 @@ Display wolfram script images in Visual Studio Code Terminal.
 
 # Installation for Emacs
 ## Prerequisites
-- **Wolfram Engine** (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
-Required for running wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
+Required for running wolfram scripts
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 Preview latex formula in emacs org-mode:
   - Linux: `sudo apt install texlive-full`
@@ -186,8 +186,8 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 # Installation for VSCode
 ## Prerequisites
 
-- **Wolfram Engine** (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
-Required for running wolfram scripts, which can be downloaded from https://www.wolfram.com/download-center/index.php.en
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
+Required for running wolfram scripts
 - [imgcat](https://github.com/wookayin/python-imgcat)\
 Enable image display in VSCode Terminal.\
 Install with `pip install imgcat`

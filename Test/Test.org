@@ -43,7 +43,7 @@ MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 ~Print[code]~ will truncate string lines in Wolfram REPL. Consider using ~WriteString["stdout", code, "\n"]~ instead.
 
 #+name: sci-wolfram-print-vs-writestring
-#+begin_src wolfram
+#+begin_src wolfram :exports both
 str = "For over three decades, Mathematica has defined the state of the art in technical computing and provided the principal computation environment for millions of innovators, educators, students and others around the world.";
 
 Print[str];
@@ -69,7 +69,7 @@ For emacs, Wolfram REPL use ~wolframscript -rawterm~, where space lines are not 
 **All space lines in string will be automatically removed before running codes.**
 
 #+name: sci-wolfram-space-lines-in-string
-#+begin_src wolfram
+#+begin_src wolfram :exports both
 str = "To be, or not to be, that is the question:
 
 Whether 'tis nobler in the mind to suffer
@@ -99,7 +99,7 @@ From org version 9.8, ~org-babel-comint-async-register~ function introduced a ne
 
 In the **sync session** src-block, spaces before a string are kept.
 
-#+begin_src wolfram :async no
+#+begin_src wolfram :async no :exports both
 Print["         String with spaces before"]
 #+end_src
 
@@ -109,7 +109,7 @@ Print["         String with spaces before"]
 
 :end:
 
-#+begin_src wolfram :async yes
+#+begin_src wolfram :async yes :exports both
 Print["         String with spaces before"]
 #+end_src
 

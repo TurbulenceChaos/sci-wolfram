@@ -459,11 +459,7 @@
   (setq-local comment-end "*)"))
 
 ;;;###autoload
-(dolist (file '("\\.wl\\'"
-		"\\.wls\\'"
-		;; "\\.nb\\'"
-		;; "\\.cdf\\'"
-		))
+(dolist (file '("\\.wl\\'" "\\.wls\\'"))
   (add-to-list 'auto-mode-alist `(,file . sci-wolfram-mode)))
 
 
