@@ -112,13 +112,17 @@ Options[sciWolframDisplayImage] =
 		sciWolframShortLines -> 10
 	};
 
+systemBoxSymbols = Apply[Alternatives, ToExpression @ Names["*Box"]];
+
+systemGraphicsBoxSymbols = Apply[Alternatives, ToExpression @ Names[{"Graphics*Box","Dynamic*Box"}]];
+
 sciWolframDisplayImage[expr_, OptionsPattern[]] :=
-	Module[{box, isFormula, isPlot},
+	Module[{box, isString, isPlot},
 		box = ToBoxes[expr];
-		isFormula = Not @ FreeQ[box, RowBox | SqrtBox | SuperscriptBox];
-		isPlot = Not @ FreeQ[box, DynamicBox | DynamicModuleBox | GraphicsBox | Graphics3DBox];
+		isString = FreeQ[box, systemBoxSymbols];
+		isPlot = Not @ FreeQ[box, systemGraphicsBoxSymbols];
 		Which[
-			Not @ isFormula && Not @ isPlot,
+			isString,
 				Switch[sciWolframEnv,
 					"emacs",
 						If[SameQ[expr, Null],
