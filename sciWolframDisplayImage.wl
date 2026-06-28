@@ -112,7 +112,7 @@ Options[sciWolframDisplayImage] =
 		sciWolframShortLines -> 10
 	};
 
-systemBoxSymbols = Apply[Alternatives, ToExpression @ Names["*Box"]];
+systemBoxSymbols = Apply[Alternatives, ToExpression @ Select[Names["*Box"], StringFreeQ[{"RowBox", "InterpretationBox"}]]];
 
 systemGraphicsBoxSymbols = Apply[Alternatives, ToExpression @ Names[{"Graphics*Box","Dynamic*Box"}]];
 
