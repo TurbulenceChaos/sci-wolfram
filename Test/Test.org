@@ -66,7 +66,7 @@ For over three decades, Mathematica has defined the state of the art in technica
 ** Note 2
 For emacs, Wolfram REPL use ~wolframscript -rawterm~, where space lines are not allowed.
 
-**All space lines in string will be automatically removed before running codes.**
+*All space lines in string will be automatically removed before running codes.*
 
 #+name: sci-wolfram-space-lines-in-string
 #+begin_src wolfram :exports both
@@ -93,13 +93,13 @@ And by opposing end them?
 :end:
 
 ** Note 3
-For org-mode version < 9.8, spaces before a string (i.e. ~str="    Hello"~) in src-block **async session** running are automatically removed.
+For org-mode version < 9.8, spaces before a string (i.e. ~str="    Hello"~) in src-block *async session* running are automatically removed.
 
 From org version 9.8, ~org-babel-comint-async-register~ function introduced a new option ~disable-prompt-filtering~ to avoid this situation.
 
-In the **sync session** src-block, spaces before a string are kept.
+In the *sync session* src-block, spaces before a string are kept.
 
-#+begin_src wolfram :async no :exports both
+#+begin_src wolfram :async no
 Print["         String with spaces before"]
 #+end_src
 
@@ -109,7 +109,7 @@ Print["         String with spaces before"]
 
 :end:
 
-#+begin_src wolfram :async yes :exports both
+#+begin_src wolfram :async yes
 Print["         String with spaces before"]
 #+end_src
 
