@@ -8,7 +8,7 @@ Begin["`Private`"];
 
 systemFormSymbols = Names["*Form"];
 
-systemManipulateSymbols = Join[Names["Manipulate"], StringReplace[Names["Manipulate`*"], RegularExpression["^Manipulate`"] -> ""]];
+systemManipulateSymbols = Join[Names["Manipulate*"], StringReplace[Names["Manipulate`*"], RegularExpression["^Manipulate`"] -> ""]];
 
 systemGraphicsSymbols = Names["Graphics*"];
 

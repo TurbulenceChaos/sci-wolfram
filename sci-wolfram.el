@@ -274,7 +274,7 @@
   (let* ((code (sci-wolfram-get-region-or-buffer-code t))
 	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
 	 (format-code (progn (with-temp-file tmp-src-file (insert code))
-			     (format "Needs[\"CodeFormatter`\"];\ninput = Import[\"%s\", \"Text\"];\nWriteString[\"stdout\", CodeFormat[input], \"\\n\"];\n" tmp-src-file)))
+			     (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[File[\"%s\"]], \"\\n\"];\n" tmp-src-file)))
 	 (result (sci-wolfram-evaluate-session format-code)))
     (message "Format wolfram script code")
     (save-excursion

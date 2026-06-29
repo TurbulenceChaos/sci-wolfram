@@ -119,7 +119,7 @@ systemGraphicsBoxSymbols = Apply[Alternatives, ToExpression @ Names[{"Graphics*B
 sciWolframDisplayImage[expr_, OptionsPattern[]] :=
 	Module[{box, isString, isPlot},
 		box = ToBoxes[expr];
-		isString = FreeQ[box, systemBoxSymbols];
+		isString = FreeQ[box, systemBoxSymbols | Cell];
 		isPlot = Not @ FreeQ[box, systemGraphicsBoxSymbols];
 		Which[
 			isString,
