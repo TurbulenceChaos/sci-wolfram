@@ -13,11 +13,11 @@ dir =
 	];
 
 
-sciWolframLSPServer = FileNameJoin[{ParentDirectory@DirectoryName[FindFile["LSPServer`"]], "Resources", "Data"}];
+sciWolframLSPServer = PacletFind["LSPServer"][[1]];
 
 sciWolframLSPSymbols[fileName_, split_] :=
 	Module[{wolframFile, symbols, symbolsSplit, symbolsFormat, elisp, elispFile},
-		wolframFile = FileNameJoin[{sciWolframLSPServer, fileName <> ".wl"}];
+		wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", fileName <> ".wl"}];
 		symbols = Import[wolframFile];
 		symbolsSplit = Partition[symbols, UpTo @ Ceiling[Length @ symbols /split]];
 		Do[
@@ -33,6 +33,7 @@ sciWolframLSPSymbols[fileName_, split_] :=
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
 ;; GENERATED WITH: `3` `4`\n
+;; LSPServer `5`\n
 ;;; Code:\n
 (defvar `1` nil)
 (setq `1` '(
@@ -40,7 +41,7 @@ sciWolframLSPSymbols[fileName_, split_] :=
 ))\n\n
 (provide '`1`)
 ;;; `1`.el ends here\n"
-][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version];
+][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
 			elispFile = FileNameJoin[{dir, "LSPSymbols", lispVar <> ".el"}];
 			Export[elispFile, elisp, "Text"];
 			WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, elispFile], "\n\n"];
