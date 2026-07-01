@@ -1,17 +1,18 @@
-;;; sci-wolfram.el --- Major mode for editing Wolfram Language. -*- lexical-binding: t -*-
-;;
+;;; sci-wolfram.el --- Major mode for editing Wolfram Language -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2025-2026 PENG
-;;
+
 ;; Author: PENG <p.peng01@outlook.com>
-;; Created: 2025-05-20
+;; Created: 20250520
+;; Version: 20260701
 ;; Package-Requires: ((emacs "29.1"))
-;; Keywords: languages, Wolfram Language, Mathematica
+;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
 ;;; License
-;;
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -26,16 +27,15 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
+
 ;; Major mode for editing Wolfram Language code
-;;
+
 ;; Installation and usage:
-;;
 ;; Please check README.md.
-;;
+
 ;; To customize all configurable variables of `sci-wolfram' package,
 ;; just type M-x customize-group RET sci-wolfram-mode RET
-;;
+
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
@@ -341,7 +341,7 @@
 ;; (defun sci-wolfram-remove-local-lsp-server ()
 ;;   (interactive)
 ;;   "Remove local installed LSPServer if needed."
-;;   (async-shell-command "wolframscript -code 'PacletUninstall[\"LSPServer\"];'"))
+;;   (async-shell-command (format "%s -code 'PacletUninstall[\"LSPServer\"];'" sci-wolfram-program)))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs

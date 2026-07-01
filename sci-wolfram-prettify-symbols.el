@@ -1,16 +1,18 @@
-;;; sci-wolfram-prettify-symbols.el --- Prettify wolfram symbols -*- lexical-binding: t -*-
-;;
+;;; sci-wolfram-prettify-symbols.el --- Wolfram characters for prettify-symbols-mode -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2025-2026 PENG
-;; Created: 2025-05-20
+
 ;; Author: PENG <p.peng01@outlook.com>
+;; Created: 20250520
+;; Version: 20260701
 ;; Package-Requires: ((emacs "29.1"))
-;; Keywords: languages processes tools
+;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
 ;;; License
-;;
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -25,21 +27,17 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; Prettify wolfram symbols
-;;
-;; Installation:
-;;
+
+;; Wolfram characters for prettify-symbols-mode
+
+;; Installation and usage:
 ;; Please check README.md.
-;;
+
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
 ;; https://reference.wolfram.com/language/guide/ListingOfNamedCharacters.html
-
-
-
 (defvar sci-wolfram-prettify-symbols-script
   (concat (file-name-directory (or load-file-name buffer-file-name))
 	  "sciWolframPrettifySymbols.wl"))
@@ -50,7 +48,7 @@
 
 (unless (file-exists-p sci-wolfram-prettify-symbols-alist-elisp)
   (message "Convert Wolfram characters to Emacs prettify symbols")
-  (shell-command (format "wolframscript -script %s" sci-wolfram-prettify-symbols-script)))
+  (shell-command (format "%s -script %s" sci-wolfram-program sci-wolfram-prettify-symbols-script)))
 
 (require 'sci-wolfram-prettify-symbols-alist)
 

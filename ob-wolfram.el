@@ -1,16 +1,18 @@
-;;; ob-wolfram.el --- Wolfram Mathematica repl -*- lexical-binding: t -*-
-;;
+;;; ob-wolfram.el --- Org-babel for Wolfram language -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2025-2026 PENG
-;; Created: 2025-05-20
+
 ;; Author: PENG <p.peng01@outlook.com>
+;; Created: 20250520
+;; Version: 20260701
 ;; Package-Requires: ((emacs "29.1"))
-;; Keywords: languages processes tools
+;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
 ;;; License
-;;
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -25,19 +27,20 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; Add wolfram repl support
-;;
-;; Installation:
-;;
+
+;; Org-babel for Wolfram language
+
+;; Installation and usage:
 ;; Please check README.md.
-;;
+
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
 (require 'ob-comint)
 (require 'sci-wolfram-display-images)
+
+(defvar sci-wolfram-program "wolframscript" "Command to run wolfram kernel")
 
 (defvar sci-wolfram-repl-buffer "*Wolfram REPL*")
 
@@ -50,7 +53,7 @@
 (defun sci-wolfram-make-repl ()
   (unless (comint-check-proc sci-wolfram-repl-buffer)
     (message "Starting Wolfram REPL ...")
-    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer "wolframscript" nil "-rawterm")
+    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer sci-wolfram-program nil "-rawterm")
     (with-current-buffer sci-wolfram-repl-buffer
       (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp))
     (setq sci-wolfram-org-babel--initiated nil)

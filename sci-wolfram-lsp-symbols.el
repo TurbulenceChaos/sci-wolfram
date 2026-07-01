@@ -1,16 +1,18 @@
 ;;; sci-wolfram-lsp-symbols.el --- Wolfram LSPServer symbols for completion -*- lexical-binding: t -*-
-;;
+
 ;; Copyright (C) 2025-2026 PENG
-;; Created: 2025-05-20
+
 ;; Author: PENG <p.peng01@outlook.com>
+;; Created: 20250520
+;; Version: 20260701
 ;; Package-Requires: ((emacs "29.1"))
-;; Keywords: languages processes tools
+;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
 
 ;; This file is not part of GNU Emacs
 
 ;;; License
-;;
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -25,13 +27,12 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; Add wolfram LSPServer symbols for completion
-;;
-;; Installation:
-;;
+
+;; Wolfram LSPServer symbols for completion
+
+;; Installation and usage:
 ;; Please check README.md.
-;;
+
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
@@ -46,7 +47,7 @@
     (make-directory lsp-symbols-dir))
   (unless (directory-files lsp-symbols-dir nil "\\.el\\'")
     (message "Convert Wolfram LSPServer symbols to emacs lisp")
-    (shell-command (format "wolframscript -script %s" sci-wolfram-lsp-symbols-script))))
+    (shell-command (format "%s -script %s" sci-wolfram-program sci-wolfram-lsp-symbols-script))))
 
 (add-to-list 'load-path (expand-file-name "LSPSymbols" (file-name-directory (or load-file-name buffer-file-name))))
 (require 'BuiltinFunctions-1)

@@ -12,7 +12,7 @@
 	  "sci-wolfram-kernel-location.el"))
 
 (unless (file-exists-p sci-wolfram-kernel-location-elisp)
-  (shell-command (format "wolframscript -script %s" sci-wolfram-kernel-location-script)))
+  (shell-command (format "%s -script %s" sci-wolfram-program sci-wolfram-kernel-location-script)))
 
 (require 'sci-wolfram-kernel-location)
 

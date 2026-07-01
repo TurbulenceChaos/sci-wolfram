@@ -1,4 +1,4 @@
-;;; sci-wolfram-display-images.el --- Display wolfram script images in emacs org-mode -*- lexical-binding: t -*-
+;;; sci-wolfram-display-images.el --- Display Wolfram images in Emacs org-mode -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
