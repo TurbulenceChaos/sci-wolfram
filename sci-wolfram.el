@@ -61,6 +61,11 @@
   :type 'number
   :group 'sci-wolfram-mode)
 
+(defcustom sci-wolfram-image-name "uuid"
+  "Wolfram image name: uuid (default) or N (natural number)"
+  :type '(choice (const "uuid") (const "N"))
+  :group 'sci-wolfram-mode)
+
 (defcustom sci-wolfram-play "no"
   "Convert plots to Mathematica interactive file: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
@@ -96,6 +101,7 @@
    "$Post = sciWolframDisplayImage[#,\n"
    "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
    "sciWolframImageDPI    -> 100 (default),\n"
+   "sciWolframImageName   -> \"uuid\" (default) or \"N\" (natural number),\n"
    "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,\n"
    "sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show\n"
    "] &;\n\n"
@@ -104,6 +110,7 @@
    "$Post = sciWolframDisplayImage[#,\n"
    (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
    (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
+   (format "sciWolframImageName   -> \"%s\",\n" sci-wolfram-image-name)
    (format "sciWolframPlay        -> \"%s\",\n" sci-wolfram-play)
    (format "sciWolframShortLines  -> %s\n" sci-wolfram-short-lines)
    "] &;\n\n"))
