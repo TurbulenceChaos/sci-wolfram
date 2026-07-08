@@ -284,7 +284,7 @@
                              (concat
                               "Needs[\"CodeFormatter`\"];"
                               (format
-                               "WriteString[\"stdout\", CodeFormat[File[\"%s\"], Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"], \"\\n\"];\n"
+                               "WriteString[\"stdout\", CodeFormatter`CodeFormat[File[\"%s\"], CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"], \"\\n\"];\n"
                                tmp-src-file))))
 	 (result (sci-wolfram-evaluate-session format-code)))
     (message "Format wolfram script code")
