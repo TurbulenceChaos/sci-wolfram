@@ -281,7 +281,11 @@
   (let* ((code (sci-wolfram-get-region-or-buffer-code t))
 	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
 	 (format-code (progn (with-temp-file tmp-src-file (insert code))
-			     (format "Needs[\"CodeFormatter`\"];\nWriteString[\"stdout\", CodeFormat[File[\"%s\"]], \"\\n\"];\n" tmp-src-file)))
+                             (concat
+                              "Needs[\"CodeFormatter`\"];"
+                              (format
+                               "WriteString[\"stdout\", CodeFormat[File[\"%s\"], Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"], \"\\n\"];\n"
+                               tmp-src-file))))
 	 (result (sci-wolfram-evaluate-session format-code)))
     (message "Format wolfram script code")
     (save-excursion
@@ -354,7 +358,10 @@
   (add-to-list 'eglot-server-programs
  	       `(sci-wolfram-mode . (,sci-wolfram-kernel
 				     "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-				     "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))))
+                                     ,(concat
+                                      "Needs[\"LSPServer`\"];"
+                                      "SetOptions[CodeFormatter`CodeFormatCST, CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"];"
+                                      "LSPServer`StartServer[]")))))
 
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
@@ -362,7 +369,10 @@
     :new-connection (lsp-stdio-connection
 		     `(,sci-wolfram-kernel
 		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-		       "Needs[\"LSPServer`\"]; LSPServer`StartServer[]"))
+		       ,(concat
+                        "Needs[\"LSPServer`\"];"
+                        "SetOptions[CodeFormatter`CodeFormatCST, CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"];"
+                        "LSPServer`StartServer[]")))
     :major-modes '(sci-wolfram-mode)
     :server-id 'wolfram-lsp)))
 
