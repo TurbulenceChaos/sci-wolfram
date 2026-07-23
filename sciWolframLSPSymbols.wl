@@ -1,35 +1,32 @@
 (* Convert Wolfram LSPServer symbols to emacs lisp *)
 
-dir =
-	Which[
-		SameQ[$InputFileName, ""],
-			Quiet @ Check[NotebookDirectory[], Directory[]]
-		,
-		StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
-			Directory[]
-		,
-		True,
-			DirectoryName[$InputFileName]
-	];
-
+dir = Which[
+    SameQ[$InputFileName, ""],
+        Quiet @ Check[NotebookDirectory[], Directory[]]
+    ,
+    StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
+        Directory[]
+    ,
+    True,
+        DirectoryName[$InputFileName]
+];
 
 sciWolframLSPServer = PacletFind["LSPServer"][[1]];
 
-sciWolframLSPSymbols[fileName_, split_] :=
-	Module[{wolframFile, symbols, symbolsSplit, symbolsFormat, elisp, elispFile},
-		wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", fileName <> ".wl"}];
-		symbols = Import[wolframFile];
-		symbolsSplit = Partition[symbols, UpTo @ Ceiling[Length @ symbols /split]];
-		Do[
-			lispVar =
-				If[split == 1,
-					fileName
-					,
-					fileName <> "-" <> ToString[i]
-				];
-			symbolsFormat = StringRiffle[symbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
-			elisp = StringTemplate[
-";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
+sciWolframLSPSymbols[fileName_, split_] := Module[
+    {wolframFile, symbols, symbolsSplit, symbolsFormat, elisp, elispFile}
+    ,
+    wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", fileName <> ".wl"}];
+    symbols = Import[wolframFile];
+    symbolsSplit = Partition[symbols, UpTo @ Ceiling[Length @ symbols / split]];
+    Do[
+        lispVar = If[split == 1,
+            fileName
+            ,
+            fileName <> "-" <> ToString[i]
+        ];
+        symbolsFormat = StringRiffle[symbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
+        elisp = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
 ;; GENERATED WITH: `3` `4`\n
@@ -40,15 +37,14 @@ sciWolframLSPSymbols[fileName_, split_] :=
 `2`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"
-][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
-			elispFile = FileNameJoin[{dir, "LSPSymbols", lispVar <> ".el"}];
-			Export[elispFile, elisp, "Text"];
-			WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, elispFile], "\n\n"];
-			,
-			{i, split}
-		];
-	]
+;;; `1`.el ends here\n"][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
+        elispFile = FileNameJoin[{dir, "LSPSymbols", lispVar <> ".el"}];
+        Export[elispFile, elisp, "Text"];
+        WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, elispFile], "\n\n"];
+        ,
+        {i, split}
+    ];
+]
 
 sciWolframLSPSymbols["BuiltinFunctions", 5];
 
@@ -67,17 +63,23 @@ sciWolframLSPSymbols["ObsoleteSymbols", 1];
 sciWolframLSPSymbols["BadSymbols", 1];
 
 (* sciWolframLSPSymbols["SystemCharacters", 1]; *)
+
 sciWolframLSPSymbols["SystemLongNames", 1];
 
 (* sciWolframLSPSymbols["FreeCharacters", 1]; *)
+
 sciWolframLSPSymbols["FreeLongNames", 1];
 
 (* sciWolframLSPSymbols["SpecialCharacters", 1]; *)
+
 sciWolframLSPSymbols["SpecialLongNames", 1];
 
 (* sciWolframLSPSymbols["UndocumentedCharacters", 1]; *)
+
 sciWolframLSPSymbols["UndocumentedLongNames", 1];
 
 (* sciWolframLSPSymbols["UnsupportedCharacters", 1]; *)
+
 sciWolframLSPSymbols["UnsupportedLongNames", 1];
+
 
