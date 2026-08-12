@@ -1,4 +1,4 @@
-;;; UndocumentedSymbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-undocumented-symbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar UndocumentedSymbols nil)
-(setq UndocumentedSymbols '(
+(defvar sci-wolfram-lsp-symbols-undocumented-symbols '(
 "ActionDelay"
 "ActionMenuBox"
 "ActionMenuBoxOptions"
@@ -767,5 +766,5 @@
 ))
 
 
-(provide 'UndocumentedSymbols)
-;;; UndocumentedSymbols.el ends here
+(provide 'sci-wolfram-lsp-symbols-undocumented-symbols)
+;;; sci-wolfram-lsp-symbols-undocumented-symbols.el ends here

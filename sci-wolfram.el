@@ -4,7 +4,7 @@
 
 ;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 20250520
-;; Version: 20260701
+;; Version: 20260812
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
@@ -28,7 +28,7 @@
 
 ;;; Commentary:
 
-;; Major mode for editing Wolfram Language code
+;; Major mode for editing Wolfram Language
 
 ;; Installation and usage:
 ;; Please check README.md.
@@ -43,16 +43,16 @@
 (require 'org-src)
 (require 'ob-wolfram)
 (require 'sci-wolfram-lsp-symbols)
-(require 'sci-wolfram-kernel)
 (require 'sci-wolfram-prettify-symbols)
 
+;; group for `sci-wolfram-mode'
 ;;;###autoload
 (defgroup sci-wolfram-mode nil
-  "Major mode for wolfram script"
+  "Group for `sci-wolfram-mode'"
   :group 'languages)
 
 (defcustom sci-wolfram-formula-type "image"
-  "Wolfram fomula output type: image (default) or latex"
+  "Wolfram formula output type: image (default) or latex"
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
@@ -62,84 +62,97 @@
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-image-name "uuid"
-  "Wolfram image name: uuid (default) or N (natural number)"
+  "Wolfram image output name: uuid (default) or N (natural number)"
   :type '(choice (const "uuid") (const "N"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-play "no"
-  "Convert plots to Mathematica interactive file: yes or no (default)"
+  "Convert plot to Mathematica interactive file: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-short-lines 10
-  "Short[expr, n]: prints as a short form of expr, less than n lines long, 10 (default)"
+  "Short[expr, n]: print output less than n lines, 10 (default)"
   :type 'number
   :group 'sci-wolfram-mode)
+
+;; wolfram package template
+(defvar sci-wolfram-script-directory (file-name-directory (or load-file-name buffer-file-name)))
+
+(defvar sci-wolfram-display-image-script (expand-file-name "sciWolframDisplayImage.wl" sci-wolfram-script-directory))
+
+(defvar sci-wolfram-convert-to-notebook-script (expand-file-name "sciWolframConvertToNotebook.wl" sci-wolfram-script-directory))
+
+(defun sci-wolfram-display-image-package ()
+  "sciWolframDisplayImage.wl package"
+  (let ((n "\n"))
+    (concat
+     (format "Get[\"%s\"];" sci-wolfram-display-image-script)
+     n n "(* sciWolframDisplayImage.wl"
+     n n "Display wolfram script image."
+     n n "Usage:"
+     n n "Default:"
+     n "$Post = sciWolframDisplayImage[#] &;"
+     n n "All options:"
+     n "$Post = sciWolframDisplayImage[#,"
+     n "sciWolframFormulaType -> \"image\" (default) or \"latex\","
+     n "sciWolframImageDPI    -> 100 (default),"
+     n "sciWolframImageName   -> \"uuid\" (default) or \"N\" (natural number),"
+     n "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,"
+     n "sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show"
+     n "] &;"
+     n n "Tyep below code to reset $Post:"
+     n "$Post = ."
+     n n "*)"
+     n n "$Post = sciWolframDisplayImage[#,"
+     n (format "sciWolframFormulaType -> \"%s\"," sci-wolfram-formula-type)
+     n (format "sciWolframImageDPI    -> %s,"     sci-wolfram-image-dpi)
+     n (format "sciWolframImageName   -> \"%s\"," sci-wolfram-image-name)
+     n (format "sciWolframPlay        -> \"%s\"," sci-wolfram-play)
+     n (format "sciWolframShortLines  -> %s"      sci-wolfram-short-lines)
+     n "] &;")))
+
+(defun sci-wolfram-convert-to-notebook-package ()
+  "sciWolframConvertToNotebook.wl package"
+  (let ((n "\n"))
+    (concat
+     (format "Get[\"%s\"];" sci-wolfram-convert-to-notebook-script)
+     n n "(* sciWolframConvertToNotebook.wl"
+     n n "Convert wolfram script to PDF and Mathematica notebook."
+     n n "Usage:"
+     n n "sciWolframConvertToNoteBook[\"/path/to/file.wl\"];"
+     n n "*)")))
+
+(defvar sci-wolfram-package-alist '(("display image" . sci-wolfram-display-image-package)
+                                    ("convert to notebook" sci-wolfram-convert-to-notebook-package)))
+
+;;;###autoload
+(defun sci-wolfram-import-package ()
+  "Import wolfram package:
+[1] display image: sciWolframDisplayImage.wl package.
+[2] convert to notebook: sciWolframConvertToNotebook.wl package."
+  (interactive)
+  (let* (pkg (completing-read "Import package: " sci-wolfram-package-alist nil t)
+             (pkg-func (cdr (assoc pkg sci-wolfram-package-alist))))
+    (save-excursion
+      (if (and (derived-mode-p 'org-mode)
+	       (org-in-src-block-p))
+	  (progn (org-edit-src-code)
+	         (forward-line 1)
+	         (insert (funcall pkg-func))
+	         (org-edit-src-exit))
+        (progn (forward-line 1)
+	       (insert (funcall pkg-func)))))))
 
 ;; run wolfram script region or buffer code
 ;;;###autoload
 (defun sci-wolfram-run-repl ()
-  "Run wolfram repl"
+  "Start a wolfram REPL."
   (interactive)
-  (sci-wolfram-make-repl)
-  (switch-to-buffer-other-window sci-wolfram-repl-buffer))
+  (ob-wolfram-make-repl)
+  (switch-to-buffer-other-window ob-wolfram-session))
 
-(defvar sci-wolfram-display-image-script
-  (expand-file-name "sciWolframDisplayImage.wl"
-		    (file-name-directory (or load-file-name buffer-file-name))))
-
-(defun sci-wolfram-display-image-package ()
-  "sciWolframDisplayImage.wl package"
-  (concat
-   (format "\nGet[\"%s\"];\n\n" sci-wolfram-display-image-script)
-   "(* sciWolframDisplayImage.wl\n\n"
-   "Display wolfram script image.\n\n"
-   "Usage:\n\n"
-   "Default:\n"
-   "$Post = sciWolframDisplayImage[#] &;\n\n"
-   "All options:\n"
-   "$Post = sciWolframDisplayImage[#,\n"
-   "sciWolframFormulaType -> \"image\" (default) or \"latex\",\n"
-   "sciWolframImageDPI    -> 100 (default),\n"
-   "sciWolframImageName   -> \"uuid\" (default) or \"N\" (natural number),\n"
-   "sciWolframPlay        -> \"yes\" or \"no\" (default) to convert plots to Mathematica interactive file,\n"
-   "sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show\n"
-   "] &;\n\n"
-   "Tyep below code to reset $Post:\n"
-   "$Post = .\n\n*)\n\n"
-   "$Post = sciWolframDisplayImage[#,\n"
-   (format "sciWolframFormulaType -> \"%s\",\n" sci-wolfram-formula-type)
-   (format "sciWolframImageDPI    -> %s,\n" sci-wolfram-image-dpi)
-   (format "sciWolframImageName   -> \"%s\",\n" sci-wolfram-image-name)
-   (format "sciWolframPlay        -> \"%s\",\n" sci-wolfram-play)
-   (format "sciWolframShortLines  -> %s\n" sci-wolfram-short-lines)
-   "] &;\n\n"))
-
-;;;###autoload
-(defmacro sci-wolfram-import-package-macro (func-name func-doc pkg)
-  "Define a function to import sci-wolfram package"
-  `(defun ,func-name ()
-     ,func-doc
-     (interactive)
-     (let ((pkg (,pkg)))
-       (save-excursion
-	 (if (and (derived-mode-p 'org-mode)
-		  (org-in-src-block-p))
-	     (progn (org-edit-src-code)
-		    (forward-line 1)
-		    (insert pkg)
-		    (org-edit-src-exit))
-	   (progn (forward-line 1)
-		  (insert pkg)))))))
-
-;;;###autoload
-(sci-wolfram-import-package-macro
- sci-wolfram-import-display-image-package
- "Import sciWolframDisplayImage.wl package"
- sci-wolfram-display-image-package)
-
-(defun sci-wolfram-get-region-or-buffer-code (&optional orig-code)
-  "Return code in region or buffer without space lines"
+(defun sci-wolfram-get-region-or-buffer-code ()
   (let* ((beg (if (region-active-p)
 		  (region-beginning)
 		(point-min)))
@@ -147,36 +160,33 @@
 		  (region-end)
 		(point-max)))
 	 (code (buffer-substring-no-properties beg end)))
-    (if orig-code
-	code
-      (sci-wolfram-remove-space-lines code))))
+    code))
 
 (defun sci-wolfram-mode-run-region-or-buffer (&optional code)
-  "Run wolfram script region or buffer code"
   (let ((code (or code (sci-wolfram-get-region-or-buffer-code)))
 	(outbuf (get-buffer-create "*Sci-Wolfram Run Result*"))
-	(lang sci-wolfram-org-src-block-name))
+	(lang "wolfram")
+        (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
 	(org-mode))
       (erase-buffer)
       (insert (concat
-	       "#+name: import-sci-wolfram-display-image-package\n"
-	       (format "#+begin_src %s\n" lang)
-	       (sci-wolfram-display-image-package)
-	       "#+end_src\n\n"))
-      (insert (concat
-	       "#+name: sci-wolfram-run-region-or-buffer\n"
-	       (format "#+begin_src %s\n" lang)
-	       code
-	       "\n#+end_src\n\n"))
+	       "#+name: sci-wolfram-import-display-image-package"
+	       n (format "#+begin_src %s" lang)
+	       n (sci-wolfram-display-image-package)
+	       n "#+end_src"
+	       n n "#+name: sci-wolfram-run-region-or-buffer"
+	       n (format "#+begin_src %s" lang)
+	       n code
+	       n "#+end_src"))
       (org-fold-hide-block-all)
-      (org-babel-execute-buffer))
-    (display-buffer outbuf)))
+      (org-babel-execute-buffer)
+      (display-buffer outbuf))))
 
 ;;;###autoload
 (defun sci-wolfram-run-region-or-buffer ()
-  "Run wolfram script region or buffer code"
+  "Run wolfram script region or buffer code."
   (interactive)
   (cond
    ((or (region-active-p)
@@ -186,60 +196,39 @@
 	 (org-in-src-block-p)
 	 (let* ((info (org-babel-get-src-block-info))
 		(lang (nth 0 info)))
-	   (string= lang sci-wolfram-org-src-block-name)))
+	   (string= lang "wolfram")))
     (let ((code (prog2 (org-edit-src-code)
 		    (sci-wolfram-get-region-or-buffer-code)
 		  (org-edit-src-exit))))
       (sci-wolfram-mode-run-region-or-buffer code)))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
-;; Convert wolfram script to PDF and Mathematica notebook
-(defvar sci-wolfram-convert-to-notebook-script
-  (expand-file-name
-   "sciWolframConvertToNotebook.wl"
-   (file-name-directory (or load-file-name buffer-file-name))))
-
-(defun sci-wolfram-convert-to-notebook-package ()
-  "sciWolframConvertToNotebook.wl package"
-  (concat
-   (format "\nGet[\"%s\"];\n\n" sci-wolfram-convert-to-notebook-script)
-   "(* sciWolframConvertToNotebook.wl\n\n"
-   "Convert wolfram script to PDF and Mathematica notebook.\n\n"
-   "Usage:\n\n"
-   "sciWolframConvertToNoteBook[\"/path/to/file.wl\"];\n\n*)\n\n"))
-
-;;;###autoload
-(sci-wolfram-import-package-macro
- sci-wolfram-import-convert-to-notebook-package
- "Import sciWolframDisplayImage.wl package"
- sci-wolfram-convert-to-notebook-package)
-
+;; convert wolfram script to PDF and Mathematica notebook
 (defun sci-wolfram-mode-convert-to-notebook (&optional file)
-  "Convert wolfram script to PDF and Mathematica notebook"
   (let ((file (or file (buffer-file-name)))
 	(outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
-	(lang sci-wolfram-org-src-block-name))
+	(lang "wolfram")
+        (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
 	(org-mode))
       (erase-buffer)
       (insert (concat
-	       "#+name: import-sci-wolfram-convert-to-notebook-package\n"
-	       (format "#+begin_src %s\n" lang)
-	       (sci-wolfram-convert-to-notebook-package)
-	       "#+end_src\n\n"))
-      (insert (concat
-	       "#+name: sci-wolfram-convert-to-notebook\n"
-	       (format "#+begin_src %s\n" lang)
-	       (format "sciWolframConvertToNotebook[\"%s\"];" file)
-	       "\n#+end_src\n\n"))
+	       "#+name: sci-wolfram-import-convert-to-notebook-package"
+	       n (format "#+begin_src %s" lang)
+               n (sci-wolfram-convert-to-notebook-package)
+	       n "#+end_src"
+	       n n "#+name: sci-wolfram-convert-to-notebook"
+	       n (format "#+begin_src %s" lang)
+	       n (format "sciWolframConvertToNotebook[\"%s\"];" file)
+	       n "#+end_src"))
       (org-fold-hide-block-all)
-      (org-babel-execute-buffer))
-    (display-buffer outbuf)))
+      (org-babel-execute-buffer)
+      (display-buffer outbuf))))
 
 ;;;###autoload
 (defun sci-wolfram-convert-to-notebook ()
-  "Convert wolfram script to PDF and Mathematica notebook"
+  "Convert wolfram script to PDF and Mathematica notebook."
   (interactive)
   (cond
    ((and (not (region-active-p))
@@ -259,12 +248,12 @@
 	 (org-in-src-block-p)
 	 (let* ((info (org-babel-get-src-block-info))
 		(lang (nth 0 info)))
-	   (string= lang sci-wolfram-org-src-block-name)))
+	   (string= lang "wolfram")))
     (let* ((code (prog2 (org-edit-src-code)
 		     (sci-wolfram-get-region-or-buffer-code)
 		   (org-edit-src-exit)))
 	   (info (org-babel-get-src-block-info))
-	   (src-block-name (or (nth 4 info) sci-wolfram-org-src-block-name))
+	   (src-block-name (or (nth 4 info) "wolfram-babel"))
 	   (file-name (format "%s-%s.wl"
 			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))
 			      src-block-name))
@@ -273,21 +262,20 @@
       (sci-wolfram-mode-convert-to-notebook file)))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
-;; format region or buffer
+;; format wolfram script region or buffer code
 (defun sci-wolfram-mode-format-region-or-buffer ()
-  "Format wolfram codes"
-  (sci-wolfram-make-repl)
-  (sci-wolfram-initiate-session)
-  (let* ((code (sci-wolfram-get-region-or-buffer-code t))
-	 (tmp-src-file (org-babel-temp-file "wolfram-" ".wl"))
-	 (format-code (progn (with-temp-file tmp-src-file (insert code))
+  (ob-wolfram-make-repl)
+  (ob-wolfram-initiate-session)
+  (let* ((code (sci-wolfram-get-region-or-buffer-code))
+	 (tmp (org-babel-temp-file "wolfram-" ".wl"))
+	 (format-code (progn (with-temp-file tmp (insert code))
                              (concat
                               "Needs[\"CodeFormatter`\"];"
                               (format
-                               "WriteString[\"stdout\", CodeFormatter`CodeFormat[File[\"%s\"], CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"], \"\\n\"];\n"
-                               tmp-src-file))))
-	 (result (sci-wolfram-evaluate-session format-code)))
-    (message "Format wolfram script code")
+                               "WriteString[\"stdout\",CodeFormatter`CodeFormat[File[\"%s\"],CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"],\"\\n\"];\n"
+                               tmp))))
+	 (result (ob-wolfram-evaluate-session format-code)))
+    (message "Format wolfram script")
     (save-excursion
       (if (region-active-p)
 	  (delete-region (region-beginning) (region-end))
@@ -296,7 +284,7 @@
 
 ;;;###autoload
 (defun sci-wolfram-format-region-or-buffer ()
-  "Format wolfram codes"
+  "Format wolfram script region or buffer codes."
   (interactive)
   (cond
    ((or (region-active-p)
@@ -306,178 +294,178 @@
 	 (org-in-src-block-p)
 	 (let* ((info (org-babel-get-src-block-info))
 		(lang (nth 0 info)))
-	   (string= lang sci-wolfram-org-src-block-name)))
+	   (string= lang "wolfram")))
     (org-edit-src-code)
     (sci-wolfram-format-region-or-buffer)
     (org-edit-src-exit))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
-;; doc lookup
+;; wolfram documentation lookup
 ;;;###autoload
 (defun sci-wolfram-doc-lookup ()
-  "Look up wolfram doc in web browser."
+  "Look up wolfram documentation in browser."
   (interactive)
-  (let* ((word
-	  (if (region-active-p)
-	      (buffer-substring-no-properties (region-beginning) (region-end))
-	    (upcase-initials (current-word))))
-         (url (format "https://reference.wolfram.com/language/ref/%s.html" word)))
+  (let* ((symbol
+	  (or (if (region-active-p)
+	          (buffer-substring-no-properties (region-beginning) (region-end))
+	        (when-let* ((word (current-word)))
+                  (upcase-initials word)))
+              (upcase-initials (read-string "Wolfram symbol: "))))
+         (url (format "https://reference.wolfram.com/language/ref/%s.html" symbol)))
     (browse-url url)))
 
-;; completion
+;; completion-at-point
 (defun sci-wolfram-completion-at-point ()
-  "Add wolfram LSP symbols to completion-at-point."
-  (let ((bounds (bounds-of-thing-at-point 'symbol)))
-    (when bounds
-      (list (car bounds)
-	    (cdr bounds)
-	    sci-wolfram-lsp-symbols ; completion-table-dynamic
-	    :exclusive 'no))))
+  "Add wolfram symbols to completion-at-point."
+  (when-let* ((bounds (bounds-of-thing-at-point 'symbol)))
+    (list (car bounds)
+	  (cdr bounds)
+	  sci-wolfram-lsp-symbols
+	  :exclusive 'no)))
 
 (add-hook 'sci-wolfram-mode-hook
-	  (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
+          (lambda ()
+            (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
 
-(defun sci-wolfram-org-block-completion-at-point ()
-  "Provide completion in wolfram org block"
-  (when (org-in-src-block-p 1)
-    (let* ((info (org-babel-get-src-block-info))
-	   (lang (nth 0 info)))
-      (when (string= lang sci-wolfram-org-src-block-name)
-	(sci-wolfram-completion-at-point)))))
+(defun ob-wolfram-completion-at-point ()
+  (when-let* ((info (org-babel-get-src-block-info))
+	      (lang (nth 0 info)))
+    (when (string= lang "wolfram")
+      (sci-wolfram-completion-at-point))))
 
 (add-hook 'org-mode-hook
-	  (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-org-block-completion-at-point nil t)))
+          (lambda ()
+            (add-hook 'completion-at-point-functions #'ob-wolfram-completion-at-point nil t)))
 
-;; lsp server
-;; (defun sci-wolfram-remove-local-lsp-server ()
-;;   (interactive)
-;;   "Remove local installed LSPServer if needed."
-;;   (async-shell-command (format "%s -code 'PacletUninstall[\"LSPServer\"];'" sci-wolfram-program)))
+;; wolfram LSPServer
+(defvar sci-wolfram-kernel-txt (concat sci-wolfram-script-directory "sci-wolfram-kernel.txt"))
+
+(unless (file-exists-p sci-wolfram-kernel-txt)
+  (with-temp-file sci-wolfram-kernel-txt
+    (insert (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'")))))
+
+(defvar sci-wolfram-kernel
+  (with-temp-buffer
+    (insert-file-contents sci-wolfram-kernel-txt)
+    (buffer-string)))
+
+;; ref:
+;; https://github.com/transentis/wolfram-language-mode
+;; https://github.com/WolframResearch/vscode-wolfram
+(defvar sci-wolfram-lsp-server
+  (list sci-wolfram-kernel
+        "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
+        (concat "Needs[\"LSPServer`\"];"
+                "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\" -> 120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
+                "LSPServer`StartServer[]")))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
- 	       `(sci-wolfram-mode . (,sci-wolfram-kernel
-				     "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-                                     ,(concat
-                                      "Needs[\"LSPServer`\"];"
-                                      "SetOptions[CodeFormatter`CodeFormatCST, CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"];"
-                                      "LSPServer`StartServer[]")))))
+               (list (cons 'sci-wolfram-mode sci-wolfram-lsp-server))))
 
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
    (make-lsp-client
-    :new-connection (lsp-stdio-connection
-		     `(,sci-wolfram-kernel
-		       "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
-		       ,(concat
-                        "Needs[\"LSPServer`\"];"
-                        "SetOptions[CodeFormatter`CodeFormatCST, CodeFormatter`Airiness -> -0.75, \"LineWidth\" -> 120, \"BreakLinesMethod\" -> \"LineBreakerV2\"];"
-                        "LSPServer`StartServer[]")))
+    :new-connection (lsp-stdio-connection sci-wolfram-lsp-server)
     :major-modes '(sci-wolfram-mode)
     :server-id 'wolfram-lsp)))
 
 ;; syntax table
-(defvar sci-wolfram-mode-syntax-table nil)
+(defvar sci-wolfram-mode-syntax-table
+  (let ((synTable (make-syntax-table)))
+    ;; comment
+    (modify-syntax-entry ?\( "()1n" synTable)
+    (modify-syntax-entry ?\) ")(4n" synTable)
+    (modify-syntax-entry ?* ". 23n" synTable)
+    ;; symbol
+    (modify-syntax-entry ?$ "_" synTable)
+    ;; punctuation
+    (modify-syntax-entry ?! "." synTable)
+    (modify-syntax-entry ?# "." synTable)
+    (modify-syntax-entry ?% "." synTable)
+    (modify-syntax-entry ?& "." synTable)
+    (modify-syntax-entry ?' "." synTable)
+    (modify-syntax-entry ?+ "." synTable)
+    (modify-syntax-entry ?, "." synTable)
+    (modify-syntax-entry ?- "." synTable)
+    (modify-syntax-entry ?. "." synTable)
+    (modify-syntax-entry ?/ "." synTable)
+    (modify-syntax-entry ?: "." synTable)
+    (modify-syntax-entry ?\; "." synTable)
+    (modify-syntax-entry ?< "." synTable)
+    (modify-syntax-entry ?= "." synTable)
+    (modify-syntax-entry ?> "." synTable)
+    (modify-syntax-entry ?? "." synTable)
+    (modify-syntax-entry ?@ "." synTable)
+    ;; (modify-syntax-entry ?\ "." synTable)
+    (modify-syntax-entry ?^ "." synTable)
+    (modify-syntax-entry ?_ "." synTable)
+    (modify-syntax-entry ?` "." synTable)
+    (modify-syntax-entry ?| "." synTable)
+    (modify-syntax-entry ?~ "." synTable)
+    ;; (modify-syntax-entry ?\\ "." synTable)
+    synTable))
 
-(setq
- sci-wolfram-mode-syntax-table
- (let ((synTable (make-syntax-table)))
-   ;; comment
-   (modify-syntax-entry ?\( "()1n" synTable)
-   (modify-syntax-entry ?\) ")(4n" synTable)
-   (modify-syntax-entry ?* ". 23n" synTable)
-   ;; symbol
-   (modify-syntax-entry ?$ "_" synTable)
-   ;; punctuation
-   (modify-syntax-entry ?! "." synTable)
-   (modify-syntax-entry ?# "." synTable)
-   (modify-syntax-entry ?% "." synTable)
-   (modify-syntax-entry ?& "." synTable)
-   (modify-syntax-entry ?' "." synTable)
-   (modify-syntax-entry ?+ "." synTable)
-   (modify-syntax-entry ?, "." synTable)
-   (modify-syntax-entry ?- "." synTable)
-   (modify-syntax-entry ?. "." synTable)
-   (modify-syntax-entry ?/ "." synTable)
-   (modify-syntax-entry ?: "." synTable)
-   (modify-syntax-entry ?\; "." synTable)
-   (modify-syntax-entry ?< "." synTable)
-   (modify-syntax-entry ?= "." synTable)
-   (modify-syntax-entry ?> "." synTable)
-   (modify-syntax-entry ?? "." synTable)
-   (modify-syntax-entry ?@ "." synTable)
+(setq sci-wolfram-mode-syntax-table (make-syntax-table))
 
-   ;; (modify-syntax-entry ?\ "." synTable)
+;; font-lock
+(defvar sci-wolfram-font-lock-keywords
+  (list
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-1 'symbols)                                      'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-2 'symbols)                                      'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-3 'symbols)                                      'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-4 'symbols)                                      'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-5 'symbols)                                      'font-lock-function-name-face)
 
-   (modify-syntax-entry ?^ "." synTable)
-   (modify-syntax-entry ?_ "." synTable)
-   (modify-syntax-entry ?` "." synTable)
-   (modify-syntax-entry ?| "." synTable)
-   (modify-syntax-entry ?~ "." synTable)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-constants 'symbols)                                                'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-options 'symbols)                                                  'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-session-symbols 'symbols)                                          'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-experimental-symbols 'symbols)                                     'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-undocumented-symbols 'symbols)                                     'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-obsolete-symbols 'symbols)                                         'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-bad-symbols 'symbols)                                              'font-lock-builtin-face)
 
-   ;; (modify-syntax-entry ?\\ "." synTable)
-   synTable))
+   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-system-long-names))       'font-lock-constant-face)
+   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-free-long-names))         'font-lock-constant-face)
+   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-special-long-names))      'font-lock-constant-face)
+   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-undocumented-long-names)) 'font-lock-constant-face)
+   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-unsupported-long-names))  'font-lock-constant-face)
 
-;; font-lock color
-(defvar sci-wolfram-font-lock-keywords nil)
-
-(setq
- sci-wolfram-font-lock-keywords
- `((,(regexp-opt BuiltinFunctions-1 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt BuiltinFunctions-2 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt BuiltinFunctions-3 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt BuiltinFunctions-4 'symbols) . font-lock-function-name-face)
-   (,(regexp-opt BuiltinFunctions-5 'symbols) . font-lock-function-name-face)
-
-   (,(regexp-opt Constants 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt Options 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt SessionSymbols 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt ExperimentalSymbols 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt UndocumentedSymbols 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt ObsoleteSymbols 'symbols) . font-lock-builtin-face)
-   (,(regexp-opt BadSymbols 'symbols) . font-lock-builtin-face)
-
-   (,(concat "\\\\\\[" (regexp-opt SystemLongNames) "\\]") . font-lock-constant-face) ; SystemCharacters
-   (,(concat "\\\\\\[" (regexp-opt FreeLongNames) "\\]") . font-lock-constant-face) ; FreeCharacters
-   (,(concat "\\\\\\[" (regexp-opt SpecialLongNames) "\\]") . font-lock-constant-face) ; SpecialCharacters
-   (,(concat "\\\\\\[" (regexp-opt UndocumentedLongNames) "\\]") . font-lock-constant-face) ; UndocumentedCharacters
-   (,(concat "\\\\\\[" (regexp-opt UnsupportedLongNames) "\\]") . font-lock-constant-face) ; UnsupportedCharacters
-
-   ("[A-Za-z][A-Za-z0-9]*" . font-lock-variable-name-face)))
+   (cons "[A-Za-z][A-Za-z0-9]*"                                                                                 'font-lock-variable-name-face)))
 
 ;; keybinding
-(defvar sci-wolfram-mode-leader-key "C-c" "leader key for sci-wolfram-mode")
-
+(defvar sci-wolfram-mode-map (make-sparse-keymap))
+(defvar sci-wolfram-leader-map (make-sparse-keymap))
+(defvar sci-wolfram-leader-key "C-c" "sci-wolfram leader key.")
 (defvar sci-wolfram-key-map
   '((sci-wolfram-doc-lookup . "h")
     (sci-wolfram-run-repl . "t")
-    (sci-wolfram-import-display-image-package . "i")
-    (sci-wolfram-import-convert-to-notebook-package . "n")
+    (sci-wolfram-import-package . "i")
     (sci-wolfram-format-region-or-buffer . "f")
     (sci-wolfram-run-region-or-buffer . "r")
     (sci-wolfram-convert-to-notebook . "c"))
   "sci-wolfram key map")
 
-(defvar sci-wolfram-mode-map
-  (let ((map (make-sparse-keymap)))
-    (dolist (key-map sci-wolfram-key-map)
-      (define-key map (kbd (format "%s %s" sci-wolfram-mode-leader-key (cdr key-map))) (car key-map)))
-    map)
-  "keymap for sci-wolfram-mode")
+(dolist (key-map sci-wolfram-key-map)
+  (define-key sci-wolfram-leader-map (kbd (cdr key-map)) (car key-map)))
+(define-key sci-wolfram-mode-map (kbd sci-wolfram-leader-key) sci-wolfram-leader-map)
 
 ;; sci-wolfram-mode
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
-  "Major mode for Wolfram Language"
-  :syntax-table sci-wolfram-mode-syntax-table
+  "Major mode for Wolfram Language."
+  ;; :syntax-table sci-wolfram-mode-syntax-table
   :keymap sci-wolfram-mode-map
   (setq font-lock-defaults '((sci-wolfram-font-lock-keywords)))
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
 
 ;;;###autoload
-(dolist (file '("\\.wl\\'" "\\.wls\\'"))
-  (add-to-list 'auto-mode-alist `(,file . sci-wolfram-mode)))
+(add-to-list 'auto-mode-alist '("\\.wls?\\'" . sci-wolfram-mode))
+
+;;;###autoload
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
 
 
 (provide 'sci-wolfram)

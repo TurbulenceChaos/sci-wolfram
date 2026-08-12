@@ -1,4 +1,4 @@
-;;; FreeLongNames.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-free-long-names.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar FreeLongNames nil)
-(setq FreeLongNames '(
+(defvar sci-wolfram-lsp-symbols-free-long-names '(
 "AAcute"
 "ABar"
 "ACup"
@@ -1093,5 +1092,5 @@
 ))
 
 
-(provide 'FreeLongNames)
-;;; FreeLongNames.el ends here
+(provide 'sci-wolfram-lsp-symbols-free-long-names)
+;;; sci-wolfram-lsp-symbols-free-long-names.el ends here

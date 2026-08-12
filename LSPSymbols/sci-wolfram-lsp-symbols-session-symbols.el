@@ -1,4 +1,4 @@
-;;; SessionSymbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-session-symbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar SessionSymbols nil)
-(setq SessionSymbols '(
+(defvar sci-wolfram-lsp-symbols-session-symbols '(
 "Echo"
 "Exit"
 "In"
@@ -29,5 +28,5 @@
 ))
 
 
-(provide 'SessionSymbols)
-;;; SessionSymbols.el ends here
+(provide 'sci-wolfram-lsp-symbols-session-symbols)
+;;; sci-wolfram-lsp-symbols-session-symbols.el ends here

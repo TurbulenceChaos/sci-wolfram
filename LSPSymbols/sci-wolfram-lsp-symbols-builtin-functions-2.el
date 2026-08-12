@@ -1,4 +1,4 @@
-;;; BuiltinFunctions-2.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-builtin-functions-2.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BuiltinFunctions-2 nil)
-(setq BuiltinFunctions-2 '(
+(defvar sci-wolfram-lsp-symbols-builtin-functions-2 '(
 "Default"
 "DefaultButton"
 "DefaultValues"
@@ -851,5 +850,5 @@
 ))
 
 
-(provide 'BuiltinFunctions-2)
-;;; BuiltinFunctions-2.el ends here
+(provide 'sci-wolfram-lsp-symbols-builtin-functions-2)
+;;; sci-wolfram-lsp-symbols-builtin-functions-2.el ends here

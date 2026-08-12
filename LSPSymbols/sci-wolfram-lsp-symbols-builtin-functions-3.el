@@ -1,4 +1,4 @@
-;;; BuiltinFunctions-3.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-builtin-functions-3.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BuiltinFunctions-3 nil)
-(setq BuiltinFunctions-3 '(
+(defvar sci-wolfram-lsp-symbols-builtin-functions-3 '(
 "HankelTransform"
 "HannPoissonWindow"
 "HannWindow"
@@ -851,5 +850,5 @@
 ))
 
 
-(provide 'BuiltinFunctions-3)
-;;; BuiltinFunctions-3.el ends here
+(provide 'sci-wolfram-lsp-symbols-builtin-functions-3)
+;;; sci-wolfram-lsp-symbols-builtin-functions-3.el ends here

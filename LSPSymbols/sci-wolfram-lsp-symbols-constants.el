@@ -1,4 +1,4 @@
-;;; Constants.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-constants.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar Constants nil)
-(setq Constants '(
+(defvar sci-wolfram-lsp-symbols-constants '(
 "Constant"
 "Flat"
 "HoldAll"
@@ -377,5 +376,5 @@
 ))
 
 
-(provide 'Constants)
-;;; Constants.el ends here
+(provide 'sci-wolfram-lsp-symbols-constants)
+;;; sci-wolfram-lsp-symbols-constants.el ends here

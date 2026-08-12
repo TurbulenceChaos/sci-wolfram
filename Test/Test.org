@@ -9,7 +9,7 @@ Support session and async run
 ** sciWolframDisplayImage.wl Package
 #+name: import-sci-wolfram-image-package
 #+begin_src wolfram
-(* Please run M-x sci-wolfram-import-display-image-package from this line *)
+(* Please run "M-x sci-wolfram-import-package RET display image" from this line *)
 #+end_src
 
 #+name: sci-wolfram-run-code

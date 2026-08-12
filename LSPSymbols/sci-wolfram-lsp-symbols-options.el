@@ -1,4 +1,4 @@
-;;; Options.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-options.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar Options nil)
-(setq Options '(
+(defvar sci-wolfram-lsp-symbols-options '(
 "AcceptanceThreshold"
 "AccuracyGoal"
 "ActiveStyle"
@@ -949,5 +948,5 @@
 ))
 
 
-(provide 'Options)
-;;; Options.el ends here
+(provide 'sci-wolfram-lsp-symbols-options)
+;;; sci-wolfram-lsp-symbols-options.el ends here

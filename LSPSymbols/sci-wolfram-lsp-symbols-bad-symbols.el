@@ -1,4 +1,4 @@
-;;; BadSymbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-bad-symbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BadSymbols nil)
-(setq BadSymbols '(
+(defvar sci-wolfram-lsp-symbols-bad-symbols '(
 "AllFalse"
 "AnyFalse"
 "Boolean"
@@ -38,5 +37,5 @@
 ))
 
 
-(provide 'BadSymbols)
-;;; BadSymbols.el ends here
+(provide 'sci-wolfram-lsp-symbols-bad-symbols)
+;;; sci-wolfram-lsp-symbols-bad-symbols.el ends here

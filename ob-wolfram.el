@@ -4,7 +4,7 @@
 
 ;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 20250520
-;; Version: 20260701
+;; Version: 20260812
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
@@ -37,137 +37,145 @@
 
 ;;; Code:
 
+(require 'org)
+(require 'ob-core)
 (require 'ob-comint)
-(require 'sci-wolfram-display-images)
 
-(defvar sci-wolfram-program "wolframscript" "Command to run wolfram kernel")
+(defvar ob-wolfram-session "*Wolfram REPL*")
 
-(defvar sci-wolfram-repl-buffer "*Wolfram REPL*")
+(defvar ob-wolfram-session-initiated nil)
 
-(defvar sci-wolfram-org-babel--initiated nil)
+(defvar ob-wolfram-async-registered nil)
 
-(defvar sci-wolfram-org-babel-async--registered nil)
+(defvar ob-wolfram-prompt-regexp "^In\\[[0-9]+\\]:= ")
 
-(defvar sci-wolfram-prompt-regexp "^In\\[[0-9]+\\]:= ")
-
-(defun sci-wolfram-make-repl ()
-  (unless (comint-check-proc sci-wolfram-repl-buffer)
+;; session evaluate
+(defun ob-wolfram-make-repl ()
+  "Create wolfram REPL."
+  (unless (comint-check-proc ob-wolfram-session)
     (message "Starting Wolfram REPL ...")
-    (make-comint-in-buffer "sci-wolfram-repl" sci-wolfram-repl-buffer sci-wolfram-program nil "-rawterm")
-    (with-current-buffer sci-wolfram-repl-buffer
-      (setq-local comint-prompt-regexp sci-wolfram-prompt-regexp))
-    (setq sci-wolfram-org-babel--initiated nil)
-    (setq sci-wolfram-org-babel-async--registered nil)))
+    (make-comint-in-buffer "ob-wolfram-session" ob-wolfram-session "wolframscript" nil "-rawterm")
+    (with-current-buffer ob-wolfram-session
+      (setq-local comint-prompt-regexp ob-wolfram-prompt-regexp))
+    (setq ob-wolfram-session-initiated nil)
+    (setq ob-wolfram-async-registered nil)))
 
-(defun sci-wolfram-remove-space-lines (body)
-  "Remove code string space lines"
-  (substring-no-properties
-   (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
+(defun ob-wolfram-remove-empty-lines (body)
+  (substring-no-properties (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
 
-(defun sci-wolfram-remove-eoe (result eoe)
-  "Remove EOE from result"
-  (mapconcat 'identity
-	     (cl-remove-if (lambda (string) (string-match-p eoe string)) result)))
-
-(defun sci-wolfram-evaluate-session (body)
-  "wolfram org-babel block execute session"
-  (let* ((eoe (format "ob_comint_session_wolfram_eoe_%s" (org-id-uuid)))
+(defun ob-wolfram-evaluate-session (body)
+  "Evaluate wolfram babel session."
+  (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
 	 (code (concat
-		(format "%s\n" (sci-wolfram-remove-space-lines body))
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" eoe)))
-	 (result
-	  (org-babel-comint-with-output
-	      (sci-wolfram-repl-buffer eoe)
-	    (comint-send-string sci-wolfram-repl-buffer code))))
-    (sci-wolfram-remove-eoe result eoe)))
+                (ob-wolfram-remove-empty-lines body)
+                (format "\n\"%s\"\n" eoe)))
+	 (result (org-babel-comint-with-output
+                     (ob-wolfram-session eoe)
+                   (comint-send-string ob-wolfram-session code))))
+    (mapconcat #'identity (cl-remove eoe result :test #'string-match-p))))
 
-(defun sci-wolfram-initiate-session ()
-  (unless sci-wolfram-org-babel--initiated
-    (sci-wolfram-evaluate-session "WriteString[\"stdout\", \"Initiate Wolfram REPL\", \"\\n\"];\n"))
-  (setq sci-wolfram-org-babel-initiated t))
+(defun ob-wolfram-initiate-session ()
+  (unless ob-wolfram-session-initiated
+    (ob-wolfram-evaluate-session "\"Initiate wolfram babel session\"\n")
+    (setq ob-wolfram-session-initiated t)))
 
-(defvar sci-wolfram-async-org-block-info nil "wolfram async org block buffer and position info")
+;; display inline images in babel result
+(defvar ob-wolfram-babel-info nil)
 
-(defun sci-wolfram-async-org-block-get-info ()
+(defun ob-wolfram-babel-get-info ()
   (let ((buf (current-buffer))
 	(pos (point)))
-    (setq sci-wolfram-async-org-block-info (cons buf pos))))
+    (setq ob-wolfram-babel-info (cons buf pos))))
 
-(add-hook 'org-babel-after-execute-hook #'sci-wolfram-async-org-block-get-info)
+(add-hook 'org-babel-after-execute-hook #'ob-wolfram-babel-get-info)
 
-(defun sci-wolfram-clean-result (result)
+;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
+(defun ob-wolfram-display-inline-images-in-babel-result ()
+  (unless (or
+	   ;; ...but not while Emacs is exporting an org buffer (where
+	   ;; `org-display-inline-images' can be awfully slow).
+	   (bound-and-true-p org-export-current-backend)
+	   ;; ...and not while tangling org buffers (which happens in a temp
+	   ;; buffer where `buffer-file-name' is nil).
+	   (string-match-p "^ \\*temp" (buffer-name)))
+    (save-excursion
+      (when-let* ((beg (org-babel-where-is-src-block-result))
+		  (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
+	(save-restriction
+          (narrow-to-region (min beg end) (max beg end))
+          (goto-char (point-min))
+	  (org-display-inline-images)
+          (when (and (executable-find "pdflatex")
+                     (search-forward "\\begin{equation*}" nil t)
+                     (search-forward "\\end{equation*}" nil t))
+	    (org-latex-preview)))))))
+
+(add-hook 'org-babel-after-execute-hook
+          (lambda ()
+            (let* ((info (org-babel-get-src-block-info))
+	           (lang (nth 0 info))
+	           (params (nth 2 info))
+	           (async (cdr (assq :async params))))
+              (when (and (string= lang "wolfram")
+                         (not (string-match-p "yes" async)))
+                (ob-wolfram-display-inline-images-in-babel-result)))))
+
+(defun ob-wolfram-async-chunk-callback (result)
+  "Filter applied to results before insertion.
+See `org-babel-comint-async-chunk-callback'."
   (prog1
       result
-    (let ((buf (car sci-wolfram-async-org-block-info))
-	  (pos (cdr sci-wolfram-async-org-block-info)))
+    (let ((buf (car ob-wolfram-babel-info))
+	  (pos (cdr ob-wolfram-babel-info)))
       (run-at-time 0 nil (lambda ()
-			   (with-current-buffer buf
-			     (save-excursion
+                           (with-current-buffer buf
+                             (save-excursion
 			       (goto-char pos)
-			       (sci-wolfram-display-images))))))))
+			       (ob-wolfram-display-inline-images-in-babel-result))))))))
 
-(defun sci-wolfram-org-babel-register-async ()
+;; async evaluate
+(defun ob-wolfram-async-register ()
   (let ((buf (current-buffer)))
-    (unless (and sci-wolfram-org-babel-async--registered
-		 (eq buf (car sci-wolfram-async-org-block-info)))
+    (unless (and ob-wolfram-async-registered
+		 (eq buf (car ob-wolfram-babel-info)))
       (org-babel-comint-async-register
-       sci-wolfram-repl-buffer buf
-       "ob_comint_async_wolfram_\\(start\\|end\\|file\\)_\\(.+\\)"
-       'sci-wolfram-clean-result
-       'org-babel-eval-read-file)
-      (setq sci-wolfram-org-babel-async--registered t))))
+       ob-wolfram-session
+       buf
+       "ob_wolfram_async_\\(start\\|end\\)_\\(.+\\)"
+       'ob-wolfram-async-chunk-callback
+       nil)
+      (setq ob-wolfram-async-registered t))))
 
-(defun sci-wolfram-async-evaluate-session (body)
-  "wolfram org-babel block async execute session"
-  (sci-wolfram-org-babel-register-async)
+(defun ob-wolfram-async-evaluate-session (body)
+  (ob-wolfram-async-register)
   (let* ((uuid (org-id-uuid))
-         (start (format "ob_comint_async_wolfram_start_%s" uuid))
-         (end   (format "ob_comint_async_wolfram_end_%s" uuid))
+         (start (format "ob_wolfram_async_start_%s" uuid))
+         (end   (format "ob_wolfram_async_end_%s" uuid))
          (code (concat
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" start)
-		(format "%s\n" (sci-wolfram-remove-space-lines body))
-		(format "WriteString[\"stdout\", \"%s\", \"\\n\"];\n" end))))
-    (comint-send-string sci-wolfram-repl-buffer code)
+		(format "\"%s\"\n" start)
+		(ob-wolfram-remove-empty-lines body)
+		(format "\n\"%s\"\n" end))))
+    (comint-send-string ob-wolfram-session code)
     uuid))
 
+;; org babel execute
 ;;;###autoload
 (defun org-babel-execute:wolfram (body params)
-  "wolfram org-babel block sync/async execute session"
-  (sci-wolfram-make-repl)
-  (sci-wolfram-initiate-session)
+  (ob-wolfram-make-repl)
+  (ob-wolfram-initiate-session)
   (let ((async (cdr (assq :async params))))
     (if (string-match-p "yes" async)
-	(sci-wolfram-async-evaluate-session body)
-      (sci-wolfram-evaluate-session body))))
+	(ob-wolfram-async-evaluate-session body)
+      (ob-wolfram-evaluate-session body))))
 
 (defvar org-babel-default-header-args:wolfram
-  `((:session . ,sci-wolfram-repl-buffer)
+  `((:session . ,ob-wolfram-session)
     (:async . "yes")
     (:results . "value drawer")
     (:display . "text")
     (:comments . "link")
     (:eval . "never-export")
-    (:exports . "both"))
-  "Default header arguments for wolfram src-block in org-mode")
-
-;;;###autoload
-(defvar sci-wolfram-org-src-block-name "wolfram" "wolfram src-block name in org-mode")
-
-;;;###autoload
-(with-eval-after-load 'org-src
-  (add-to-list 'org-src-lang-modes `(,sci-wolfram-org-src-block-name . sci-wolfram)))
-
-(defun sci-wolfram-auto-display-images ()
-  "Auto display latex or images after executing wolfram session block."
-  (let* ((info (org-babel-get-src-block-info))
-	 (lang (nth 0 info))
-	 (params (nth 2 info))
-	 (async (cdr (assq :async params))))
-    (when (string= lang sci-wolfram-org-src-block-name)
-      (unless (string-match-p "yes" async)
-	(sci-wolfram-display-images)))))
-
-(add-hook 'org-babel-after-execute-hook #'sci-wolfram-auto-display-images)
+    (:exports . "both")))
 
 
 (provide 'ob-wolfram)

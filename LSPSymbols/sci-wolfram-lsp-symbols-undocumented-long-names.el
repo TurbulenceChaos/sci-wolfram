@@ -1,4 +1,4 @@
-;;; UndocumentedLongNames.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-undocumented-long-names.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar UndocumentedLongNames nil)
-(setq UndocumentedLongNames '(
+(defvar sci-wolfram-lsp-symbols-undocumented-long-names '(
 "Akuz"
 "Andy"
 "ContinuedFractionK"
@@ -40,5 +39,5 @@
 ))
 
 
-(provide 'UndocumentedLongNames)
-;;; UndocumentedLongNames.el ends here
+(provide 'sci-wolfram-lsp-symbols-undocumented-long-names)
+;;; sci-wolfram-lsp-symbols-undocumented-long-names.el ends here

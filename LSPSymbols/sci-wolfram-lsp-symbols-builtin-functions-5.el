@@ -1,4 +1,4 @@
-;;; BuiltinFunctions-5.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-builtin-functions-5.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BuiltinFunctions-5 nil)
-(setq BuiltinFunctions-5 '(
+(defvar sci-wolfram-lsp-symbols-builtin-functions-5 '(
 "SelectionCreateCell"
 "SelectionEvaluate"
 "SelectionEvaluateCreateCell"
@@ -850,5 +849,5 @@
 ))
 
 
-(provide 'BuiltinFunctions-5)
-;;; BuiltinFunctions-5.el ends here
+(provide 'sci-wolfram-lsp-symbols-builtin-functions-5)
+;;; sci-wolfram-lsp-symbols-builtin-functions-5.el ends here

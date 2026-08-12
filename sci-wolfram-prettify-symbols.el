@@ -4,7 +4,7 @@
 
 ;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 20250520
-;; Version: 20260701
+;; Version: 20260812
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
@@ -37,23 +37,22 @@
 
 ;;; Code:
 
-;; https://reference.wolfram.com/language/guide/ListingOfNamedCharacters.html
+(defvar sci-wolfram-prettify-symbols-script-directory
+  (file-name-directory (or load-file-name buffer-file-name)))
+
 (defvar sci-wolfram-prettify-symbols-script
-  (concat (file-name-directory (or load-file-name buffer-file-name))
-	  "sciWolframPrettifySymbols.wl"))
+  (expand-file-name  "sciWolframPrettifySymbols.wl" sci-wolfram-prettify-symbols-script-directory))
 
 (defvar sci-wolfram-prettify-symbols-alist-elisp
-  (concat (file-name-directory (or load-file-name buffer-file-name))
-	  "sci-wolfram-prettify-symbols-alist.el"))
+  (expand-file-name "sci-wolfram-prettify-symbols-alist.el" sci-wolfram-prettify-symbols-script-directory))
 
 (unless (file-exists-p sci-wolfram-prettify-symbols-alist-elisp)
-  (message "Convert Wolfram characters to Emacs prettify symbols")
-  (shell-command (format "%s -script %s" sci-wolfram-program sci-wolfram-prettify-symbols-script)))
+  (message "Convert wolfram characters to emacs prettify symbols")
+  (shell-command (format "wolframscript -script %s" sci-wolfram-prettify-symbols-script)))
 
 (require 'sci-wolfram-prettify-symbols-alist)
 
 (defun sci-wolfram-prettify-symbols ()
-  "Add wolfram prettify symbols alist"
   (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols-alist)
   (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
   ;; (setq-local prettify-symbols-unprettify-at-point nil)
@@ -64,5 +63,3 @@
 
 (provide 'sci-wolfram-prettify-symbols)
 ;;; sci-wolfram-prettify-symbols.el ends here
-
-

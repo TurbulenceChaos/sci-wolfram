@@ -1,4 +1,4 @@
-;;; ExperimentalSymbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-experimental-symbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar ExperimentalSymbols nil)
-(setq ExperimentalSymbols '(
+(defvar sci-wolfram-lsp-symbols-experimental-symbols '(
 "ActiveClassification"
 "ActiveClassificationObject"
 "ActivePrediction"
@@ -810,5 +809,5 @@
 ))
 
 
-(provide 'ExperimentalSymbols)
-;;; ExperimentalSymbols.el ends here
+(provide 'sci-wolfram-lsp-symbols-experimental-symbols)
+;;; sci-wolfram-lsp-symbols-experimental-symbols.el ends here

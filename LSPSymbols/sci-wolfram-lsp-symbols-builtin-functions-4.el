@@ -1,4 +1,4 @@
-;;; BuiltinFunctions-4.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-builtin-functions-4.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BuiltinFunctions-4 nil)
-(setq BuiltinFunctions-4 '(
+(defvar sci-wolfram-lsp-symbols-builtin-functions-4 '(
 "MovingAverage"
 "MovingMap"
 "MovingMedian"
@@ -851,5 +850,5 @@
 ))
 
 
-(provide 'BuiltinFunctions-4)
-;;; BuiltinFunctions-4.el ends here
+(provide 'sci-wolfram-lsp-symbols-builtin-functions-4)
+;;; sci-wolfram-lsp-symbols-builtin-functions-4.el ends here

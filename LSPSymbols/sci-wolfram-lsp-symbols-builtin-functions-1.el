@@ -1,4 +1,4 @@
-;;; BuiltinFunctions-1.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-builtin-functions-1.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar BuiltinFunctions-1 nil)
-(setq BuiltinFunctions-1 '(
+(defvar sci-wolfram-lsp-symbols-builtin-functions-1 '(
 "AASTriangle"
 "AbelianGroup"
 "Abort"
@@ -851,5 +850,5 @@
 ))
 
 
-(provide 'BuiltinFunctions-1)
-;;; BuiltinFunctions-1.el ends here
+(provide 'sci-wolfram-lsp-symbols-builtin-functions-1)
+;;; sci-wolfram-lsp-symbols-builtin-functions-1.el ends here

@@ -1,4 +1,4 @@
-(* Convert Wolfram LSPServer symbols to emacs lisp *)
+(* Convert wolfram LSPServer symbols to emacs symbols *)
 
 dir = Which[
     SameQ[$InputFileName, ""],
@@ -13,73 +13,59 @@ dir = Which[
 
 sciWolframLSPServer = PacletFind["LSPServer"][[1]];
 
-sciWolframLSPSymbols[fileName_, split_] := Module[
-    {wolframFile, symbols, symbolsSplit, symbolsFormat, elisp, elispFile}
+sciWolfram2Emacs[wolframFileName_, split_] := Module[
+    {wolframFile, wolframSymbols, wolframSymbolsSplit, emacsFormat, emacsSymbols, emacsFile}
     ,
-    wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", fileName <> ".wl"}];
-    symbols = Import[wolframFile];
-    symbolsSplit = Partition[symbols, UpTo @ Ceiling[Length @ symbols / split]];
+    wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", wolframFileName <> ".wl"}];
+    wolframSymbols = Import[wolframFile];
+    wolframSymbolsSplit = Partition[wolframSymbols, UpTo @ Ceiling[Length @ wolframSymbols / split]];
     Do[
-        lispVar = If[split == 1,
-            fileName
-            ,
-            fileName <> "-" <> ToString[i]
+        emacsFileName = StringTemplate["sci-wolfram-lsp-symbols-`1`"][ToLowerCase @ StringRiffle[StringCases[wolframFileName, RegularExpression["[A-Z][a-z]*"]], "-"]];
+        If[split > 1,
+           emacsFileName = StringTemplate["`1`-`2`"][emacsFileName, i]
         ];
-        symbolsFormat = StringRiffle[symbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
-        elisp = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
+        emacsFormat = StringRiffle[wolframSymbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
+        emacsSymbols = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
 ;; GENERATED WITH: `3` `4`\n
 ;; LSPServer `5`\n
 ;;; Code:\n
-(defvar `1` nil)
-(setq `1` '(
+(defvar `1` '(
 `2`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"][lispVar, symbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
-        elispFile = FileNameJoin[{dir, "LSPSymbols", lispVar <> ".el"}];
-        Export[elispFile, elisp, "Text"];
-        WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, elispFile], "\n\n"];
+;;; `1`.el ends here\n"][emacsFileName, emacsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
+        emacsFile = FileNameJoin[{dir, "LSPSymbols", emacsFileName <> ".el"}];
+        Export[emacsFile, emacsSymbols, "Text"];
+        WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, emacsFile], "\n\n"];
         ,
         {i, split}
     ];
 ]
 
-sciWolframLSPSymbols["BuiltinFunctions", 5];
+sciWolfram2Emacs["BuiltinFunctions", 5];
 
-sciWolframLSPSymbols["Constants", 1];
+sciWolfram2Emacs["Constants", 1];
 
-sciWolframLSPSymbols["Options", 1];
+sciWolfram2Emacs["Options", 1];
 
-sciWolframLSPSymbols["SessionSymbols", 1];
+sciWolfram2Emacs["SessionSymbols", 1];
 
-sciWolframLSPSymbols["ExperimentalSymbols", 1];
+sciWolfram2Emacs["ExperimentalSymbols", 1];
 
-sciWolframLSPSymbols["UndocumentedSymbols", 1];
+sciWolfram2Emacs["UndocumentedSymbols", 1];
 
-sciWolframLSPSymbols["ObsoleteSymbols", 1];
+sciWolfram2Emacs["ObsoleteSymbols", 1];
 
-sciWolframLSPSymbols["BadSymbols", 1];
+sciWolfram2Emacs["BadSymbols", 1];
 
-(* sciWolframLSPSymbols["SystemCharacters", 1]; *)
+sciWolfram2Emacs["SystemLongNames", 1];
 
-sciWolframLSPSymbols["SystemLongNames", 1];
+sciWolfram2Emacs["FreeLongNames", 1];
 
-(* sciWolframLSPSymbols["FreeCharacters", 1]; *)
+sciWolfram2Emacs["SpecialLongNames", 1];
 
-sciWolframLSPSymbols["FreeLongNames", 1];
+sciWolfram2Emacs["UndocumentedLongNames", 1];
 
-(* sciWolframLSPSymbols["SpecialCharacters", 1]; *)
-
-sciWolframLSPSymbols["SpecialLongNames", 1];
-
-(* sciWolframLSPSymbols["UndocumentedCharacters", 1]; *)
-
-sciWolframLSPSymbols["UndocumentedLongNames", 1];
-
-(* sciWolframLSPSymbols["UnsupportedCharacters", 1]; *)
-
-sciWolframLSPSymbols["UnsupportedLongNames", 1];
-
-
+sciWolfram2Emacs["UnsupportedLongNames", 1];

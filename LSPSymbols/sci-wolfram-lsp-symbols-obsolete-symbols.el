@@ -1,4 +1,4 @@
-;;; ObsoleteSymbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-obsolete-symbols.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar ObsoleteSymbols nil)
-(setq ObsoleteSymbols '(
+(defvar sci-wolfram-lsp-symbols-obsolete-symbols '(
 "AbortScheduledTask"
 "Active"
 "AlgebraicRules"
@@ -183,5 +182,5 @@
 ))
 
 
-(provide 'ObsoleteSymbols)
-;;; ObsoleteSymbols.el ends here
+(provide 'sci-wolfram-lsp-symbols-obsolete-symbols)
+;;; sci-wolfram-lsp-symbols-obsolete-symbols.el ends here

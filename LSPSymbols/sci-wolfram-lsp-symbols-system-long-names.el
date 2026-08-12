@@ -1,4 +1,4 @@
-;;; SystemLongNames.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
+;;; sci-wolfram-lsp-symbols-system-long-names.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-
 
 ;;; Commentary:
 
@@ -10,8 +10,7 @@
 
 ;;; Code:
 
-(defvar SystemLongNames nil)
-(setq SystemLongNames '(
+(defvar sci-wolfram-lsp-symbols-system-long-names '(
 "SystemsModelDelay"
 "FormalA"
 "FormalB"
@@ -184,5 +183,5 @@
 ))
 
 
-(provide 'SystemLongNames)
-;;; SystemLongNames.el ends here
+(provide 'sci-wolfram-lsp-symbols-system-long-names)
+;;; sci-wolfram-lsp-symbols-system-long-names.el ends here
