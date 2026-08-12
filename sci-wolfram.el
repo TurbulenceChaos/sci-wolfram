@@ -132,8 +132,8 @@
 [1] display image: sciWolframDisplayImage.wl package.
 [2] convert to notebook: sciWolframConvertToNotebook.wl package."
   (interactive)
-  (let* (pkg (completing-read "Import package: " sci-wolfram-package-alist nil t)
-             (pkg-func (cdr (assoc pkg sci-wolfram-package-alist))))
+  (let* ((pkg (completing-read "Import package: " sci-wolfram-package-alist nil t))
+         (pkg-func (cdr (assoc pkg sci-wolfram-package-alist))))
     (save-excursion
       (if (and (derived-mode-p 'org-mode)
 	       (org-in-src-block-p))

@@ -104,7 +104,9 @@
 	(save-restriction
           (narrow-to-region (min beg end) (max beg end))
           (goto-char (point-min))
-	  (org-display-inline-images)
+          (if (version< "9.8" (org-version))
+              (org-link-preview-region)
+            (org-display-inline-images))
           (when (and (executable-find "pdflatex")
                      (search-forward "\\begin{equation*}" nil t)
                      (search-forward "\\end{equation*}" nil t))
