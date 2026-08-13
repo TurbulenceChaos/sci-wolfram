@@ -89,6 +89,7 @@
 
 (add-hook 'org-babel-after-execute-hook #'ob-wolfram-babel-get-info)
 
+;; reference:
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
 (defun ob-wolfram-display-inline-images-in-babel-result ()
   (unless (or

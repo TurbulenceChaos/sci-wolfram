@@ -313,8 +313,27 @@
     (browse-url url)))
 
 ;; completion-at-point
-(eval-when-compile
-  (require 'sci-wolfram-lsp-symbols))
+(require 'sci-wolfram-lsp-symbols)
+
+(defvar sci-wolfram-lsp-symbols
+  (append
+   sci-wolfram-lsp-symbols-builtin-functions-1
+   sci-wolfram-lsp-symbols-builtin-functions-2
+   sci-wolfram-lsp-symbols-builtin-functions-3
+   sci-wolfram-lsp-symbols-builtin-functions-4
+   sci-wolfram-lsp-symbols-builtin-functions-5
+   sci-wolfram-lsp-symbols-constants
+   sci-wolfram-lsp-symbols-options
+   sci-wolfram-lsp-symbols-session-symbols
+   sci-wolfram-lsp-symbols-experimental-symbols
+   sci-wolfram-lsp-symbols-undocumented-symbols
+   sci-wolfram-lsp-symbols-obsolete-symbols
+   sci-wolfram-lsp-symbols-bad-symbols
+   sci-wolfram-lsp-symbols-system-long-names
+   sci-wolfram-lsp-symbols-free-long-names
+   sci-wolfram-lsp-symbols-special-long-names
+   sci-wolfram-lsp-symbols-undocumented-long-names
+   sci-wolfram-lsp-symbols-unsupported-long-names))
 
 (defun sci-wolfram-completion-at-point ()
   "Add wolfram symbols to completion-at-point."
@@ -340,7 +359,7 @@
 (eval-when-compile
   (require 'sci-wolfram-kernel))
 
-;; ref:
+;; reference:
 ;; https://github.com/transentis/wolfram-language-mode
 ;; https://github.com/WolframResearch/vscode-wolfram
 (defvar sci-wolfram-lsp-server
@@ -457,8 +476,7 @@
   (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
 
 ;; prettify symbols
-(eval-when-compile
-  (require 'sci-wolfram-prettify-symbols))
+(require 'sci-wolfram-prettify-symbols)
 
 
 (provide 'sci-wolfram)

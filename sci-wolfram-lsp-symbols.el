@@ -46,66 +46,27 @@
 (unless (file-directory-p sci-wolfram-lsp-symbols-script-directory)
   (make-directory sci-wolfram-lsp-symbols-script-directory))
 
-(unless (seq-every-p
-         (lambda (file) (member file (directory-files sci-wolfram-lsp-symbols-script-directory nil "\\.el\\'")))
-         '("sci-wolfram-lsp-symbols-builtin-functions-1.el"
-           "sci-wolfram-lsp-symbols-builtin-functions-2.el"
-           "sci-wolfram-lsp-symbols-builtin-functions-3.el"
-           "sci-wolfram-lsp-symbols-builtin-functions-4.el"
-           "sci-wolfram-lsp-symbols-builtin-functions-5.el"
-           "sci-wolfram-lsp-symbols-constants.el"
-           "sci-wolfram-lsp-symbols-options.el"
-           "sci-wolfram-lsp-symbols-session-symbols.el"
-           "sci-wolfram-lsp-symbols-experimental-symbols.el"
-           "sci-wolfram-lsp-symbols-undocumented-symbols.el"
-           "sci-wolfram-lsp-symbols-obsolete-symbols.el"
-           "sci-wolfram-lsp-symbols-bad-symbols.el"
-           "sci-wolfram-lsp-symbols-system-long-names.el"
-           "sci-wolfram-lsp-symbols-free-long-names.el"
-           "sci-wolfram-lsp-symbols-special-long-names.el"
-           "sci-wolfram-lsp-symbols-undocumented-long-names.el"
-           "sci-wolfram-lsp-symbols-unsupported-long-names.el"))
+(unless (directory-files sci-wolfram-lsp-symbols-script-directory nil "\\.el\\'")
   (message "Convert wolfram LSPServer symbols to emacs symbols")
   (shell-command (format "wolframscript -script %s" sci-wolfram-lsp-symbols-script)))
 
-(add-to-list 'load-path sci-wolfram-lsp-symbols-script-directory)
-(require 'sci-wolfram-lsp-symbols-builtin-functions-1)
-(require 'sci-wolfram-lsp-symbols-builtin-functions-2)
-(require 'sci-wolfram-lsp-symbols-builtin-functions-3)
-(require 'sci-wolfram-lsp-symbols-builtin-functions-4)
-(require 'sci-wolfram-lsp-symbols-builtin-functions-5)
-(require 'sci-wolfram-lsp-symbols-constants)
-(require 'sci-wolfram-lsp-symbols-options)
-(require 'sci-wolfram-lsp-symbols-session-symbols)
-(require 'sci-wolfram-lsp-symbols-experimental-symbols)
-(require 'sci-wolfram-lsp-symbols-undocumented-symbols)
-(require 'sci-wolfram-lsp-symbols-obsolete-symbols)
-(require 'sci-wolfram-lsp-symbols-bad-symbols)
-(require 'sci-wolfram-lsp-symbols-system-long-names)
-(require 'sci-wolfram-lsp-symbols-free-long-names)
-(require 'sci-wolfram-lsp-symbols-special-long-names)
-(require 'sci-wolfram-lsp-symbols-undocumented-long-names)
-(require 'sci-wolfram-lsp-symbols-unsupported-long-names)
-
-(defvar sci-wolfram-lsp-symbols
-  (append
-   sci-wolfram-lsp-symbols-builtin-functions-1
-   sci-wolfram-lsp-symbols-builtin-functions-2
-   sci-wolfram-lsp-symbols-builtin-functions-3
-   sci-wolfram-lsp-symbols-builtin-functions-4
-   sci-wolfram-lsp-symbols-builtin-functions-5
-   sci-wolfram-lsp-symbols-constants
-   sci-wolfram-lsp-symbols-options
-   sci-wolfram-lsp-symbols-session-symbols
-   sci-wolfram-lsp-symbols-experimental-symbols
-   sci-wolfram-lsp-symbols-undocumented-symbols
-   sci-wolfram-lsp-symbols-obsolete-symbols
-   sci-wolfram-lsp-symbols-bad-symbols
-   sci-wolfram-lsp-symbols-system-long-names
-   sci-wolfram-lsp-symbols-free-long-names
-   sci-wolfram-lsp-symbols-special-long-names
-   sci-wolfram-lsp-symbols-undocumented-long-names
-   sci-wolfram-lsp-symbols-unsupported-long-names))
+(load (expand-file-name "sci-wolfram-lsp-symbols-builtin-functions-1.el"     sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-builtin-functions-2.el"     sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-builtin-functions-3.el"     sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-builtin-functions-4.el"     sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-builtin-functions-5.el"     sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-constants.el"               sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-options.el"                 sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-session-symbols.el"         sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-experimental-symbols.el"    sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-undocumented-symbols.el"    sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-obsolete-symbols.el"        sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-bad-symbols.el"             sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-system-long-names.el"       sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-free-long-names.el"         sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-special-long-names.el"      sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-undocumented-long-names.el" sci-wolfram-lsp-symbols-script-directory) t)
+(load (expand-file-name "sci-wolfram-lsp-symbols-unsupported-long-names.el"  sci-wolfram-lsp-symbols-script-directory) t)
 
 
 (provide 'sci-wolfram-lsp-symbols)

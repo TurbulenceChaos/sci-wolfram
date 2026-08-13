@@ -3,7 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(defvar sci-wolfram-kernel-location (concat sci-wolfram-script-directory "sci-wolfram-kernel.txt"))
+(defvar sci-wolfram-kernel-location
+  (expand-file-name "sci-wolfram-kernel-location.txt" (file-name-directory (or load-file-name buffer-file-name))))
 
 (unless (file-exists-p sci-wolfram-kernel-location)
   (with-temp-file sci-wolfram-kernel-location
