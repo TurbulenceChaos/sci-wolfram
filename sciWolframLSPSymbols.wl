@@ -14,7 +14,7 @@ dir = Which[
 sciWolframLSPServer = PacletFind["LSPServer"][[1]];
 
 sciWolfram2Emacs[wolframFileName_, split_] := Module[
-    {wolframFile, wolframSymbols, wolframSymbolsSplit, emacsFormat, emacsSymbols, emacsFile}
+    {wolframFile, wolframSymbols, wolframSymbolsSplit, emacsSymbolsFormat, emacsSymbols, emacsFile}
     ,
     wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", wolframFileName <> ".wl"}];
     wolframSymbols = Import[wolframFile];
@@ -22,9 +22,9 @@ sciWolfram2Emacs[wolframFileName_, split_] := Module[
     Do[
         emacsFileName = StringTemplate["sci-wolfram-lsp-symbols-`1`"][ToLowerCase @ StringRiffle[StringCases[wolframFileName, RegularExpression["[A-Z][a-z]*"]], "-"]];
         If[split > 1,
-           emacsFileName = StringTemplate["`1`-`2`"][emacsFileName, i]
+            emacsFileName = StringTemplate["`1`-`2`"][emacsFileName, i]
         ];
-        emacsFormat = StringRiffle[wolframSymbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
+        emacsSymbolsFormat = StringRiffle[wolframSymbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
         emacsSymbols = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
@@ -35,7 +35,7 @@ sciWolfram2Emacs[wolframFileName_, split_] := Module[
 `2`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"][emacsFileName, emacsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
+;;; `1`.el ends here\n"][emacsFileName, emacsSymbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
         emacsFile = FileNameJoin[{dir, "LSPSymbols", emacsFileName <> ".el"}];
         Export[emacsFile, emacsSymbols, "Text"];
         WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, emacsFile], "\n\n"];

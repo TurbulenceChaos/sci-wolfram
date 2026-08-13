@@ -42,8 +42,6 @@
 
 (require 'org-src)
 (require 'ob-wolfram)
-(require 'sci-wolfram-lsp-symbols)
-(require 'sci-wolfram-prettify-symbols)
 
 ;; group for `sci-wolfram-mode'
 ;;;###autoload
@@ -315,6 +313,76 @@
     (browse-url url)))
 
 ;; completion-at-point
+(defvar sci-wolfram-lsp-symbols-script
+  (expand-file-name "sciWolframLSPSymbols.wl" sci-wolfram-script-directory))
+
+(defvar sci-wolfram-lsp-symbols-directory
+  (expand-file-name "LSPSymbols" sci-wolfram-script-directory))
+
+(unless (file-directory-p sci-wolfram-lsp-symbols-directory)
+  (make-directory sci-wolfram-lsp-symbols-directory))
+
+(unless (seq-every-p
+         (lambda (file) (member file (directory-files sci-wolfram-lsp-symbols-directory nil "\\.el\\'")))
+         '("sci-wolfram-lsp-symbols-builtin-functions-1.el"
+           "sci-wolfram-lsp-symbols-builtin-functions-2.el"
+           "sci-wolfram-lsp-symbols-builtin-functions-3.el"
+           "sci-wolfram-lsp-symbols-builtin-functions-4.el"
+           "sci-wolfram-lsp-symbols-builtin-functions-5.el"
+           "sci-wolfram-lsp-symbols-constants.el"
+           "sci-wolfram-lsp-symbols-options.el"
+           "sci-wolfram-lsp-symbols-session-symbols.el"
+           "sci-wolfram-lsp-symbols-experimental-symbols.el"
+           "sci-wolfram-lsp-symbols-undocumented-symbols.el"
+           "sci-wolfram-lsp-symbols-obsolete-symbols.el"
+           "sci-wolfram-lsp-symbols-bad-symbols.el"
+           "sci-wolfram-lsp-symbols-system-long-names.el"
+           "sci-wolfram-lsp-symbols-free-long-names.el"
+           "sci-wolfram-lsp-symbols-special-long-names.el"
+           "sci-wolfram-lsp-symbols-undocumented-long-names.el"
+           "sci-wolfram-lsp-symbols-unsupported-long-names.el"))
+  (message "Convert wolfram LSPServer symbols to emacs symbols")
+  (shell-command (format "wolframscript -script %s" sci-wolfram-lsp-symbols-script)))
+
+(add-to-list 'load-path sci-wolfram-lsp-symbols-directory)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-1)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-2)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-3)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-4)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-5)
+(require 'sci-wolfram-lsp-symbols-constants)
+(require 'sci-wolfram-lsp-symbols-options)
+(require 'sci-wolfram-lsp-symbols-session-symbols)
+(require 'sci-wolfram-lsp-symbols-experimental-symbols)
+(require 'sci-wolfram-lsp-symbols-undocumented-symbols)
+(require 'sci-wolfram-lsp-symbols-obsolete-symbols)
+(require 'sci-wolfram-lsp-symbols-bad-symbols)
+(require 'sci-wolfram-lsp-symbols-system-long-names)
+(require 'sci-wolfram-lsp-symbols-free-long-names)
+(require 'sci-wolfram-lsp-symbols-special-long-names)
+(require 'sci-wolfram-lsp-symbols-undocumented-long-names)
+(require 'sci-wolfram-lsp-symbols-unsupported-long-names)
+
+(defvar sci-wolfram-lsp-symbols
+  (append
+   sci-wolfram-lsp-symbols-builtin-functions-1
+   sci-wolfram-lsp-symbols-builtin-functions-2
+   sci-wolfram-lsp-symbols-builtin-functions-3
+   sci-wolfram-lsp-symbols-builtin-functions-4
+   sci-wolfram-lsp-symbols-builtin-functions-5
+   sci-wolfram-lsp-symbols-constants
+   sci-wolfram-lsp-symbols-options
+   sci-wolfram-lsp-symbols-session-symbols
+   sci-wolfram-lsp-symbols-experimental-symbols
+   sci-wolfram-lsp-symbols-undocumented-symbols
+   sci-wolfram-lsp-symbols-obsolete-symbols
+   sci-wolfram-lsp-symbols-bad-symbols
+   sci-wolfram-lsp-symbols-system-long-names
+   sci-wolfram-lsp-symbols-free-long-names
+   sci-wolfram-lsp-symbols-special-long-names
+   sci-wolfram-lsp-symbols-undocumented-long-names
+   sci-wolfram-lsp-symbols-unsupported-long-names))
+
 (defun sci-wolfram-completion-at-point ()
   "Add wolfram symbols to completion-at-point."
   (when-let* ((bounds (bounds-of-thing-at-point 'symbol)))
@@ -324,8 +392,7 @@
 	  :exclusive 'no)))
 
 (add-hook 'sci-wolfram-mode-hook
-          (lambda ()
-            (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
+          (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
 
 (defun ob-wolfram-completion-at-point ()
   (when-let* ((info (org-babel-get-src-block-info))
@@ -334,20 +401,30 @@
       (sci-wolfram-completion-at-point))))
 
 (add-hook 'org-mode-hook
-          (lambda ()
-            (add-hook 'completion-at-point-functions #'ob-wolfram-completion-at-point nil t)))
+          (lambda () (add-hook 'completion-at-point-functions #'ob-wolfram-completion-at-point nil t)))
 
 ;; wolfram LSPServer
-(defvar sci-wolfram-kernel-txt (concat sci-wolfram-script-directory "sci-wolfram-kernel.txt"))
+(defvar sci-wolfram-kernel-script
+  (expand-file-name "sci-wolfram-kernel.el" sci-wolfram-script-directory))
 
-(unless (file-exists-p sci-wolfram-kernel-txt)
-  (with-temp-file sci-wolfram-kernel-txt
-    (insert (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'")))))
+(unless (file-exists-p sci-wolfram-kernel-script)
+  (with-temp-file sci-wolfram-kernel-script
+    (let ((kernel (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'")))
+          (n "\n"))
+      (insert (concat
+               ";;; sci-wolfram-kernel.el --- Wolfram kernel location -*- lexical-binding: t -*-"
+               n n ";;; Commentary:"
+               n n ";; AUTO GENERATED FILE"
+               n n ";;; Code:"
+               n n "(defcustom sci-wolfram-kernel"
+               n (format "\"%s\"" kernel)  
+               n "\"Wolfram kernel location\""
+               n ":type 'string"
+               n ":group 'sci-wolfram-mode)"
+               n n n"(provide 'sci-wolfram-kernel)"
+               n";;; sci-wolfram-kernel.el ends here")))))
 
-(defvar sci-wolfram-kernel
-  (with-temp-buffer
-    (insert-file-contents sci-wolfram-kernel-txt)
-    (buffer-string)))
+(require 'sci-wolfram-kernerl)
 
 ;; ref:
 ;; https://github.com/transentis/wolfram-language-mode
@@ -356,12 +433,12 @@
   (list sci-wolfram-kernel
         "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
         (concat "Needs[\"LSPServer`\"];"
-                "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\" -> 120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
+                "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
                 "LSPServer`StartServer[]")))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-               (list (cons 'sci-wolfram-mode sci-wolfram-lsp-server))))
+               (cons 'sci-wolfram-mode sci-wolfram-lsp-server)))
 
 (with-eval-after-load 'lsp-mode
   (lsp-register-client
@@ -406,7 +483,7 @@
     ;; (modify-syntax-entry ?\\ "." synTable)
     synTable))
 
-(setq sci-wolfram-mode-syntax-table (make-syntax-table))
+;; (setq sci-wolfram-mode-syntax-table (make-syntax-table))
 
 ;; font-lock
 (defvar sci-wolfram-font-lock-keywords
@@ -466,6 +543,27 @@
 ;;;###autoload
 (with-eval-after-load 'org-src
   (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
+
+;; prettify symbols
+(defvar sci-wolfram-prettify-symbols-convert-script
+  (expand-file-name  "sciWolframPrettifySymbols.wl" sci-wolfram-script-directory))
+
+(defvar sci-wolfram-prettify-symbols-script
+  (expand-file-name "sci-wolfram-prettify-symbols.el" sci-wolfram-script-directory))
+
+(unless (file-exists-p sci-wolfram-prettify-symbols-script)
+  (message "Convert wolfram symbols to emacs prettify symbols")
+  (shell-command (format "wolframscript -script %s" sci-wolfram-prettify-symbols-convert-script)))
+
+(require 'sci-wolfram-prettify-symbols)
+
+(defun sci-wolfram-prettify-symbols ()
+  (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols-alist)
+  (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
+  ;; (setq-local prettify-symbols-unprettify-at-point nil)
+  (prettify-symbols-mode 1))
+
+(add-hook 'sci-wolfram-mode-hook #'sci-wolfram-prettify-symbols)
 
 
 (provide 'sci-wolfram)
