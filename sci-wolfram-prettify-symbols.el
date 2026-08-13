@@ -1,4 +1,4 @@
-;;; sci-wolfram-prettify-symbols.el --- Wolfram characters for prettify-symbols-mode -*- lexical-binding: t -*-
+;;; sci-wolfram-prettify-symbols.el --- Convert wolfram characters to emacs prettify symbols -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2025-2026 PENG
 
@@ -28,18 +28,20 @@
 
 ;;; Commentary:
 
-;; Wolfram characters for prettify-symbols-mode
+;; Convert wolfram characters to emacs prettify symbols
 
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
-(let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-  (defvar sci-wolfram-prettify-symbols-convert-script
-    (expand-file-name  "sciWolframPrettifySymbols.wl" dir))
+(defvar sci-wolfram-prettify-symbols-directory
+  (file-name-directory (or load-file-name buffer-file-name)))
 
-  (defvar sci-wolfram-prettify-symbols-alist-script
-    (expand-file-name "sci-wolfram-prettify-symbols-alist.el" dir)))
+(defvar sci-wolfram-prettify-symbols-convert-script
+  (expand-file-name  "sciWolframPrettifySymbols.wl" sci-wolfram-prettify-symbols-directory))
+
+(defvar sci-wolfram-prettify-symbols-alist-script
+  (expand-file-name "sci-wolfram-prettify-symbols-alist.el" sci-wolfram-prettify-symbols-directory))
 
 (unless (file-exists-p sci-wolfram-prettify-symbols-alist-script)
   (message "Convert wolfram characters to emacs prettify symbols")

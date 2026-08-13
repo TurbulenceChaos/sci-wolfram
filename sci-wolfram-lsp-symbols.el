@@ -34,18 +34,20 @@
 
 ;;; Code:
 
-(let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-  (defvar sci-wolfram-lsp-symbols-script
-    (expand-file-name "sciWolframLSPSymbols.wl" dir))
+(defvar sci-wolfram-lsp-symbols-directory
+  (file-name-directory (or load-file-name buffer-file-name)))
 
-  (defvar sci-wolfram-lsp-symbols-directory
-    (expand-file-name "LSPSymbols" dir)))
+(defvar sci-wolfram-lsp-symbols-script
+  (expand-file-name "sciWolframLSPSymbols.wl" sci-wolfram-lsp-symbols-directory))
 
-(unless (file-directory-p sci-wolfram-lsp-symbols-directory)
-  (make-directory sci-wolfram-lsp-symbols-directory))
+(defvar sci-wolfram-lsp-symbols-script-directory
+  (expand-file-name "LSPSymbols" sci-wolfram-lsp-symbols-directory))
+
+(unless (file-directory-p sci-wolfram-lsp-symbols-script-directory)
+  (make-directory sci-wolfram-lsp-symbols-script-directory))
 
 (unless (seq-every-p
-         (lambda (file) (member file (directory-files sci-wolfram-lsp-symbols-directory nil "\\.el\\'")))
+         (lambda (file) (member file (directory-files sci-wolfram-lsp-symbols-script-directory nil "\\.el\\'")))
          '("sci-wolfram-lsp-symbols-builtin-functions-1.el"
            "sci-wolfram-lsp-symbols-builtin-functions-2.el"
            "sci-wolfram-lsp-symbols-builtin-functions-3.el"
@@ -66,7 +68,7 @@
   (message "Convert wolfram LSPServer symbols to emacs symbols")
   (shell-command (format "wolframscript -script %s" sci-wolfram-lsp-symbols-script)))
 
-(add-to-list 'load-path sci-wolfram-lsp-symbols-directory)
+(add-to-list 'load-path sci-wolfram-lsp-symbols-script-directory)
 (require 'sci-wolfram-lsp-symbols-builtin-functions-1)
 (require 'sci-wolfram-lsp-symbols-builtin-functions-2)
 (require 'sci-wolfram-lsp-symbols-builtin-functions-3)

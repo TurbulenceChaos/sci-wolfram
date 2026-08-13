@@ -344,7 +344,7 @@
 ;; https://github.com/transentis/wolfram-language-mode
 ;; https://github.com/WolframResearch/vscode-wolfram
 (defvar sci-wolfram-lsp-server
-  (list sci-wolfram-kernel-location
+  (list sci-wolfram-kernel
         "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
         (concat "Needs[\"LSPServer`\"];"
                 "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
@@ -396,8 +396,6 @@
     (modify-syntax-entry ?~ "." synTable)
     ;; (modify-syntax-entry ?\\ "." synTable)
     synTable))
-
-;; (setq sci-wolfram-mode-syntax-table (make-syntax-table))
 
 ;; font-lock
 (defvar sci-wolfram-font-lock-keywords
