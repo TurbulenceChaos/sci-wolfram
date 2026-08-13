@@ -375,11 +375,12 @@
                (cons 'sci-wolfram-mode sci-wolfram-lsp-server)))
 
 (with-eval-after-load 'lsp-mode
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection sci-wolfram-lsp-server)
-    :major-modes '(sci-wolfram-mode)
-    :server-id 'wolfram-lsp)))
+  (add-to-list 'lsp-language-id-configuration '(sci-wolfram-mode . "wolfram"))
+
+  (lsp-register-client (make-lsp-client
+                        :new-connection (lsp-stdio-connection sci-wolfram-lsp-server)
+                        :activation-fn (lsp-activate-on "wolfram")
+                        :server-id 'wolfram-lsp)))
 
 ;; syntax table
 (defvar sci-wolfram-mode-syntax-table
