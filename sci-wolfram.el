@@ -424,7 +424,7 @@
                n n n"(provide 'sci-wolfram-kernel)"
                n";;; sci-wolfram-kernel.el ends here")))))
 
-(require 'sci-wolfram-kernerl)
+(require 'sci-wolfram-kernel)
 
 ;; ref:
 ;; https://github.com/transentis/wolfram-language-mode
