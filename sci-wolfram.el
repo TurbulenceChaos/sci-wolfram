@@ -313,7 +313,8 @@
     (browse-url url)))
 
 ;; completion-at-point
-(require 'sci-wolfram-lsp-symbols)
+(eval-when-compile
+  (require 'sci-wolfram-lsp-symbols))
 
 (defvar sci-wolfram-lsp-symbols
   (append
@@ -476,7 +477,8 @@
   (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
 
 ;; prettify symbols
-(require 'sci-wolfram-prettify-symbols)
+(eval-when-compile
+  (require 'sci-wolfram-prettify-symbols))
 
 
 (provide 'sci-wolfram)

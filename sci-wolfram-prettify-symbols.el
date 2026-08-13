@@ -51,7 +51,7 @@
 
 (defun sci-wolfram-prettify-symbols ()
   (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols-alist)
-  (setq-local prettify-symbols-compose-predicate (lambda () t))
+  (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
   ;; (setq-local prettify-symbols-unprettify-at-point nil)
   (prettify-symbols-mode 1))
 
