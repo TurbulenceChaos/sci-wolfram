@@ -344,7 +344,7 @@
 ;; https://github.com/transentis/wolfram-language-mode
 ;; https://github.com/WolframResearch/vscode-wolfram
 (defvar sci-wolfram-lsp-server
-  (list sci-wolfram-kernel
+  (list sci-wolfram-kernel-location
         "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
         (concat "Needs[\"LSPServer`\"];"
                 "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
@@ -461,6 +461,7 @@
 ;; prettify symbols
 (eval-when-compile
   (require 'sci-wolfram-prettify-symbols))
+
 
 (provide 'sci-wolfram)
 ;;; sci-wolfram.el ends here

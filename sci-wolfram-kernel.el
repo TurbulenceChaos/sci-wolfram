@@ -25,5 +25,6 @@
 
 (require 'sci-wolfram-kernel-location)
 
+
 (provide 'sci-wolfram-kernel)
 ;;; sci-wolfram-kernel.el ends here
