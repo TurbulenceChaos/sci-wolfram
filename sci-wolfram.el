@@ -347,14 +347,16 @@
 (add-hook 'sci-wolfram-mode-hook
           (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
 
-(defun ob-wolfram-completion-at-point ()
-  (when-let* ((info (org-babel-get-src-block-info))
-	      (lang (nth 0 info)))
-    (when (string= lang "wolfram")
-      (sci-wolfram-completion-at-point))))
-
+;;;###autoload
 (add-hook 'org-mode-hook
-          (lambda () (add-hook 'completion-at-point-functions #'ob-wolfram-completion-at-point nil t)))
+          (lambda () (add-hook 'completion-at-point-functions
+                               (lambda ()
+                                 (when (org-in-src-block-p t)
+                                   (let* ((info (org-babel-get-src-block-info))
+	                                  (lang (nth 0 info)))
+                                     (when (string= lang "wolfram")
+                                       (sci-wolfram-completion-at-point)))))
+                               nil t)))
 
 ;; wolfram LSPServer
 (eval-and-compile
