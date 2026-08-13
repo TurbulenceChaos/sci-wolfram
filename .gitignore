@@ -6,6 +6,6 @@ sci-wolfram-pkg.el
 ltximg/
 *.nb
 *.pdf
-/sci-wolfram-kernel.el
-/sci-wolfram-prettify-symbols.el
 /LSPSymbols
+/sci-wolfram-kernel-location.el
+/sci-wolfram-prettify-symbols-alist.el
