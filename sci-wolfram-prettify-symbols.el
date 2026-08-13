@@ -45,6 +45,8 @@
   (message "Convert wolfram characters to emacs prettify symbols")
   (shell-command (format "wolframscript -script %s" sci-wolfram-prettify-symbols-convert-script)))
 
+(require 'sci-wolfram-prettify-symbols-alist)
+
 (defun sci-wolfram-prettify-symbols ()
   (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols-alist)
   (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
