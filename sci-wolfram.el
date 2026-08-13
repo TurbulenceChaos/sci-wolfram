@@ -313,7 +313,7 @@
     (browse-url url)))
 
 ;; completion-at-point
-(eval-when-compile
+(eval-and-compile
   (require 'sci-wolfram-lsp-symbols))
 
 (defvar sci-wolfram-lsp-symbols
@@ -357,7 +357,7 @@
           (lambda () (add-hook 'completion-at-point-functions #'ob-wolfram-completion-at-point nil t)))
 
 ;; wolfram LSPServer
-(eval-when-compile
+(eval-and-compile
   (require 'sci-wolfram-kernel))
 
 ;; reference:
@@ -477,7 +477,7 @@
   (add-to-list 'org-src-lang-modes '("wolfram" . sci-wolfram)))
 
 ;; prettify symbols
-(eval-when-compile
+(eval-and-compile
   (require 'sci-wolfram-prettify-symbols))
 
 
