@@ -68,7 +68,7 @@
   (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
 	 (code (concat
                 (ob-wolfram-remove-empty-lines body)
-                (format "\n\"%s\"\n" eoe)))
+                (format "\nWriteString[\"stdout\",\"%s\\n\"];\n" eoe)))
 	 (result (org-babel-comint-with-output
                      (ob-wolfram-session eoe)
                    (comint-send-string ob-wolfram-session code))))
@@ -76,7 +76,7 @@
 
 (defun ob-wolfram-initiate-session ()
   (unless ob-wolfram-session-initiated
-    (ob-wolfram-evaluate-session "\"Initiate wolfram babel session\"\n")
+    (ob-wolfram-evaluate-session "WriteString[\"stdout\",\"Initiate wolfram babel session\\n\"];\n")
     (setq ob-wolfram-session-initiated t)))
 
 ;; display inline images in babel result
@@ -155,9 +155,9 @@ See `org-babel-comint-async-chunk-callback'."
          (start (format "ob_wolfram_async_start_%s" uuid))
          (end   (format "ob_wolfram_async_end_%s" uuid))
          (code (concat
-		(format "\"%s\"\n" start)
+		(format "WriteString[\"stdout\",\"%s\\n\"]\n" start)
 		(ob-wolfram-remove-empty-lines body)
-		(format "\n\"%s\"\n" end))))
+		(format "\nWriteString[\"stdout\",\"%s\\n\"]\n" end))))
     (comint-send-string ob-wolfram-session code)
     uuid))
 

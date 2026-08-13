@@ -14,7 +14,7 @@
   (with-temp-buffer
     (insert-file-contents sci-wolfram-kernel-location)
     (buffer-string))
-  "Wolfram kernel location"
+  "Wolfram kernel location used for eglot or lsp-mode."
   :type 'string
   :group 'sci-wolfram-mode)
 
