@@ -40,6 +40,7 @@
 (require 'org)
 (require 'ob-core)
 (require 'ob-comint)
+(require 'cl-seq)
 
 (defvar ob-wolfram-session "*Wolfram REPL*")
 

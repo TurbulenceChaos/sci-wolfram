@@ -42,6 +42,7 @@
 
 (require 'org-src)
 (require 'ob-wolfram)
+(require 'bytecomp)
 
 ;; group for `sci-wolfram-mode'
 ;;;###autoload
