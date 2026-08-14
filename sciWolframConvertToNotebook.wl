@@ -14,7 +14,7 @@ systemGraphicsSymbols = Names["Graphics*"];
 
 systemSymbols = ToExpression @ Join[systemFormSymbols, systemManipulateSymbols, systemGraphicsSymbols];
 
-(* Ref: https://community.wolfram.com/groups/-/m/t/37054 *)
+(* reference: https://community.wolfram.com/groups/-/m/t/37054 *)
 
 systemSymbolsReplace = # -> Defer[#]& /@ systemSymbols;
 
@@ -67,5 +67,3 @@ sciWolframConvertToNotebook[file_] := Block[{$Post},
 End[];
 
 EndPackage[];
-
-
