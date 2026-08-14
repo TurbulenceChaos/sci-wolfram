@@ -314,7 +314,35 @@
 
 ;; completion-at-point
 (eval-and-compile
-  (require 'sci-wolfram-lsp-symbols))
+  (let* ((dir default-directory)
+         (script (expand-file-name "sciWolframLSPSymbols.wl" dir))
+         (symbols (expand-file-name "LSPSymbols" dir)))
+    (unless (file-directory-p symbols)
+      (make-directory symbols))
+
+    (add-to-list 'load-path symbols)
+
+    (unless (directory-files symbols nil "\\.el\\'")
+      (message "Convert wolfram LSPServer symbols to emacs symbols")
+      (shell-command (format "wolframscript -script %s" script)))))
+
+(require 'sci-wolfram-lsp-symbols-builtin-functions-1)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-2)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-3)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-4)
+(require 'sci-wolfram-lsp-symbols-builtin-functions-5)
+(require 'sci-wolfram-lsp-symbols-constants)
+(require 'sci-wolfram-lsp-symbols-options)
+(require 'sci-wolfram-lsp-symbols-session-symbols)
+(require 'sci-wolfram-lsp-symbols-experimental-symbols)
+(require 'sci-wolfram-lsp-symbols-undocumented-symbols)
+(require 'sci-wolfram-lsp-symbols-obsolete-symbols)
+(require 'sci-wolfram-lsp-symbols-bad-symbols)
+(require 'sci-wolfram-lsp-symbols-system-long-names)
+(require 'sci-wolfram-lsp-symbols-free-long-names)
+(require 'sci-wolfram-lsp-symbols-special-long-names)
+(require 'sci-wolfram-lsp-symbols-undocumented-long-names)
+(require 'sci-wolfram-lsp-symbols-unsupported-long-names)
 
 (defvar sci-wolfram-lsp-symbols
   (append
@@ -360,7 +388,20 @@
 
 ;; wolfram LSPServer
 (eval-and-compile
-  (require 'sci-wolfram-kernel))
+  (defvar sci-wolfram-kernel-location
+    (expand-file-name "sci-wolfram-kernel-location.txt" default-directory))
+
+  (unless (file-exists-p sci-wolfram-kernel-location)
+    (with-temp-file sci-wolfram-kernel-location
+      (insert (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'"))))))
+
+(defcustom sci-wolfram-kernel
+  (with-temp-buffer
+    (insert-file-contents sci-wolfram-kernel-location)
+    (buffer-string))
+  "Wolfram kernel used for eglot or lsp-mode."
+  :type 'string
+  :group 'sci-wolfram-mode)
 
 ;; reference:
 ;; https://github.com/transentis/wolfram-language-mode
@@ -454,7 +495,21 @@
 
 ;; prettify symbols
 (eval-and-compile
-  (require 'sci-wolfram-prettify-symbols))
+  (let* ((dir default-directory)
+         (script (expand-file-name "sciWolframPrettifySymbols.wl" dir))
+         (symbols (expand-file-name "sci-wolfram-prettify-symbols.el" dir)))
+    (unless (file-exists-p symbols)
+      (message "Convert wolfram characters to emacs prettify symbols")
+      (shell-command (format "wolframscript -script %s" script)))))
+
+(require 'sci-wolfram-prettify-symbols)
+
+(add-hook 'sci-wolfram-mode-hook
+          (lambda ()
+            (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols)
+            (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
+            ;; (setq-local prettify-symbols-unprettify-at-point nil)
+            (prettify-symbols-mode 1)))
 
 
 (provide 'sci-wolfram)

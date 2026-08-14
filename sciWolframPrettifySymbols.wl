@@ -43,7 +43,7 @@ wolframCharacters = MapAt[wolframCharactersReplace, wolframCharacters, {All, 2}]
 
 emacsSymbolsFormat = StringRiffle[MapApply[StringTemplate["(`1` . `2`)"], wolframCharacters], "\n"];
 
-emacsFileName = "sci-wolfram-prettify-symbols-alist";
+emacsFileName = "sci-wolfram-prettify-symbols";
 
 emacsSymbols = StringTemplate[
 ";;; `1`.el --- Wolfram prettify symbols alist -*- lexical-binding: t -*-\n
