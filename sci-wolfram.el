@@ -392,6 +392,7 @@
     (expand-file-name "sci-wolfram-kernel-location.txt" (file-name-directory (or byte-compile-current-file load-file-name buffer-file-name))))
 
   (unless (file-exists-p sci-wolfram-kernel-location)
+    (message "Get wolfram kernel location")
     (with-temp-file sci-wolfram-kernel-location
       (insert (string-trim-right (shell-command-to-string "wolframscript -code 'First[$CommandLine]'"))))))
 

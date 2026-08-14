@@ -6,7 +6,7 @@ Email: [p.peng01@outlook.com](mailto:p.peng01@outlook.com)
 GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wolfram)
 
 # Table of Contents
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+<!-- markdown_toc_begin -->
 - [Introduction](#introduction)
 - [Features for Emacs](#features-for-emacs)
 - [Features for VSCode](#features-for-vscode)
@@ -23,10 +23,9 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
   - [For Wolfram REPL](#for-wolfram-repl)
   - [Convert Wolfram Script to PDF and Mathematica Notebook](#convert-wolfram-script-to-pdf-and-mathematica-notebook)
 - [Change Log](#change-log)
-  - [v3.0.0](#v300)
+  - [v3.0.0](#v3.0.0)
 - [Reference](#reference)
-
-<!-- markdown-toc end -->
+<!-- markdown_toc_end -->
 
 # Introduction
 An all-in-one Wolfram Mathematica package for Emacs.
@@ -46,7 +45,7 @@ Display wolfram script images in Visual Studio Code Terminal.
 
 # Installation for Emacs
 ## Prerequisites
-- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **wolfram player**), or **Mathematica**\
 Required for running wolfram scripts
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 Preview latex formula in emacs org-mode:
@@ -97,7 +96,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 Default leader key in sci-wolfram-mode is `Ctrl-c`, or you can just type `M-x sci-wolfram-` to use all interactive functions.
 
 ## For Wolfram Script File
-`sci-wolfram-run-region-or-buffer`
+`M-x sci-wolfram-run-region-or-buffer`
 
 Display images, latex fragments, and Wolfram Player interactive files.
 
@@ -105,13 +104,13 @@ Display images, latex fragments, and Wolfram Player interactive files.
 
 https://github.com/user-attachments/assets/ce9bd35c-2226-4060-9d21-d16a909705e9
 
-`eglot` or `lsp-mode`
+`M-x eglot` or `M-x lsp`
 
 Support auto-completion and formatting.
 
 https://github.com/user-attachments/assets/dd92aec6-ac95-48c4-81a3-dfebaa373410
 
-`sci-wolfram-convert-to-notebook`
+`M-x sci-wolfram-convert-to-notebook`
 
 Convert region or buffer code to PDF and Mathematica notebook.
 
@@ -119,13 +118,13 @@ You can using `TextCell` to add title, subtitle, section, text, formula, etc to 
 
 https://github.com/user-attachments/assets/e1cc634e-df51-4e83-86be-397e95eb9588
 
-`sci-wolfram-prettify-symbols`
+`M-x sci-wolfram-prettify-symbols`
 
 Toggle with `M-x prettify-symbols-mode`
 
 https://github.com/user-attachments/assets/e3280367-7d27-4987-842f-3df41b1535e0
 
-`sci-wolfram-doc-lookup`
+`M-x sci-wolfram-doc-lookup`
 
 Search wolfram doc in web.
 
@@ -155,13 +154,13 @@ Support auto-completion inside wolfram src-block.
 
 https://github.com/user-attachments/assets/44f5aa76-fed0-413f-b71e-b199f4fd04d7
 
-`sci-wolfram-format-region-or-buffer`
+`M-x sci-wolfram-format-region-or-buffer`
 
 Format region or wolfram src-block code.
 
 https://github.com/user-attachments/assets/de4a3d06-751e-41fb-8602-0a3a844ac9e9
 
-`sci-wolfram-convert-to-notebook`
+`M-x sci-wolfram-convert-to-notebook`
 
 Convert region or wolfram src-block code to PDF and Mathematica notebook.
 
@@ -236,7 +235,7 @@ https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 # Change Log
 ## v3.0.0
 - **Add Wolfram REPL async session calc support**
-- **Remove emacs-jupyter package dependency**
+- **Remove [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency**
 - Refactor `sciWolframDisplayImage.wl` and `sciWolframConvertToNotebook.wl` package
 
 # Reference
