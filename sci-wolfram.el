@@ -299,20 +299,6 @@
     (org-edit-src-exit))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
-;; wolfram documentation lookup
-;;;###autoload
-(defun sci-wolfram-doc-lookup ()
-  "Look up wolfram documentation in browser."
-  (interactive)
-  (let* ((symbol
-	  (or (if (region-active-p)
-	          (buffer-substring-no-properties (region-beginning) (region-end))
-	        (when-let* ((word (current-word)))
-                  (upcase-initials word)))
-              (upcase-initials (read-string "Wolfram symbol: "))))
-         (url (format "https://reference.wolfram.com/language/ref/%s.html" symbol)))
-    (browse-url url)))
-
 ;; completion-at-point
 (eval-and-compile
   (let* ((dir (file-name-directory (or byte-compile-current-file load-file-name buffer-file-name)))
@@ -386,6 +372,20 @@
                                      (when (string= lang "wolfram")
                                        (sci-wolfram-completion-at-point)))))
                                nil t)))
+
+;; wolfram documentation lookup
+;;;###autoload
+(defun sci-wolfram-doc-lookup ()
+  "Look up wolfram documentation in browser."
+  (interactive)
+  (let* ((symbol
+	  (or (if (region-active-p)
+	          (buffer-substring-no-properties (region-beginning) (region-end))
+	        (when-let* ((word (current-word)))
+                  (upcase-initials word)))
+              (upcase-initials (completing-read "Wolfram symbol: " sci-wolfram-lsp-symbols))))
+         (url (format "https://reference.wolfram.com/language/ref/%s.html" symbol)))
+    (browse-url url)))
 
 ;; wolfram LSPServer
 (eval-and-compile
