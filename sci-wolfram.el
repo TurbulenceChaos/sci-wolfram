@@ -427,12 +427,14 @@
 
 ;; syntax table
 (defvar sci-wolfram-mode-syntax-table
-  (let ((synTable (make-syntax-table)))
+  (let ((syntax-table (make-syntax-table)))
     ;; comment
-    (modify-syntax-entry ?\( "()1n" synTable)
-    (modify-syntax-entry ?\) ")(4n" synTable)
-    (modify-syntax-entry ?* ". 23n" synTable)
-    synTable))
+    (modify-syntax-entry ?\( "()1n"  syntax-table)
+    (modify-syntax-entry ?\) ")(4n"  syntax-table)
+    (modify-syntax-entry ?*  ". 23n" syntax-table)
+    ;; \[Omega]
+    (modify-syntax-entry ?\\ "."     syntax-table)
+    syntax-table))
 
 ;; font-lock
 (defvar sci-wolfram-mode-font-lock-keywords
