@@ -314,7 +314,7 @@
 
 ;; completion-at-point
 (eval-and-compile
-  (let* ((dir (file-name-directory (or load-file-name buffer-file-name default-directory)))
+  (let* ((dir (file-name-directory (or byte-compile-current-file load-file-name buffer-file-name)))
          (script (expand-file-name "sciWolframLSPSymbols.wl" dir))
          (symbols (expand-file-name "LSPSymbols" dir)))
     (unless (file-directory-p symbols)
@@ -389,7 +389,7 @@
 ;; wolfram LSPServer
 (eval-and-compile
   (defvar sci-wolfram-kernel-location
-    (expand-file-name "sci-wolfram-kernel-location.txt" (file-name-directory (or load-file-name buffer-file-name default-directory))))
+    (expand-file-name "sci-wolfram-kernel-location.txt" (file-name-directory (or byte-compile-current-file load-file-name buffer-file-name))))
 
   (unless (file-exists-p sci-wolfram-kernel-location)
     (with-temp-file sci-wolfram-kernel-location
@@ -497,7 +497,7 @@
 
 ;; prettify symbols
 (eval-and-compile
-  (let* ((dir (file-name-directory (or load-file-name buffer-file-name default-directory)))
+  (let* ((dir (file-name-directory (or byte-compile-current-file load-file-name buffer-file-name)))
          (script (expand-file-name "sciWolframPrettifySymbols.wl" dir))
          (symbols (expand-file-name "sci-wolfram-prettify-symbols.el" dir)))
     (unless (file-exists-p symbols)
