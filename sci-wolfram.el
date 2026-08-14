@@ -391,84 +391,57 @@
     (modify-syntax-entry ?\( "()1n" synTable)
     (modify-syntax-entry ?\) ")(4n" synTable)
     (modify-syntax-entry ?* ". 23n" synTable)
-    ;; symbol
-    (modify-syntax-entry ?$ "_" synTable)
-    ;; punctuation
-    (modify-syntax-entry ?! "." synTable)
-    (modify-syntax-entry ?# "." synTable)
-    (modify-syntax-entry ?% "." synTable)
-    (modify-syntax-entry ?& "." synTable)
-    (modify-syntax-entry ?' "." synTable)
-    (modify-syntax-entry ?+ "." synTable)
-    (modify-syntax-entry ?, "." synTable)
-    (modify-syntax-entry ?- "." synTable)
-    (modify-syntax-entry ?. "." synTable)
-    (modify-syntax-entry ?/ "." synTable)
-    (modify-syntax-entry ?: "." synTable)
-    (modify-syntax-entry ?\; "." synTable)
-    (modify-syntax-entry ?< "." synTable)
-    (modify-syntax-entry ?= "." synTable)
-    (modify-syntax-entry ?> "." synTable)
-    (modify-syntax-entry ?? "." synTable)
-    (modify-syntax-entry ?@ "." synTable)
-    ;; (modify-syntax-entry ?\ "." synTable)
-    (modify-syntax-entry ?^ "." synTable)
-    (modify-syntax-entry ?_ "." synTable)
-    (modify-syntax-entry ?` "." synTable)
-    (modify-syntax-entry ?| "." synTable)
-    (modify-syntax-entry ?~ "." synTable)
-    ;; (modify-syntax-entry ?\\ "." synTable)
     synTable))
 
 ;; font-lock
-(defvar sci-wolfram-font-lock-keywords
+(defvar sci-wolfram-mode-font-lock-keywords
   (list
-   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-1 'symbols)                                      'font-lock-function-name-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-2 'symbols)                                      'font-lock-function-name-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-3 'symbols)                                      'font-lock-function-name-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-4 'symbols)                                      'font-lock-function-name-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-5 'symbols)                                      'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-1 'symbols)                     'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-2 'symbols)                     'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-3 'symbols)                     'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-4 'symbols)                     'font-lock-function-name-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-5 'symbols)                     'font-lock-function-name-face)
 
-   (cons (regexp-opt sci-wolfram-lsp-symbols-constants 'symbols)                                                'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-options 'symbols)                                                  'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-session-symbols 'symbols)                                          'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-experimental-symbols 'symbols)                                     'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-undocumented-symbols 'symbols)                                     'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-obsolete-symbols 'symbols)                                         'font-lock-builtin-face)
-   (cons (regexp-opt sci-wolfram-lsp-symbols-bad-symbols 'symbols)                                              'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-constants 'symbols)                               'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-options 'symbols)                                 'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-session-symbols 'symbols)                         'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-experimental-symbols 'symbols)                    'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-undocumented-symbols 'symbols)                    'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-obsolete-symbols 'symbols)                        'font-lock-builtin-face)
+   (cons (regexp-opt sci-wolfram-lsp-symbols-bad-symbols 'symbols)                             'font-lock-builtin-face)
 
-   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-system-long-names))       'font-lock-constant-face)
-   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-free-long-names))         'font-lock-constant-face)
-   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-special-long-names))      'font-lock-constant-face)
-   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-undocumented-long-names)) 'font-lock-constant-face)
-   (cons (regexp-opt (mapcar (lambda (s) (format "\\[%s]" s)) sci-wolfram-lsp-symbols-unsupported-long-names))  'font-lock-constant-face)
+   (cons (concat "\\\\\\[" (regexp-opt sci-wolfram-lsp-symbols-system-long-names) "\\]")       'font-lock-constant-face)
+   (cons (concat "\\\\\\[" (regexp-opt sci-wolfram-lsp-symbols-free-long-names) "\\]")         'font-lock-constant-face)
+   (cons (concat "\\\\\\[" (regexp-opt sci-wolfram-lsp-symbols-special-long-names) "\\]")      'font-lock-constant-face)
+   (cons (concat "\\\\\\[" (regexp-opt sci-wolfram-lsp-symbols-undocumented-long-names) "\\]") 'font-lock-constant-face)
+   (cons (concat "\\\\\\[" (regexp-opt sci-wolfram-lsp-symbols-unsupported-long-names) "\\]")  'font-lock-constant-face)
 
-   (cons "[A-Za-z][A-Za-z0-9]*"                                                                                 'font-lock-variable-name-face)))
+   (cons "[A-Za-z][A-Za-z0-9]*"                                                                'font-lock-variable-name-face)))
 
 ;; keybinding
 (defvar sci-wolfram-mode-map (make-sparse-keymap))
-(defvar sci-wolfram-leader-map (make-sparse-keymap))
-(defvar sci-wolfram-leader-key "C-c" "sci-wolfram leader key.")
-(defvar sci-wolfram-key-map
+(defvar sci-wolfram-mode-leader-key-map (make-sparse-keymap))
+(defvar sci-wolfram-mode-leader-key "C-c" "sci-wolfram-mode leader key")
+(defvar sci-wolfram-mode-key
   '((sci-wolfram-doc-lookup . "h")
     (sci-wolfram-run-repl . "t")
     (sci-wolfram-import-package . "i")
     (sci-wolfram-format-region-or-buffer . "f")
     (sci-wolfram-run-region-or-buffer . "r")
     (sci-wolfram-convert-to-notebook . "c"))
-  "sci-wolfram key map")
+  "sci-wolfram-mode keymap")
 
-(dolist (key-map sci-wolfram-key-map)
-  (define-key sci-wolfram-leader-map (kbd (cdr key-map)) (car key-map)))
-(define-key sci-wolfram-mode-map (kbd sci-wolfram-leader-key) sci-wolfram-leader-map)
+(dolist (key sci-wolfram-mode-key)
+  (define-key sci-wolfram-mode-leader-key-map (kbd (cdr key)) (car key)))
+(define-key sci-wolfram-mode-map (kbd sci-wolfram-mode-leader-key) sci-wolfram-mode-leader-key-map)
 
 ;; sci-wolfram-mode
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
   "Major mode for Wolfram Language."
-  ;; :syntax-table sci-wolfram-mode-syntax-table
+  :syntax-table sci-wolfram-mode-syntax-table
   :keymap sci-wolfram-mode-map
-  (setq font-lock-defaults '((sci-wolfram-font-lock-keywords)))
+  (setq font-lock-defaults '((sci-wolfram-mode-font-lock-keywords)))
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
 
