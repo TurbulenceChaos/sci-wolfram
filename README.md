@@ -170,11 +170,14 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 
 > [!IMPORTANT]
 > 1. `Print[code]` will truncate string lines in Wolfram REPL. Consider using `WriteString["stdout", code, "\n"]` instead.
-> 2. For emacs, Wolfram REPL use `wolframscript -rawterm`, where space lines are not allowed.\
-> **All space lines in string will be automatically removed before running codes.**
+> 2. For emacs, Wolfram REPL use `wolframscript -rawterm`, where empty lines are not allowed.\
+> **All empty lines in string will be automatically removed before running codes.** You should use "\n" to insert empty lines in string.
 > ```wolfram
 > str="First line
 >
+> Second line"
+>
+> str="First line\n
 > Second line"
 > ```
 > 3. For org-mode version < 9.8, spaces before a string (i.e. `str="    Hello"`) in src-block **async session** running are automatically removed.

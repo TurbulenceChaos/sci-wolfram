@@ -64,13 +64,15 @@ For over three decades, Mathematica has defined the state of the art in technica
 :end:
 
 ** Note 2
-For emacs, Wolfram REPL use ~wolframscript -rawterm~, where space lines are not allowed.
+For emacs, Wolfram REPL use ~wolframscript -rawterm~, where empty lines are not allowed.
 
-*All space lines in string will be automatically removed before running codes.*
+*All empty lines in string will be automatically removed before running codes.*
 
-#+name: sci-wolfram-space-lines-in-string
+You should use "\n" to insert empty lines in string.
+
+#+name: sci-wolfram-empty-lines-in-string
 #+begin_src wolfram :exports both
-str = "To be, or not to be, that is the question:
+string = "To be, or not to be, that is the question:
 
 Whether 'tis nobler in the mind to suffer
 
@@ -78,17 +80,30 @@ The slings and arrows of outrageous fortune,
 
 Or to take arms against a sea of troubles,
 
-And by opposing end them?";
+And by opposing end them?"
 
-WriteString["stdout", str, "\n"];
+string = "To be, or not to be, that is the question:\n
+Whether 'tis nobler in the mind to suffer\n
+The slings and arrows of outrageous fortune,\n
+Or to take arms against a sea of troubles,\n
+And by opposing end them?"
 #+end_src
 
-#+RESULTS: sci-wolfram-space-lines-in-string
+#+RESULTS: sci-wolfram-empty-lines-in-string
 :results:
 To be, or not to be, that is the question:
 Whether 'tis nobler in the mind to suffer
 The slings and arrows of outrageous fortune,
 Or to take arms against a sea of troubles,
+And by opposing end them?
+To be, or not to be, that is the question:
+
+Whether 'tis nobler in the mind to suffer
+
+The slings and arrows of outrageous fortune,
+
+Or to take arms against a sea of troubles,
+
 And by opposing end them?
 :end:
 
