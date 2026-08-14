@@ -434,9 +434,12 @@
     (modify-syntax-entry ?\( "()1n"  syntax-table)
     (modify-syntax-entry ?\) ")(4n"  syntax-table)
     (modify-syntax-entry ?*  ". 23n" syntax-table)
-    ;; \[Omega]
-    (modify-syntax-entry ?\\ "."     syntax-table)
     syntax-table))
+
+;; \[Omega]
+(defvar sci-wolfram-mode-syntax-propertize-function
+  (syntax-propertize-rules
+   ("\\\\[[A-Z][A-Za-z]*]" (0 "_"))))
 
 ;; font-lock
 (defvar sci-wolfram-mode-font-lock-keywords
@@ -486,6 +489,7 @@
   "Major mode for Wolfram Language."
   :syntax-table sci-wolfram-mode-syntax-table
   :keymap sci-wolfram-mode-map
+  (setq-local syntax-propertize-function sci-wolfram-mode-syntax-propertize-function)
   (setq font-lock-defaults '((sci-wolfram-mode-font-lock-keywords)))
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
