@@ -262,6 +262,12 @@
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; format wolfram script region or buffer code
+(defvar sci-wolfram-tab-width 4)
+
+(defvar sci-wolfram-indent-string
+  (make-string sci-wolfram-tab-width ?\s))
+
+;; https://github.com/WolframResearch/codeformatter/issues/4
 (defun sci-wolfram-mode-format-region-or-buffer ()
   (ob-wolfram-make-repl)
   (ob-wolfram-initiate-session)
@@ -270,9 +276,14 @@
 	 (format-code (progn (with-temp-file tmp (insert code))
                              (concat
                               "Needs[\"CodeFormatter`\"];"
-                              (format
-                               "WriteString[\"stdout\",CodeFormatter`CodeFormat[File[\"%s\"],CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"],\"\\n\"];\n"
-                               tmp))))
+                              "WriteString[\"stdout\","
+                              (format "CodeFormatter`CodeFormat[File[\"%s\"]," tmp)
+                              "\"Airiness\"->-0.75,"
+                              "\"LineWidth\"->120,"
+                              "\"BreakLinesMethod\"->\"LineBreakerV2\","
+                              (format "\"TabWidth\"->%s," sci-wolfram-tab-width)
+                              (format "\"IndentationString\"->\"%s\"" sci-wolfram-indent-string)
+                              "]];\n")))
 	 (result (ob-wolfram-evaluate-session format-code)))
     (message "Format wolfram script")
     (save-excursion
@@ -412,7 +423,9 @@
   (list sci-wolfram-kernel
         "-noinit" "-noprompt" "-nopaclet" "-noicon" "-nostartuppaclets" "-run"
         (concat "Needs[\"LSPServer`\"];"
-                "SetOptions[CodeFormatter`CodeFormatCST,CodeFormatter`Airiness->-0.75,\"LineWidth\"->120,\"BreakLinesMethod\"->\"LineBreakerV2\"];"
+                "CodeFormatter`$DefaultAiriness=-0.75;"
+                "CodeFormatter`$DefaultLineWidth=120;"
+                "CodeFormatter`$DefaultBreakLinesMethod=\"LineBreakerV2\";"
                 "LSPServer`StartServer[]")))
 
 (with-eval-after-load 'eglot
@@ -515,7 +528,9 @@
   :syntax-table sci-wolfram-mode-syntax-table
   :keymap sci-wolfram-mode-map
   (setq-local syntax-propertize-function sci-wolfram-mode-syntax-propertize-function)
-  (setq font-lock-defaults '((sci-wolfram-mode-font-lock-keywords)))
+  (setq-local font-lock-defaults '((sci-wolfram-mode-font-lock-keywords)))
+  (setq-local tab-width sci-wolfram-tab-width)
+  (setq-local indent-tabs-mode nil)
   (setq-local comment-start "(*")
   (setq-local comment-end "*)"))
 
