@@ -176,10 +176,10 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 > ```wolfram
 > str="First line
 >
-> Second line"
+> Third line"
 >
 > str="First line\n
-> Second line"
+> Third line"
 > ```
 > 3. For org-mode version < 9.8, spaces before a string (i.e. `str="    Hello"`) in src-block **async session** running are automatically removed.
 > From org version 9.8, `org-babel-comint-async-register` function introduced a new option `disable-prompt-filtering` to avoid this situation.
@@ -189,7 +189,7 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 # Installation for VSCode
 ## Prerequisites
 
-- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **Wolfram Player**), or **Mathematica**\
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **wolfram player**), or **Mathematica**\
 Required for running wolfram scripts
 - [imgcat](https://github.com/wookayin/python-imgcat)\
 Enable image display in VSCode Terminal.\

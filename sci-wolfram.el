@@ -28,7 +28,7 @@
 
 ;;; Commentary:
 
-;; Major mode for editing Wolfram Language
+;; Major mode for editing Wolfram Language.
 
 ;; Installation and usage:
 ;; Please check README.md.
@@ -37,6 +37,10 @@
 ;; just type M-x customize-group RET sci-wolfram-mode RET
 
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
+
+;; [ ] TODO: Tree-sitter and SMIE
+;; [ ] TODO: Make wolframscript2notebook (section, title, etc. in comments) same as Wolfram Mathematica
+;; [ ] TODO: Section style like Matlab and AUCTeX
 
 ;;; Code:
 
@@ -555,7 +559,7 @@
 (add-hook 'sci-wolfram-mode-hook
           (lambda ()
             (setq-local prettify-symbols-alist sci-wolfram-prettify-symbols)
-            (setq-local prettify-symbols-compose-predicate (lambda (start end match) t))
+            (setq-local prettify-symbols-compose-predicate (lambda (_start _end _match) t))
             ;; (setq-local prettify-symbols-unprettify-at-point nil)
             (prettify-symbols-mode 1)))
 
