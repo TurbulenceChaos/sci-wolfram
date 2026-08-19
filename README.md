@@ -38,6 +38,9 @@ Display wolfram script images in Visual Studio Code Terminal.
 - [x] Automatic completion and formatting with LSPServer
 - [x] Convert wolfram script to PDF and Mathematica notebook
 - [x] Prettify Mathematica symbols
+- [ ] TODO: Tree-sitter and SMIE
+- [ ] TODO: Make wolframscript2notebook (section, title, etc. in comments) same as Wolfram Mathematica
+- [ ] TODO: Section style like Matlab and AUCTeX
 
 # Features for VSCode
 - [x] **Display wolfram script images in VSCode Terminal using imgcat**
@@ -45,8 +48,8 @@ Display wolfram script images in Visual Studio Code Terminal.
 
 # Installation for Emacs
 ## Prerequisites
-- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **wolfram player**), or **Mathematica**\
-Required for running wolfram scripts
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include wolframscript and wolfram player), or **Mathematica**\
+Required for running wolfram scripts.
 - [LaTeX](https://orgmode.org/manual/Previewing-LaTeX-fragments.html) (optional)\
 Preview latex formula in emacs org-mode:
   - Linux: `sudo apt install texlive-full`
@@ -118,9 +121,7 @@ You can using `TextCell` to add title, subtitle, section, text, formula, etc to 
 
 https://github.com/user-attachments/assets/e1cc634e-df51-4e83-86be-397e95eb9588
 
-`M-x sci-wolfram-prettify-symbols`
-
-Toggle with `M-x prettify-symbols-mode`
+`M-x prettify-symbols-mode`
 
 https://github.com/user-attachments/assets/e3280367-7d27-4987-842f-3df41b1535e0
 
@@ -132,7 +133,7 @@ https://github.com/user-attachments/assets/3d2d058b-d847-43f0-a774-1a526992aadd
 
 > [!NOTE]
 > 1. For **any selected region in any buffer**, you can evaluate it, format it, or convert it to a Mathematica notebook.\
-> For example, you can run Wolfram code in a LaTeX file and insert the generated LaTeX fragments back into the document.
+> For example, you can run wolfram code in a LaTeX file and insert the generated LaTeX fragments back into the document.
 > 2. Wolfram expressions are converted to Mathematica notebook images by default. To convert them to LaTeX fragments instead, run `M-x customize-group RET sci-wolfram-mode RET` and set `sci-wolfram-formula-type` to latex.
 > 3. **Long expression results are displayed using `Short[expr, n]`**, where `n` is the maximum number of lines to show. To change the default value 10, run `M-x customize-group RET sci-wolfram-mode RET` and customize `sci-wolfram-short-lines`.
 
@@ -189,7 +190,7 @@ https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 # Installation for VSCode
 ## Prerequisites
 
-- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include **wolframscript** and **wolfram player**), or **Mathematica**\
+- [**Wolfram Engine**](https://www.wolfram.com/download-center/index.php.en) (**free**, already include wolframscript and wolfram player), or **Mathematica**\
 Required for running wolfram scripts
 - [imgcat](https://github.com/wookayin/python-imgcat)\
 Enable image display in VSCode Terminal.\
@@ -282,4 +283,3 @@ For `sciWolframPrettifySymbols.wl`:
 - [List all built-in commands and symbols of Mathematica programtically from Wolfram Community](https://community.wolfram.com/groups/-/m/t/2511222)
 - [List of Mathematica glyphs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/7610/list-of-mathematica-glyphs/102079#102079)
 - [Get list of special characters from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/253271/get-list-of-special-characters)
-

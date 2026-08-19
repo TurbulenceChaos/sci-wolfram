@@ -38,10 +38,6 @@
 
 ;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
-;; [ ] TODO: Tree-sitter and SMIE
-;; [ ] TODO: Make wolframscript2notebook (section, title, etc. in comments) same as Wolfram Mathematica
-;; [ ] TODO: Section style like Matlab and AUCTeX
-
 ;;; Code:
 
 (require 'org-src)
@@ -139,13 +135,13 @@
          (pkg-func (cdr (assoc pkg sci-wolfram-package-alist))))
     (save-excursion
       (if (and (derived-mode-p 'org-mode)
-	       (org-in-src-block-p))
-	  (progn (org-edit-src-code)
-	         (forward-line 1)
-	         (insert (funcall pkg-func))
-	         (org-edit-src-exit))
+               (org-in-src-block-p))
+          (progn (org-edit-src-code)
+                 (forward-line 1)
+                 (insert (funcall pkg-func))
+                 (org-edit-src-exit))
         (progn (forward-line 1)
-	       (insert (funcall pkg-func)))))))
+               (insert (funcall pkg-func)))))))
 
 ;; run wolfram script region or buffer code
 ;;;###autoload
@@ -157,32 +153,32 @@
 
 (defun sci-wolfram-get-region-or-buffer-code ()
   (let* ((beg (if (region-active-p)
-		  (region-beginning)
-		(point-min)))
-	 (end (if (region-active-p)
-		  (region-end)
-		(point-max)))
-	 (code (buffer-substring-no-properties beg end)))
+                  (region-beginning)
+                (point-min)))
+         (end (if (region-active-p)
+                  (region-end)
+                (point-max)))
+         (code (buffer-substring-no-properties beg end)))
     code))
 
 (defun sci-wolfram-mode-run-region-or-buffer (&optional code)
   (let ((code (or code (sci-wolfram-get-region-or-buffer-code)))
-	(outbuf (get-buffer-create "*Sci-Wolfram Run Result*"))
-	(lang "wolfram")
+        (outbuf (get-buffer-create "*Sci-Wolfram Run Result*"))
+        (lang "wolfram")
         (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
-	(org-mode))
+        (org-mode))
       (erase-buffer)
       (insert (concat
-	       "#+name: sci-wolfram-import-display-image-package"
-	       n (format "#+begin_src %s" lang)
-	       n (sci-wolfram-display-image-package)
-	       n "#+end_src"
-	       n n "#+name: sci-wolfram-run-region-or-buffer"
-	       n (format "#+begin_src %s" lang)
-	       n code
-	       n "#+end_src"))
+               "#+name: sci-wolfram-import-display-image-package"
+               n (format "#+begin_src %s" lang)
+               n (sci-wolfram-display-image-package)
+               n "#+end_src"
+               n n "#+name: sci-wolfram-run-region-or-buffer"
+               n (format "#+begin_src %s" lang)
+               n code
+               n "#+end_src"))
       (org-fold-hide-block-all)
       (org-babel-execute-buffer)
       (display-buffer outbuf))))
@@ -193,38 +189,38 @@
   (interactive)
   (cond
    ((or (region-active-p)
-	(derived-mode-p 'sci-wolfram-mode))
+        (derived-mode-p 'sci-wolfram-mode))
     (sci-wolfram-mode-run-region-or-buffer))
    ((and (derived-mode-p 'org-mode)
-	 (org-in-src-block-p)
-	 (let* ((info (org-babel-get-src-block-info))
-		(lang (nth 0 info)))
-	   (string= lang "wolfram")))
+         (org-in-src-block-p)
+         (let* ((info (org-babel-get-src-block-info))
+                (lang (nth 0 info)))
+           (string= lang "wolfram")))
     (let ((code (prog2 (org-edit-src-code)
-		    (sci-wolfram-get-region-or-buffer-code)
-		  (org-edit-src-exit))))
+                    (sci-wolfram-get-region-or-buffer-code)
+                  (org-edit-src-exit))))
       (sci-wolfram-mode-run-region-or-buffer code)))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
 
 ;; convert wolfram script to PDF and Mathematica notebook
 (defun sci-wolfram-mode-convert-to-notebook (&optional file)
   (let ((file (or file (buffer-file-name)))
-	(outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
-	(lang "wolfram")
+        (outbuf (get-buffer-create "*Sci-Wolfram Convert Result*"))
+        (lang "wolfram")
         (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
-	(org-mode))
+        (org-mode))
       (erase-buffer)
       (insert (concat
-	       "#+name: sci-wolfram-import-convert-to-notebook-package"
-	       n (format "#+begin_src %s" lang)
+               "#+name: sci-wolfram-import-convert-to-notebook-package"
+               n (format "#+begin_src %s" lang)
                n (sci-wolfram-convert-to-notebook-package)
-	       n "#+end_src"
-	       n n "#+name: sci-wolfram-convert-to-notebook"
-	       n (format "#+begin_src %s" lang)
-	       n (format "sciWolframConvertToNotebook[\"%s\"];" file)
-	       n "#+end_src"))
+               n "#+end_src"
+               n n "#+name: sci-wolfram-convert-to-notebook"
+               n (format "#+begin_src %s" lang)
+               n (format "sciWolframConvertToNotebook[\"%s\"];" file)
+               n "#+end_src"))
       (org-fold-hide-block-all)
       (org-babel-execute-buffer)
       (display-buffer outbuf))))
@@ -235,32 +231,32 @@
   (interactive)
   (cond
    ((and (not (region-active-p))
-	 (buffer-file-name)
-	 (derived-mode-p 'sci-wolfram-mode))
+         (buffer-file-name)
+         (derived-mode-p 'sci-wolfram-mode))
     (save-buffer)
     (sci-wolfram-mode-convert-to-notebook))
    ((or (region-active-p)
-	(derived-mode-p 'sci-wolfram-mode))
+        (derived-mode-p 'sci-wolfram-mode))
     (let* ((code (sci-wolfram-get-region-or-buffer-code))
-	   (file-name (format "%s-region-or-buffer.wl"
-			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))))
-	   (file (expand-file-name file-name default-directory)))
+           (file-name (format "%s-region-or-buffer.wl"
+                              (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))))
+           (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
    ((and (derived-mode-p 'org-mode)
-	 (org-in-src-block-p)
-	 (let* ((info (org-babel-get-src-block-info))
-		(lang (nth 0 info)))
-	   (string= lang "wolfram")))
+         (org-in-src-block-p)
+         (let* ((info (org-babel-get-src-block-info))
+                (lang (nth 0 info)))
+           (string= lang "wolfram")))
     (let* ((code (prog2 (org-edit-src-code)
-		     (sci-wolfram-get-region-or-buffer-code)
-		   (org-edit-src-exit)))
-	   (info (org-babel-get-src-block-info))
-	   (src-block-name (or (nth 4 info) "wolfram-babel"))
-	   (file-name (format "%s-%s.wl"
-			      (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))
-			      src-block-name))
-	   (file (expand-file-name file-name default-directory)))
+                     (sci-wolfram-get-region-or-buffer-code)
+                   (org-edit-src-exit)))
+           (info (org-babel-get-src-block-info))
+           (src-block-name (or (nth 4 info) "wolfram-babel"))
+           (file-name (format "%s-%s.wl"
+                              (replace-regexp-in-string "[^a-zA-Z0-9_.\\-]" "" (file-name-sans-extension (buffer-name)))
+                              src-block-name))
+           (file (expand-file-name file-name default-directory)))
       (write-region code nil file)
       (sci-wolfram-mode-convert-to-notebook file)))
    (t (user-error "You must be in a selected region, a sci-wolfram-mode buffer, or a wolfram org-src block!"))))
@@ -276,8 +272,8 @@
   (ob-wolfram-make-repl)
   (ob-wolfram-initiate-session)
   (let* ((code (sci-wolfram-get-region-or-buffer-code))
-	 (tmp (org-babel-temp-file "wolfram-" ".wl"))
-	 (format-code (progn (with-temp-file tmp (insert code))
+         (tmp (org-babel-temp-file "wolfram-" ".wl"))
+         (format-code (progn (with-temp-file tmp (insert code))
                              (concat
                               "Needs[\"CodeFormatter`\"];"
                               "WriteString[\"stdout\","
@@ -288,12 +284,12 @@
                               (format "\"TabWidth\"->%s," sci-wolfram-tab-width)
                               (format "\"IndentationString\"->\"%s\"" sci-wolfram-indent-string)
                               "]];\n")))
-	 (result (ob-wolfram-evaluate-session format-code)))
+         (result (ob-wolfram-evaluate-session format-code)))
     (message "Format wolfram script")
     (save-excursion
       (if (region-active-p)
-	  (delete-region (region-beginning) (region-end))
-	(erase-buffer))
+          (delete-region (region-beginning) (region-end))
+        (erase-buffer))
       (insert result))))
 
 ;;;###autoload
@@ -302,13 +298,13 @@
   (interactive)
   (cond
    ((or (region-active-p)
-	(derived-mode-p 'sci-wolfram-mode))
+        (derived-mode-p 'sci-wolfram-mode))
     (sci-wolfram-mode-format-region-or-buffer))
    ((and (derived-mode-p 'org-mode)
-	 (org-in-src-block-p)
-	 (let* ((info (org-babel-get-src-block-info))
-		(lang (nth 0 info)))
-	   (string= lang "wolfram")))
+         (org-in-src-block-p)
+         (let* ((info (org-babel-get-src-block-info))
+                (lang (nth 0 info)))
+           (string= lang "wolfram")))
     (org-edit-src-code)
     (sci-wolfram-format-region-or-buffer)
     (org-edit-src-exit))
@@ -370,9 +366,9 @@
   "Add wolfram symbols to completion-at-point."
   (when-let* ((bounds (bounds-of-thing-at-point 'symbol)))
     (list (car bounds)
-	  (cdr bounds)
-	  sci-wolfram-lsp-symbols
-	  :exclusive 'no)))
+          (cdr bounds)
+          sci-wolfram-lsp-symbols
+          :exclusive 'no)))
 
 (add-hook 'sci-wolfram-mode-hook
           (lambda () (add-hook 'completion-at-point-functions #'sci-wolfram-completion-at-point nil t)))
@@ -383,7 +379,7 @@
                                (lambda ()
                                  (when (org-in-src-block-p t)
                                    (let* ((info (org-babel-get-src-block-info))
-	                                  (lang (nth 0 info)))
+                                          (lang (nth 0 info)))
                                      (when (string= lang "wolfram")
                                        (sci-wolfram-completion-at-point)))))
                                nil t)))
@@ -394,9 +390,9 @@
   "Look up wolfram documentation in browser."
   (interactive)
   (let* ((symbol
-	  (or (if (region-active-p)
-	          (buffer-substring-no-properties (region-beginning) (region-end))
-	        (when-let* ((word (current-word)))
+          (or (if (region-active-p)
+                  (buffer-substring-no-properties (region-beginning) (region-end))
+                (when-let* ((word (current-word)))
                   (upcase-initials word)))
               (upcase-initials (completing-read "Wolfram symbol: " sci-wolfram-lsp-symbols))))
          (url (format "https://reference.wolfram.com/language/ref/%s.html" symbol)))
@@ -419,6 +415,13 @@
   "Wolfram kernel used for eglot or lsp-mode."
   :type 'string
   :group 'sci-wolfram-mode)
+
+(defvar eglot-server-programs)
+(defvar lsp-language-id-configuration)
+(declare-function lsp-register-client "lsp-mode")
+(declare-function make-lsp-client "lsp-mode")
+(declare-function lsp-stdio-connection "lsp-mode")
+(declare-function lsp-activate-on "lsp-mode")
 
 ;; reference:
 ;; https://github.com/transentis/wolfram-language-mode
@@ -445,6 +448,7 @@
                         :server-id 'wolfram-lsp)))
 
 ;; syntax table
+;; reference: https://github.com/xahlee/xah-wolfram-mode/blob/113317d71684cff630c178553d4c2d2f42983b15/xah-wolfram-mode.el#L2631
 (defvar sci-wolfram-mode-syntax-table
   (let ((syntax-table (make-syntax-table)))
     ;; comment
@@ -479,11 +483,13 @@
     syntax-table))
 
 ;; \[Omega]
+;; reference: https://github.com/kawabata/wolfram-mode/blob/be680190cac6ccf579dbce107deaae495928d1b3/wolfram-mode.el#L189
 (defvar sci-wolfram-mode-syntax-propertize-function
   (syntax-propertize-rules
    ("\\\\[[A-Z][A-Za-z]*]" (0 "_"))))
 
 ;; font-lock
+;; reference: https://github.com/xahlee/xah-wolfram-mode/blob/113317d71684cff630c178553d4c2d2f42983b15/xah-wolfram-mode.el#L2685
 (defvar sci-wolfram-mode-font-lock-keywords
   (list
    (cons (regexp-opt sci-wolfram-lsp-symbols-builtin-functions-1 'symbols)                     'font-lock-function-name-face)
