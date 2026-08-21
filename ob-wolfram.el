@@ -67,10 +67,10 @@
 (defun ob-wolfram-evaluate-session (body)
   "Evaluate wolfram babel session."
   (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
-	 (code (concat
+         (code (concat
                 (ob-wolfram-remove-empty-lines body)
                 (format "\nWriteString[\"stdout\",\"%s\\n\"];\n" eoe)))
-	 (result (org-babel-comint-with-output
+         (result (org-babel-comint-with-output
                      (ob-wolfram-session eoe)
                    (comint-send-string ob-wolfram-session code))))
     (mapconcat #'identity (cl-remove eoe result :test #'string-match-p))))
@@ -85,7 +85,7 @@
 
 (defun ob-wolfram-babel-get-info ()
   (let ((buf (current-buffer))
-	(pos (point)))
+        (pos (point)))
     (setq ob-wolfram-babel-info (cons buf pos))))
 
 (add-hook 'org-babel-after-execute-hook #'ob-wolfram-babel-get-info)
@@ -94,32 +94,34 @@
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
 (defun ob-wolfram-display-inline-images-in-babel-result ()
   (unless (or
-	   ;; ...but not while Emacs is exporting an org buffer (where
-	   ;; `org-display-inline-images' can be awfully slow).
-	   (bound-and-true-p org-export-current-backend)
-	   ;; ...and not while tangling org buffers (which happens in a temp
-	   ;; buffer where `buffer-file-name' is nil).
-	   (string-match-p "^ \\*temp" (buffer-name)))
+           ;; ...but not while Emacs is exporting an org buffer (where
+           ;; `org-display-inline-images' can be awfully slow).
+           (bound-and-true-p org-export-current-backend)
+           ;; ...and not while tangling org buffers (which happens in a temp
+           ;; buffer where `buffer-file-name' is nil).
+           (string-match-p "^ \\*temp" (buffer-name)))
     (save-excursion
       (when-let* ((beg (org-babel-where-is-src-block-result))
-		  (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
-	(save-restriction
+                  (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
+        (save-restriction
           (narrow-to-region (min beg end) (max beg end))
           (goto-char (point-min))
           (if (version< "9.8" (org-version))
-              (org-link-preview-region)
-            (org-display-inline-images))
+              (org-link-preview-region nil nil (point-min) (point-max))
+            (org-display-inline-images nil nil (point-min) (point-max)))
           (when (and (executable-find "pdflatex")
                      (search-forward "\\begin{equation*}" nil t)
                      (search-forward "\\end{equation*}" nil t))
-	    (org-latex-preview)))))))
+            (message "Creating LaTeX previews in buffer...")
+            (org--latex-preview-region (point-min) (point-max))
+            (message "Creating LaTeX previews in buffer... done.")))))))
 
 (add-hook 'org-babel-after-execute-hook
           (lambda ()
             (let* ((info (org-babel-get-src-block-info))
-	           (lang (nth 0 info))
-	           (params (nth 2 info))
-	           (async (cdr (assq :async params))))
+                   (lang (nth 0 info))
+                   (params (nth 2 info))
+                   (async (cdr (assq :async params))))
               (when (and (string= lang "wolfram")
                          (not (string-match-p "yes" async)))
                 (ob-wolfram-display-inline-images-in-babel-result)))))
@@ -130,18 +132,18 @@ See `org-babel-comint-async-chunk-callback'."
   (prog1
       result
     (let ((buf (car ob-wolfram-babel-info))
-	  (pos (cdr ob-wolfram-babel-info)))
+          (pos (cdr ob-wolfram-babel-info)))
       (run-at-time 0 nil (lambda ()
                            (with-current-buffer buf
                              (save-excursion
-			       (goto-char pos)
-			       (ob-wolfram-display-inline-images-in-babel-result))))))))
+                               (goto-char pos)
+                               (ob-wolfram-display-inline-images-in-babel-result))))))))
 
 ;; async evaluate
 (defun ob-wolfram-async-register ()
   (let ((buf (current-buffer)))
     (unless (and ob-wolfram-async-registered
-		 (eq buf (car ob-wolfram-babel-info)))
+                 (eq buf (car ob-wolfram-babel-info)))
       (org-babel-comint-async-register
        ob-wolfram-session
        buf
@@ -156,9 +158,9 @@ See `org-babel-comint-async-chunk-callback'."
          (start (format "ob_wolfram_async_start_%s" uuid))
          (end   (format "ob_wolfram_async_end_%s" uuid))
          (code (concat
-		(format "WriteString[\"stdout\",\"%s\\n\"]\n" start)
-		(ob-wolfram-remove-empty-lines body)
-		(format "\nWriteString[\"stdout\",\"%s\\n\"]\n" end))))
+                (format "WriteString[\"stdout\",\"%s\\n\"]\n" start)
+                (ob-wolfram-remove-empty-lines body)
+                (format "\nWriteString[\"stdout\",\"%s\\n\"]\n" end))))
     (comint-send-string ob-wolfram-session code)
     uuid))
 
@@ -169,7 +171,7 @@ See `org-babel-comint-async-chunk-callback'."
   (ob-wolfram-initiate-session)
   (let ((async (cdr (assq :async params))))
     (if (string-match-p "yes" async)
-	(ob-wolfram-async-evaluate-session body)
+        (ob-wolfram-async-evaluate-session body)
       (ob-wolfram-evaluate-session body))))
 
 (defvar org-babel-default-header-args:wolfram
