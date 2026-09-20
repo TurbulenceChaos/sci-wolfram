@@ -49,7 +49,8 @@ sciWolframTeX[expr_, sciWolframShortLines_] := Module[
     WriteString["stdout", StringTemplate[": Out[`1`]= "][n++], "\n"];
     WriteString["stdout", "\\begin{equation*}", "\n"];
     WriteString["stdout", TeXForm[Short[expr, sciWolframShortLines]], "\n"];
-    WriteString["stdout", "\\end{equation*}", "\n"]; expr;
+    WriteString["stdout", "\\end{equation*}", "\n"];
+    expr;
 ];
 
 (* Display Image output *)
@@ -136,29 +137,45 @@ systemBoxSymbols = Apply[Alternatives, ToExpression @ Select[Names["*Box"], Stri
 systemGraphicsBoxSymbols = Apply[Alternatives, ToExpression @ Names[{"Graphics*Box", "Dynamic*Box"}]];
 
 sciWolframDisplayImage[expr_, OptionsPattern[]] := Module[{box, isString, isPlot},
-    box = ToBoxes[expr];
-    isString = FreeQ[box, systemBoxSymbols | Cell];
-    isPlot = Not @ FreeQ[box, systemGraphicsBoxSymbols];
-    Which[
-        isString,
-            Switch[sciWolframEnv,
-                "emacs",
-                    If[SameQ[expr, Null],
-                        expr
-                        ,
-                        sciWolframText[expr, OptionValue[sciWolframShortLines]]
-                    ]
-                ,
-                "vscode",
-                    expr
-            ]
+    If[SameQ[expr, Null],
+        (* https://reference.wolfram.com/language/ref/Out.html *)
+        expr
         ,
-        True,
-            Switch[sciWolframEnv,
-                "emacs",
-                    Switch[OptionValue[sciWolframFormulaType],
-                        "latex",
-                            If[isPlot,
+        box = ToBoxes[expr];
+        isString = FreeQ[box, systemBoxSymbols | Cell];
+        isPlot = Not @ FreeQ[box, systemGraphicsBoxSymbols];
+        Which[
+            isString,
+                Switch[sciWolframEnv,
+                    "emacs",
+                        sciWolframText[expr, OptionValue[sciWolframShortLines]]
+                    ,
+                    "vscode",
+                        expr
+                ]
+            ,
+            True,
+                Switch[sciWolframEnv,
+                    "emacs",
+                        Switch[OptionValue[sciWolframFormulaType],
+                            "latex",
+                                If[isPlot,
+                                    sciWolframImage[
+                                        expr
+                                        ,
+                                        OptionValue[sciWolframImageDPI]
+                                        ,
+                                        OptionValue[sciWolframImageName]
+                                        ,
+                                        playNB = OptionValue[sciWolframPlay]
+                                        ,
+                                        OptionValue[sciWolframShortLines]
+                                    ]
+                                    ,
+                                    sciWolframTeX[expr, OptionValue[sciWolframShortLines]]
+                                ]
+                            ,
+                            "image",
                                 sciWolframImage[
                                     expr
                                     ,
@@ -166,49 +183,34 @@ sciWolframDisplayImage[expr_, OptionsPattern[]] := Module[{box, isString, isPlot
                                     ,
                                     OptionValue[sciWolframImageName]
                                     ,
-                                    playNB = OptionValue[sciWolframPlay]
+                                    playNB = If[isPlot,
+                                        OptionValue[sciWolframPlay]
+                                        ,
+                                        "no"
+                                    ]
                                     ,
                                     OptionValue[sciWolframShortLines]
                                 ]
-                                ,
-                                sciWolframTeX[expr, OptionValue[sciWolframShortLines]]
-                            ]
-                        ,
-                        "image",
-                            sciWolframImage[
-                                expr
-                                ,
-                                OptionValue[sciWolframImageDPI]
-                                ,
-                                OptionValue[sciWolframImageName]
-                                ,
-                                playNB = If[isPlot,
-                                    OptionValue[sciWolframPlay]
-                                    ,
-                                    "no"
-                                ]
-                                ,
-                                OptionValue[sciWolframShortLines]
-                            ]
-                    ]
-                ,
-                "vscode",
-                    sciWolframImage[
-                        expr
-                        ,
-                        OptionValue[sciWolframImageDPI]
-                        ,
-                        OptionValue[sciWolframImageName]
-                        ,
-                        playNB = If[isPlot,
-                            OptionValue[sciWolframPlay]
-                            ,
-                            "no"
                         ]
-                        ,
-                        OptionValue[sciWolframShortLines]
-                    ]
-            ]
+                    ,
+                    "vscode",
+                        sciWolframImage[
+                            expr
+                            ,
+                            OptionValue[sciWolframImageDPI]
+                            ,
+                            OptionValue[sciWolframImageName]
+                            ,
+                            playNB = If[isPlot,
+                                OptionValue[sciWolframPlay]
+                                ,
+                                "no"
+                            ]
+                            ,
+                            OptionValue[sciWolframShortLines]
+                        ]
+                ]
+        ]
     ]
 ];
 
