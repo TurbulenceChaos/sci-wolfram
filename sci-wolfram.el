@@ -51,7 +51,12 @@
   :group 'languages)
 
 (defcustom sci-wolfram-formula-type "image"
-  "Wolfram formula output type: image (default) or latex"
+  "Wolfram formula output type: image (default) or latex.
+For example, the result of
+DSolve[y'[x] + y[x] == a Sin[x], y[x], x]
+will be automatically converted to:
+[1] image: ./tmp/wolfram/wolfram-uuid.png
+[2] latex: \\begin{equation*} expression \\end{equation*}"
   :type '(choice (const "image") (const "latex"))
   :group 'sci-wolfram-mode)
 
@@ -66,16 +71,16 @@
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-play "no"
-  "Convert plot to Mathematica interactive file: yes or no (default)"
+  "Convert dynamic plot to Mathematica interactive file: yes or no (default)"
   :type '(choice (const "yes") (const "no"))
   :group 'sci-wolfram-mode)
 
 (defcustom sci-wolfram-short-lines 10
   "Short[expr, n]: print output less than n lines, 10 (default)"
-  :type 'number
+  :type 'integer
   :group 'sci-wolfram-mode)
 
-;; wolfram package template
+;; insert wolfram PKG
 (defvar sci-wolfram-script-directory (file-name-directory (or load-file-name buffer-file-name)))
 
 (defvar sci-wolfram-display-image-script (expand-file-name "sciWolframDisplayImage.wl" sci-wolfram-script-directory))
@@ -146,7 +151,7 @@
 ;; run wolfram script region or buffer code
 ;;;###autoload
 (defun sci-wolfram-run-repl ()
-  "Start a wolfram REPL."
+  "Create a new Wolfram REPL if it is not exist."
   (interactive)
   (ob-wolfram-make-repl)
   (switch-to-buffer-other-window ob-wolfram-session))
@@ -195,7 +200,7 @@
          (org-in-src-block-p)
          (let* ((info (org-babel-get-src-block-info))
                 (lang (nth 0 info)))
-           (string= lang "wolfram")))
+           (string-match-p lang "wolfram")))
     (let ((code (prog2 (org-edit-src-code)
                     (sci-wolfram-get-region-or-buffer-code)
                   (org-edit-src-exit))))
@@ -247,7 +252,7 @@
          (org-in-src-block-p)
          (let* ((info (org-babel-get-src-block-info))
                 (lang (nth 0 info)))
-           (string= lang "wolfram")))
+           (string-match-p lang "wolfram")))
     (let* ((code (prog2 (org-edit-src-code)
                      (sci-wolfram-get-region-or-buffer-code)
                    (org-edit-src-exit)))
@@ -276,15 +281,18 @@
          (format-code (progn (with-temp-file tmp (insert code))
                              (concat
                               "Needs[\"CodeFormatter`\"];"
-                              "WriteString[\"stdout\","
-                              (format "CodeFormatter`CodeFormat[File[\"%s\"]," tmp)
+                              (format "WriteString[%S," tmp)
+                              (format "CodeFormatter`CodeFormat[File[%S]," tmp)
                               "\"Airiness\"->-0.75,"
                               "\"LineWidth\"->120,"
                               "\"BreakLinesMethod\"->\"LineBreakerV2\","
                               (format "\"TabWidth\"->%s," sci-wolfram-tab-width)
-                              (format "\"IndentationString\"->\"%s\"" sci-wolfram-indent-string)
-                              "]];\n")))
-         (result (ob-wolfram-evaluate-session format-code)))
+                              (format "\"IndentationString\"->%S" sci-wolfram-indent-string)
+                              "]];"
+                              (format "Close[%S];" tmp))))
+         (result (progn (ob-wolfram-evaluate-session format-code)
+                        (with-temp-buffer (insert-file-contents tmp)
+                                          (substring-no-properties (buffer-string))))))
     (message "Format wolfram script")
     (save-excursion
       (if (region-active-p)
@@ -304,7 +312,7 @@
          (org-in-src-block-p)
          (let* ((info (org-babel-get-src-block-info))
                 (lang (nth 0 info)))
-           (string= lang "wolfram")))
+           (string-match-p lang "wolfram")))
     (org-edit-src-code)
     (sci-wolfram-format-region-or-buffer)
     (org-edit-src-exit))
@@ -380,7 +388,7 @@
                                  (when (org-in-src-block-p t)
                                    (let* ((info (org-babel-get-src-block-info))
                                           (lang (nth 0 info)))
-                                     (when (string= lang "wolfram")
+                                     (when (string-match-p lang "wolfram")
                                        (sci-wolfram-completion-at-point)))))
                                nil t)))
 
@@ -518,13 +526,14 @@
 (defvar sci-wolfram-mode-map (make-sparse-keymap))
 (defvar sci-wolfram-mode-leader-key-map (make-sparse-keymap))
 (defvar sci-wolfram-mode-leader-key "C-c" "sci-wolfram-mode leader key")
+;;;###autoload
 (defvar sci-wolfram-mode-key
-  '((sci-wolfram-doc-lookup . "h")
-    (sci-wolfram-run-repl . "t")
-    (sci-wolfram-import-package . "i")
-    (sci-wolfram-format-region-or-buffer . "f")
-    (sci-wolfram-run-region-or-buffer . "r")
-    (sci-wolfram-convert-to-notebook . "c"))
+  '((sci-wolfram-doc-lookup              . "C-h")
+    (sci-wolfram-run-repl                . "C-t")
+    (sci-wolfram-import-package          . "C-i")
+    (sci-wolfram-format-region-or-buffer . "C-f")
+    (sci-wolfram-run-region-or-buffer    . "C-c")
+    (sci-wolfram-convert-to-notebook     . "C-n"))
   "sci-wolfram-mode keymap")
 
 (dolist (key sci-wolfram-mode-key)
@@ -534,9 +543,9 @@
 ;; sci-wolfram-mode
 ;;;###autoload
 (define-derived-mode sci-wolfram-mode prog-mode "sci-wolfram"
-  "Major mode for Wolfram Language."
+  "Major mode for Wolfram Language.
+\\{sci-wolfram-mode-map}"
   :syntax-table sci-wolfram-mode-syntax-table
-  :keymap sci-wolfram-mode-map
   (setq-local syntax-propertize-function sci-wolfram-mode-syntax-propertize-function)
   (setq-local font-lock-defaults '((sci-wolfram-mode-font-lock-keywords)))
   (setq-local tab-width sci-wolfram-tab-width)
