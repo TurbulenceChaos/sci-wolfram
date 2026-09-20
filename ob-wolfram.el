@@ -52,7 +52,7 @@
 
 ;; session evaluate
 (defun ob-wolfram-make-repl ()
-  "Create wolfram REPL."
+  "Create a new Wolfram REPL if it is not exist."
   (unless (comint-check-proc ob-wolfram-session)
     (message "Starting Wolfram REPL ...")
     (make-comint-in-buffer "ob-wolfram-session" ob-wolfram-session "wolframscript" nil "-rawterm")
@@ -62,34 +62,40 @@
     (setq ob-wolfram-async-registered nil)))
 
 (defun ob-wolfram-remove-empty-lines (body)
+  "`wolframscript' with `-rawterm' does not allow empty lines,
+which should be automatically removed before running code!"
   (substring-no-properties (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
 
+(defun ob-wolfram-write-string (string)
+  (format "WriteString[\"stdout\", %S, \"\\n\"];" string))
+
 (defun ob-wolfram-evaluate-session (body)
-  "Evaluate wolfram babel session."
+  "Evaluate Wolfram REPL session."
   (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
          (code (concat
                 (ob-wolfram-remove-empty-lines body)
-                (format "\nWriteString[\"stdout\",\"%s\\n\"];\n" eoe)))
+                "\n" (ob-wolfram-write-string eoe)
+                ;; return orginal value for % calc in REPL
+                ;; https://reference.wolfram.com/language/ref/Out.html
+                "Out[];\n"))
          (result (org-babel-comint-with-output
                      (ob-wolfram-session eoe)
-                   (comint-send-string ob-wolfram-session code))))
-    (mapconcat #'identity (cl-remove eoe result :test #'string-match-p))))
+                   (comint-send-string ob-wolfram-session code)))
+         (return (string-trim-right (mapconcat #'identity (cl-remove eoe result :test #'string-match-p)))))
+    return))
 
 (defun ob-wolfram-initiate-session ()
   (unless ob-wolfram-session-initiated
-    (ob-wolfram-evaluate-session "WriteString[\"stdout\",\"Initiate wolfram babel session\\n\"];\n")
+    (ob-wolfram-evaluate-session
+     (concat
+      ;; prevent long input being truncated, i.e. {1,2,...,100}
+      ;; reference:
+      ;; https://mathematica.stackexchange.com/questions/88543/how-to-set-default-pagewidth-for-inputform
+      "SetOptions[\"stdout\", PageWidth -> Infinity];"
+      (ob-wolfram-write-string "Wolfram REPL session is initiated.")))
     (setq ob-wolfram-session-initiated t)))
 
-;; display inline images in babel result
-(defvar ob-wolfram-babel-info nil)
-
-(defun ob-wolfram-babel-get-info ()
-  (let ((buf (current-buffer))
-        (pos (point)))
-    (setq ob-wolfram-babel-info (cons buf pos))))
-
-(add-hook 'org-babel-after-execute-hook #'ob-wolfram-babel-get-info)
-
+;; display inline images in org babel results
 ;; reference:
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
 (defun ob-wolfram-display-inline-images-in-babel-result ()
@@ -106,15 +112,17 @@
         (save-restriction
           (narrow-to-region (min beg end) (max beg end))
           (goto-char (point-min))
-          (if (version< "9.8" (org-version))
-              (org-link-preview-region nil nil (point-min) (point-max))
-            (org-display-inline-images nil nil (point-min) (point-max)))
+          ;; preview image
+          (org-display-inline-images nil nil (point-min) (point-max))
           (when (and (executable-find "pdflatex")
                      (search-forward "\\begin{equation*}" nil t)
                      (search-forward "\\end{equation*}" nil t))
             (message "Creating LaTeX previews in buffer...")
+            ;; preview latex
             (org--latex-preview-region (point-min) (point-max))
             (message "Creating LaTeX previews in buffer... done.")))))))
+
+(defvar ob-wolfram-babel-info nil)
 
 (add-hook 'org-babel-after-execute-hook
           (lambda ()
@@ -122,24 +130,27 @@
                    (lang (nth 0 info))
                    (params (nth 2 info))
                    (async (cdr (assq :async params))))
-              (when (and (string= lang "wolfram")
-                         (not (string-match-p "yes" async)))
-                (ob-wolfram-display-inline-images-in-babel-result)))))
+              (when (string-match-p lang "wolfram")
+                (if (string-match-p "yes" async)
+                    ;; for async session
+                    (setq ob-wolfram-babel-info (cons (current-buffer) (point)))
+                  ;; for session results
+                  (ob-wolfram-display-inline-images-in-babel-result))))))
 
+;; async session evaluate
 (defun ob-wolfram-async-chunk-callback (result)
-  "Filter applied to results before insertion.
+  "Filter applied to async results before insertion.
 See `org-babel-comint-async-chunk-callback'."
   (prog1
-      result
-    (let ((buf (car ob-wolfram-babel-info))
-          (pos (cdr ob-wolfram-babel-info)))
-      (run-at-time 0 nil (lambda ()
-                           (with-current-buffer buf
-                             (save-excursion
-                               (goto-char pos)
-                               (ob-wolfram-display-inline-images-in-babel-result))))))))
+      ;; process async results
+      (string-trim-right result)
+    ;; display images
+    (run-at-time 0 nil (lambda ()
+                         (with-current-buffer (car ob-wolfram-babel-info)
+                           (save-excursion
+                             (goto-char (cdr ob-wolfram-babel-info))
+                             (ob-wolfram-display-inline-images-in-babel-result)))))))
 
-;; async evaluate
 (defun ob-wolfram-async-register ()
   (let ((buf (current-buffer)))
     (unless (and ob-wolfram-async-registered
@@ -158,9 +169,12 @@ See `org-babel-comint-async-chunk-callback'."
          (start (format "ob_wolfram_async_start_%s" uuid))
          (end   (format "ob_wolfram_async_end_%s" uuid))
          (code (concat
-                (format "WriteString[\"stdout\",\"%s\\n\"]\n" start)
-                (ob-wolfram-remove-empty-lines body)
-                (format "\nWriteString[\"stdout\",\"%s\\n\"]\n" end))))
+                (ob-wolfram-write-string start)
+                "\n" (ob-wolfram-remove-empty-lines body)
+                "\n" (ob-wolfram-write-string end)
+                ;; return orginal value for % calc in REPL
+                ;; https://reference.wolfram.com/language/ref/Out.html
+                "Out[];\n")))
     (comint-send-string ob-wolfram-session code)
     uuid))
 
@@ -175,13 +189,15 @@ See `org-babel-comint-async-chunk-callback'."
       (ob-wolfram-evaluate-session body))))
 
 (defvar org-babel-default-header-args:wolfram
-  `((:session . ,ob-wolfram-session)
-    (:async . "yes")
-    (:results . "value drawer")
-    (:display . "text")
+  `((:session  . ,ob-wolfram-session)
+    (:async    . "yes")
+    (:results  . "value drawer")
+    ;; https://orgmode.org/manual/Extracting-Source-Code.html
     (:comments . "link")
-    (:eval . "never-export")
-    (:exports . "both")))
+    ;; disable evaluating code when exporting
+    ;; https://orgmode.org/manual/Evaluating-Code-Blocks.html
+    (:eval     . "never-export")
+    (:exports  . "both")))
 
 
 (provide 'ob-wolfram)
