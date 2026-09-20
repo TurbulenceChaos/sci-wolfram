@@ -7,3 +7,5 @@ ltximg/
 *.nb
 *.pdf
 /sci-wolfram-kernel-location.txt
+*~
+/TAGS

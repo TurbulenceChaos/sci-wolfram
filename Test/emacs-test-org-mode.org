@@ -1,0 +1,97 @@
+#+Title: Emacs Org-mode Test
+#+Author: PENG
+#+Email: p.peng01@outlook.com
+#+Date: 20260520
+
+* For Wolfram Src-block
+Support session or async session running
+
+** Display inline Images
+#+name: import-sci-wolfram-image-package
+#+begin_src wolfram
+(* Please run "M-x sci-wolfram-import-package RET display image RET" from this line *)
+#+end_src
+
+#+name: sci-wolfram-run-code
+#+begin_src wolfram
+sol1 = DSolve[{D[y[x, t], t] + 2 D[y[x, t], x] == Sin[x], y[0, t] == Cos[t]}, y[x, t], {x, t}]
+
+sol2 = sol1[[1, 1, 2]]
+
+Plot3D[sol2, {x, -10, 10}, {t, -5, 5}]
+
+Manipulate[Plot[Sin[n x], {x, 0, 2 Pi}], {n, 1, 20}]
+
+MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
+#+end_src
+
+* Important Notes
+** Note 1
+~SetOptions["stdout", PageWidth -> Infinity];~ is used by default to prevent long Lists or strings being truncated.
+
+** Note 2
+~wolframscript -rawterm~ does not allow **empty lines**, which will be automatically **removed** before running codes!
+
+Use "\n" to insert empty lines in a string.
+
+#+name: sci-wolfram-empty-lines-in-string
+#+begin_src wolfram :exports both
+str1 = "To be, or not to be, that is the question:
+
+Whether 'tis nobler in the mind to suffer
+
+The slings and arrows of outrageous fortune,
+
+Or to take arms against a sea of troubles,
+
+And by opposing end them?"
+
+str2 = "To be, or not to be, that is the question:\n
+Whether 'tis nobler in the mind to suffer\n
+The slings and arrows of outrageous fortune,\n
+Or to take arms against a sea of troubles,\n
+And by opposing end them?"
+#+end_src
+
+#+RESULTS: sci-wolfram-empty-lines-in-string
+:results:
+Out[1]= To be, or not to be, that is the question:
+         Whether 'tis nobler in the mind to suffer
+         The slings and arrows of outrageous fortune,
+         Or to take arms against a sea of troubles,
+         And by opposing end them?
+Out[2]= To be, or not to be, that is the question:
+
+         Whether 'tis nobler in the mind to suffer
+
+         The slings and arrows of outrageous fortune,
+
+         Or to take arms against a sea of troubles,
+
+         And by opposing end them?
+:end:
+
+** Note 3
+For async session block in org-mode version < 9.8,
+*spaces* before a string (i.e. str="    Hello") will be automatically *removed*
+due to the default ~filter-prompts~ option in ~org-babel-comint-async-register~ function.
+
+Since org-mode version 9.8, a new option [[https://orgmode.org/Changes.html][disable-prompt-filtering]] was introduced to avoid this situation.
+
+#+begin_src wolfram :async no
+Print["         spaces before a string"]
+#+end_src
+
+#+RESULTS:
+:results:
+         spaces before a string
+:end:
+
+#+begin_src wolfram :async yes
+Print["         spaces before a string"]
+#+end_src
+
+#+RESULTS:
+:results:
+spaces before a string
+:end:

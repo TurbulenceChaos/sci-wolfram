@@ -1,3 +1,15 @@
+(* sciWolframConvertToNotebook.wl
+
+Convert wolfram script to PDF and Mathematica notebook.
+
+Usage:
+
+Get["/path/to/sciWolframConvertToNotebook.wl"];
+
+sciWolframConvertToNotebook["vscode-test-convert-to-notebook.wl"];
+
+*)
+
 (* title *)
 
 TextCell["Script To Notebook.wl", "Title"]

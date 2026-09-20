@@ -21,8 +21,9 @@ $Post = .
 
 *)
 
-
 (*
+
+SetOptions[\"stdout\", PageWidth -> Infinity];
 
 Get["/path/to/sciWolframDisplayImage.wl"];
 
@@ -30,7 +31,7 @@ $Post = sciWolframDisplayImage[#,
 sciWolframFormulaType -> "image",
 sciWolframImageDPI    -> 100,
 sciWolframImageName   -> "uuid",
-sciWolframPlay	      -> "no",
+sciWolframPlay        -> "no",
 sciWolframShortLines  -> 10
 ] &;
 
