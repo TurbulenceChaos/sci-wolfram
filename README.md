@@ -137,7 +137,7 @@ https://github.com/user-attachments/assets/1d226657-a3a3-4145-95df-f2a5b7348ecd
 
 Display **images**, **LaTeX** fragments, and Wolfram Player **interactive** files.
 
-Support async session src-block calc.
+Support **async session** src-block calc.
 
 https://github.com/user-attachments/assets/c28920eb-3ed5-4f4d-86f3-c13bc0733e14
 
@@ -211,6 +211,8 @@ https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 
 # Reference
 For `sciWolframDisplayImage.wl`:
+
+The core idea is to use `$Post` function in Wolfram to automatically convert complex expression or dynamic plot to **images**, **LaTeX** fragments, or Wolfram Mathematica **interactive** files.
 - [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 - [How to set up a Plot viewer for Wolfram Engine from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
 

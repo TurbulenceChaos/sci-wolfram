@@ -27,9 +27,6 @@ MatrixForm[Array[Subscript[a, ##]&, {2, 2, 2}]]
 
 * Important Notes
 ** Note 1
-~SetOptions["stdout", PageWidth -> Infinity];~ is used by default to prevent long Lists or strings being truncated.
-
-** Note 2
 ~wolframscript -rawterm~ does not allow **empty lines**, which will be automatically **removed** before running codes!
 
 Use "\n" to insert empty lines in a string.
@@ -71,7 +68,7 @@ Out[2]= To be, or not to be, that is the question:
          And by opposing end them?
 :end:
 
-** Note 3
+** Note 2
 For async session block in org-mode version < 9.8,
 *spaces* before a string (i.e. str="    Hello") will be automatically *removed*
 due to the default ~filter-prompts~ option in ~org-babel-comint-async-register~ function.

@@ -89,9 +89,9 @@ which should be automatically removed before running code!"
     (ob-wolfram-evaluate-session
      (concat
       ;; prevent long input being truncated, i.e. {1,2,...,100}
-      ;; reference:
-      ;; https://mathematica.stackexchange.com/questions/88543/how-to-set-default-pagewidth-for-inputform
-      "SetOptions[\"stdout\", PageWidth -> Infinity];"
+      ;; reference: https://mathematica.stackexchange.com/questions/88543/how-to-set-default-pagewidth-for-inputform
+      ;; Short[code, n] not work in wolframscript -rawterm when PageWidth is set to infinity.
+      ;; "SetOptions[\"stdout\", PageWidth -> Infinity];"
       (ob-wolfram-write-string "Wolfram REPL session is initiated.")))
     (setq ob-wolfram-session-initiated t)))
 
