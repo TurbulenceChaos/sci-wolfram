@@ -74,7 +74,7 @@ which should be automatically removed before running code!"
   (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
          (code (concat
                 (ob-wolfram-remove-empty-lines body)
-                "\n" (ob-wolfram-write-string eoe)
+                "\n\n" (ob-wolfram-write-string eoe)
                 ;; return orginal value for % calc in REPL
                 ;; https://reference.wolfram.com/language/ref/Out.html
                 "Out[];\n"))
@@ -170,8 +170,9 @@ See `org-babel-comint-async-chunk-callback'."
          (end   (format "ob_wolfram_async_end_%s" uuid))
          (code (concat
                 (ob-wolfram-write-string start)
-                "\n" (ob-wolfram-remove-empty-lines body)
-                "\n" (ob-wolfram-write-string end)
+                "Out[];\n"
+                (ob-wolfram-remove-empty-lines body)
+                "\n\n" (ob-wolfram-write-string end)
                 ;; return orginal value for % calc in REPL
                 ;; https://reference.wolfram.com/language/ref/Out.html
                 "Out[];\n")))
