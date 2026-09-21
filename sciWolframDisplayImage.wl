@@ -60,15 +60,14 @@ imgCount = 1;
 sciWolframImage[expr_, sciWolframImageDPI_, sciWolframImageName_, playNB_, sciWolframShortLines_] := Module[
     {dir, sciWolframImageDir, filePNG, fileNB}
     ,
-    dir = Which[
-        SameQ[$InputFileName, ""],
-            Quiet @ Check[NotebookDirectory[], Directory[]]
-        ,
-        StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
+    dir = Check[
+        If[$Notebooks,
+            NotebookDirectory[]
+            ,
             Directory[]
+        ]
         ,
-        True,
-            DirectoryName[$InputFileName]
+        $InputFileName
     ];
     sciWolframImageDir = FileNameJoin[{dir, "tmp", "wolfram"}];
     If[Not @ DirectoryQ[sciWolframImageDir],

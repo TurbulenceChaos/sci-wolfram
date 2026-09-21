@@ -93,14 +93,14 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 ```
 
 # Usage for Emacs
-Type `Ctrl-c` or `M-x sci-wolfram-` in sci-wolfram-mode to use all interactive functions.
+Type `Ctrl-c` in sci-wolfram-mode or `M-x sci-wolfram-` to use all interactive functions.
 
 ## For Wolfram Script File
 `M-x sci-wolfram-run-region-or-buffer`
 
-Display images, LaTeX fragments, and Wolfram Player interactive files.
+Display **images**, **LaTeX** fragments, and Wolfram Player **interactive** files.
 
-Support Wolfram REPL async session calc.
+Support Wolfram REPL **async session** calc.
 
 https://github.com/user-attachments/assets/ce9bd35c-2226-4060-9d21-d16a909705e9
 
@@ -135,7 +135,7 @@ https://github.com/user-attachments/assets/1d226657-a3a3-4145-95df-f2a5b7348ecd
 ## For Wolfram Src-block in Org-mode
 `org-babel-execute:wolfram`
 
-Display images, LaTeX fragments, and Wolfram Player interactive files.
+Display **images**, **LaTeX** fragments, and Wolfram Player **interactive** files.
 
 Support async session src-block calc.
 
@@ -149,13 +149,13 @@ https://github.com/user-attachments/assets/44f5aa76-fed0-413f-b71e-b199f4fd04d7
 
 `M-x sci-wolfram-format-region-or-buffer`
 
-Format region or wolfram src-block code.
+Format Wolfram src-block code.
 
 https://github.com/user-attachments/assets/de4a3d06-751e-41fb-8602-0a3a844ac9e9
 
 `M-x sci-wolfram-convert-to-notebook`
 
-Convert region or wolfram src-block code to PDF and Mathematica notebook.
+Convert Wolfram src-block to PDF and Mathematica notebook.
 
 https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 
@@ -167,7 +167,7 @@ Read [emacs-test-org-mode.org](Test/emacs-test-org-mode.org) for more details.
 - [imgcat](https://github.com/wookayin/python-imgcat) (display image in vscode terminal)
 
 ## Configuration
-- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VSCode settings,\
+- Enable `Terminal > Integrated: Enable Images` and `Terminal > Integrated: GPU Acceleration` in VSCode settings,
 and make sure your system is using a **discrete graphics card**!
 
 ![vscode-official-wolfram-extension.png](Images/vscode-terminal-enable-display-images.png "title")
@@ -206,7 +206,7 @@ https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 # Change Log
 ## v3.0.0
 - Add Wolfram REPL **async session** calc support
-- Remove [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency
+- **Remove** [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency
 - Refactor `sciWolframDisplayImage.wl` and `sciWolframConvertToNotebook.wl` package
 
 # Reference
