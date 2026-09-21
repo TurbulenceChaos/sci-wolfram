@@ -1,62 +1,42 @@
-(* Convert wolfram characters to emacs prettify symbols *)
+(* Convert Wolfram characters to Emacs prettify symbols *)
 
-Needs["LSPServer`ReplaceLongNamePUA`"]
-
-dir = Which[
-    SameQ[$InputFileName, ""],
-        Quiet @ Check[NotebookDirectory[], Directory[]]
-    ,
-    StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
+dir = Check[
+    If[$Notebooks,
+        NotebookDirectory[]
+        ,
         Directory[]
-    ,
-    True,
-        DirectoryName[$InputFileName]
-];
-
-wolframCharactersReplace[string_] := Module[
-    {stringPrettify}
-    ,
-    If[
-        StringLength[string] > 1
-        ,
-        stringPrettify = StringTemplate["(`1`)"][StringRiffle[Characters[string], {"?", " (Br . Bl) ?", ""}]]; StringReplace[stringPrettify, {"[" -> "\\[", "]" -> "\\]"}]
-        ,
-        ToString[InputForm[string]]
     ]
-]
-
-wolframCharacters = Select[Table[{ToString[FullForm[#]], #}&[FromCharacterCode[i]], {i, 65535}], StringContainsQ[#[[1]], "\\["]&];
-
-wolframCharacters = {StringReplace[#[[1]], {"\\" -> "\\\\"}], replaceLongNamePUA[#[[2]]]}& /@ wolframCharacters;
-
-wolframCharacters = Select[
-    wolframCharacters
     ,
-    StringFreeQ[
-        #[[1]]
-        ,
-        {"Raw", "InlinePart", "Continuation", "LineSeparator", "ParagraphSeparator", "Invisible", "Space]", "Hyphen]", "Key]"}
-    ] && StringFreeQ[#[[2]], {"\n", RegularExpression[" [A-Za-z0-9]+"]}] && Not @ StringMatchQ[#[[2]], ""]&
+    $InputFileName
 ];
 
-wolframCharacters = MapAt[wolframCharactersReplace, wolframCharacters, {All, 2}];
+(* Remove Unicode Private Use Area (PUA): U+E000 .. U+F8FF => 57344 .. 63743 *)
 
-emacsSymbolsFormat = StringRiffle[MapApply[StringTemplate["(`1` . `2`)"], wolframCharacters], "\n"];
+characters = Select[
+    Table[
+        {StringReplace[ToString @ FullForm @ FromCharacterCode[i], {"\\" -> "\\\\"}], FromCharacterCode[i]}
+        ,
+        {i, Join[Range[1, 57343], Range[63744, 65535]]}
+    ]
+    ,
+    StringContainsQ[#[[1]], "\\["]&
+];
 
-emacsFileName = "sci-wolfram-prettify-symbols";
+characters = StringRiffle[MapApply[StringTemplate["(`1` . \"`2`\")"], characters], "\n"];
 
-emacsSymbols = StringTemplate[
-";;; `1`.el --- Wolfram prettify symbols alist -*- lexical-binding: t -*-\n
+file = "sci-wolfram-prettify-symbols";
+
+elisp = StringTemplate[";;; `1`.el --- Wolfram prettify symbols alist -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `3` `4`\n
+;; GENERATED WITH: `2`\n
 ;;; Code:\n
 (defvar `1` '(
-`2`
+`3`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"][emacsFileName, emacsSymbolsFormat, "ProductIDName" /. $ProductInformation, $Version];
+;;; `1`.el ends here\n"][file, "ProductKernelName" /. $ProductInformation, characters];
 
-Export[FileNameJoin[{dir, emacsFileName <> ".el"}], emacsSymbols, "Text"];
+Export[FileNameJoin[{dir, file <> ".el"}], elisp, "Text"];
 
-WriteString["stdout", "Finish converting wolfram characters to emacs prettify symbols", "\n"];
+WriteString["stdout", "Convert Wolfram characters to Emacs prettify symbols.", "\n"];

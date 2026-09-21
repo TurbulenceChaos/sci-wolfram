@@ -4,9 +4,7 @@
 
 ;; AUTO GENERATED FILE
 
-;; GENERATED WITH: WolframEngine 15.0.0 for Linux x86 (64-bit) (May 26, 2026)
-
-;; LSPServer 1.13
+;; GENERATED WITH: Wolfram Language 15.0.0 Engine
 
 ;;; Code:
 

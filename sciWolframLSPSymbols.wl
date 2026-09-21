@@ -1,71 +1,69 @@
-(* Convert wolfram LSPServer symbols to emacs symbols *)
+(* Convert Wolfram LSPServer symbols to Emacs symbols *)
 
-dir = Which[
-    SameQ[$InputFileName, ""],
-        Quiet @ Check[NotebookDirectory[], Directory[]]
-    ,
-    StringContainsQ[$InputFileName, "WolframLanguageForJupyter"],
+dir = Check[
+    If[$Notebooks,
+        NotebookDirectory[]
+        ,
         Directory[]
+    ]
     ,
-    True,
-        DirectoryName[$InputFileName]
+    $InputFileName
 ];
 
-sciWolframLSPServer = PacletFind["LSPServer"][[1]];
+lsp = PacletFind["LSPServer"][[1]];
 
-sciWolfram2Emacs[wolframFileName_, split_] := Module[
-    {wolframFile, wolframSymbols, wolframSymbolsSplit, emacsSymbolsFormat, emacsSymbols, emacsFile}
+wolfram2elisp[wolframFileName_, split_] := Module[
+    {wolframFile, symbols, emacsFileName, elisp, emacsFile}
     ,
-    wolframFile = FileNameJoin[{sciWolframLSPServer["Location"], "Resources", "Data", wolframFileName <> ".wl"}];
-    wolframSymbols = Import[wolframFile];
-    wolframSymbolsSplit = Partition[wolframSymbols, UpTo @ Ceiling[Length @ wolframSymbols / split]];
+    wolframFile = FileNameJoin[{lsp["Location"], "Resources", "Data", wolframFileName <> ".wl"}];
+    symbols = Import[wolframFile];
+    symbols = Partition[symbols, UpTo @ Ceiling[Length @ symbols / split]];
     Do[
         emacsFileName = StringTemplate["sci-wolfram-lsp-symbols-`1`"][ToLowerCase @ StringRiffle[StringCases[wolframFileName, RegularExpression["[A-Z][a-z]*"]], "-"]];
         If[split > 1,
             emacsFileName = StringTemplate["`1`-`2`"][emacsFileName, i]
         ];
-        emacsSymbolsFormat = StringRiffle[wolframSymbolsSplit[[i]], {"\"", "\"\n\"", "\""}];
-        emacsSymbols = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
+        symbols[[i]] = StringRiffle[symbols[[i]], {"\"", "\"\n\"", "\""}];
+        elisp = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
 ;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `3` `4`\n
-;; LSPServer `5`\n
+;; GENERATED WITH: `2`\n
 ;;; Code:\n
 (defvar `1` '(
-`2`
+`3`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"][emacsFileName, emacsSymbolsFormat, "ProductIDName" /. $ProductInformation, $Version, sciWolframLSPServer["Version"]];
+;;; `1`.el ends here\n"][emacsFileName, "ProductKernelName" /. $ProductInformation, symbols[[i]]];
         emacsFile = FileNameJoin[{dir, "LSPSymbols", emacsFileName <> ".el"}];
-        Export[emacsFile, emacsSymbols, "Text"];
-        WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, emacsFile], "\n\n"];
+        Export[emacsFile, elisp, "Text"];
+        WriteString["stdout", StringTemplate["Convert `1` -> `2`"][wolframFile, emacsFile], "\n"];
         ,
         {i, split}
     ];
 ]
 
-sciWolfram2Emacs["BuiltinFunctions", 5];
+wolfram2elisp["BuiltinFunctions", 5];
 
-sciWolfram2Emacs["Constants", 1];
+wolfram2elisp["Constants", 1];
 
-sciWolfram2Emacs["Options", 1];
+wolfram2elisp["Options", 1];
 
-sciWolfram2Emacs["SessionSymbols", 1];
+wolfram2elisp["SessionSymbols", 1];
 
-sciWolfram2Emacs["ExperimentalSymbols", 1];
+wolfram2elisp["ExperimentalSymbols", 1];
 
-sciWolfram2Emacs["UndocumentedSymbols", 1];
+wolfram2elisp["UndocumentedSymbols", 1];
 
-sciWolfram2Emacs["ObsoleteSymbols", 1];
+wolfram2elisp["ObsoleteSymbols", 1];
 
-sciWolfram2Emacs["BadSymbols", 1];
+wolfram2elisp["BadSymbols", 1];
 
-sciWolfram2Emacs["SystemLongNames", 1];
+wolfram2elisp["SystemLongNames", 1];
 
-sciWolfram2Emacs["FreeLongNames", 1];
+wolfram2elisp["FreeLongNames", 1];
 
-sciWolfram2Emacs["SpecialLongNames", 1];
+wolfram2elisp["SpecialLongNames", 1];
 
-sciWolfram2Emacs["UndocumentedLongNames", 1];
+wolfram2elisp["UndocumentedLongNames", 1];
 
-sciWolfram2Emacs["UnsupportedLongNames", 1];
+wolfram2elisp["UnsupportedLongNames", 1];
