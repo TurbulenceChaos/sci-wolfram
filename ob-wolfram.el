@@ -4,7 +4,7 @@
 
 ;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 20250520
-;; Version: 20260812
+;; Version: 20260922
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
@@ -87,16 +87,10 @@ which should be automatically removed before running code!"
 (defun ob-wolfram-initiate-session ()
   (unless ob-wolfram-session-initiated
     (ob-wolfram-evaluate-session
-     (concat
-      ;; prevent long input being truncated, i.e. {1,2,...,100}
-      ;; reference: https://mathematica.stackexchange.com/questions/88543/how-to-set-default-pagewidth-for-inputform
-      ;; Short[code, n] not work in wolframscript -rawterm when PageWidth is set to infinity.
-      ;; "SetOptions[\"stdout\", PageWidth -> Infinity];"
-      (ob-wolfram-write-string "Wolfram REPL session is initiated.")))
+     (ob-wolfram-write-string "Wolfram REPL session is initiated."))
     (setq ob-wolfram-session-initiated t)))
 
 ;; display inline images in org babel results
-;; reference:
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
 (defun ob-wolfram-display-inline-images-in-babel-result ()
   (unless (or
@@ -114,13 +108,11 @@ which should be automatically removed before running code!"
           (goto-char (point-min))
           ;; preview image
           (org-display-inline-images nil nil (point-min) (point-max))
+          ;; preview latex
           (when (and (executable-find "pdflatex")
                      (search-forward "\\begin{equation*}" nil t)
                      (search-forward "\\end{equation*}" nil t))
-            (message "Creating LaTeX previews in buffer...")
-            ;; preview latex
-            (org--latex-preview-region (point-min) (point-max))
-            (message "Creating LaTeX previews in buffer... done.")))))))
+            (org--latex-preview-region (point-min) (point-max))))))))
 
 (defvar ob-wolfram-babel-info nil)
 
@@ -134,7 +126,7 @@ which should be automatically removed before running code!"
                 (if (string-match-p "yes" async)
                     ;; for async session
                     (setq ob-wolfram-babel-info (cons (current-buffer) (point)))
-                  ;; for session results
+                  ;; for session, display images
                   (ob-wolfram-display-inline-images-in-babel-result))))))
 
 ;; async session evaluate

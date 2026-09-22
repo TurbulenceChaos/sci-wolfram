@@ -39,9 +39,6 @@ Display wolfram script images in [Visual Studio Code](https://code.visualstudio.
 - [x] Automatic completion and formatting with LSPServer
 - [x] Convert wolfram script to PDF and Mathematica notebook
 - [x] Prettify Mathematica symbols
-- [ ] TODO: Tree-sitter and SMIE
-- [ ] TODO: Make wolframscript2notebook (section, title, etc. in comments) same as Wolfram Mathematica
-- [ ] TODO: Section style like [Emacs-MATLAB-mode](https://github.com/mathworks/Emacs-MATLAB-Mode) and [AUCTeX](https://www.gnu.org/software/auctex/index.html)
 
 # Features for VSCode
 - [x] Display wolfram script images in VSCode Terminal using **imgcat**
@@ -66,7 +63,7 @@ Display wolfram script images in [Visual Studio Code](https://code.visualstudio.
 ;; (require 'sci-wolfram)
 
 ;; to customize all configurable variables of `sci-wolfram' package,
-;; just type M-x customize-group RET sci-wolfram-mode RET
+;; just type M-x customize-group RET sci-wolfram RET
 ```
 
 For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discussion](https://github.com/TurbulenceChaos/sci-wolfram/issues/4)):
@@ -89,7 +86,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
   )
 
 ;; to customize all configurable variables of `sci-wolfram' package,
-;; just type M-x customize-group RET sci-wolfram-mode RET
+;; just type M-x customize-group RET sci-wolfram RET
 ```
 
 # Usage for Emacs
@@ -112,9 +109,9 @@ https://github.com/user-attachments/assets/dd92aec6-ac95-48c4-81a3-dfebaa373410
 
 `M-x sci-wolfram-convert-to-notebook`
 
-Convert region or buffer code to PDF and Mathematica notebook.
+Convert Wolfram script to Wolfram Mathematica notebook.
 
-You can using `TextCell` to add title, section, text, formula, etc to Mathematica notebook.
+You can using `TextCell` to add title, section, text, formula, etc.
 
 https://github.com/user-attachments/assets/e1cc634e-df51-4e83-86be-397e95eb9588
 
@@ -124,7 +121,7 @@ https://github.com/user-attachments/assets/e3280367-7d27-4987-842f-3df41b1535e0
 
 `M-x sci-wolfram-doc-lookup`
 
-Search wolfram doc in web.
+Search Wolfram doc in web.
 
 https://github.com/user-attachments/assets/3d2d058b-d847-43f0-a774-1a526992aadd
 
@@ -143,7 +140,7 @@ https://github.com/user-attachments/assets/c28920eb-3ed5-4f4d-86f3-c13bc0733e14
 
 `completion-at-point`
 
-Support **auto-completion** inside wolfram src-block.
+Support **auto-completion** inside Wolfram src-block.
 
 https://github.com/user-attachments/assets/44f5aa76-fed0-413f-b71e-b199f4fd04d7
 
@@ -152,12 +149,6 @@ https://github.com/user-attachments/assets/44f5aa76-fed0-413f-b71e-b199f4fd04d7
 Format Wolfram src-block code.
 
 https://github.com/user-attachments/assets/de4a3d06-751e-41fb-8602-0a3a844ac9e9
-
-`M-x sci-wolfram-convert-to-notebook`
-
-Convert Wolfram src-block to PDF and Mathematica notebook.
-
-https://github.com/user-attachments/assets/24f62587-6291-4030-be8f-63050b6913d3
 
 Read [emacs-test-org-mode.org](Test/emacs-test-org-mode.org) for more details.
 
@@ -182,8 +173,8 @@ Steps:
 1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
 ```wolfram
-Get["/path/to/sciWolframDisplayImage.wl"];
-$Post = sciWolframDisplayImage[#] &;
+Get["/path/to/DisplayImage.wl"];
+$Post = DisplayImage[#] &;
 ```
 3. `Ctrl+Shift+p: Terminal: Run Selected Text In Active Terminal`
 
@@ -196,7 +187,7 @@ Steps:
 1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
 ```wolfram
-Get["/path/to/sciWolframConvertToNotebook.wl"];
+Get["/path/to/ConvertToNotebook.wl"];
 sciWolframConvertToNotebook["/path/to/file.wl"];
 ```
 Read [vscode-test-convert-to-notebook.wl](Test/vscode-test-convert-to-notebook.wl) for more details.
