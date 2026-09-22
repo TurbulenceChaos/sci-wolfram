@@ -4,7 +4,7 @@
 #+Date: 20260922
 
 * For Wolfram Src-block
-Support session or async session running
+Support Wolfram REPL session or async session running.
 
 ** Display inline Images
 #+name: import-sci-wolfram-image-package

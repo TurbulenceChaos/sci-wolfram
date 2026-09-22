@@ -15,15 +15,16 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
   - [Prerequisites](#prerequisites)
   - [Configuration](#configuration)
 - [Usage for Emacs](#usage-for-emacs)
-  - [For Wolfram Script File](#for-wolfram-script-file)
+  - [For Wolfram Script](#for-wolfram-script)
   - [For Wolfram Src-block in Org-mode](#for-wolfram-src-block-in-org-mode)
 - [Installation for VSCode](#installation-for-vscode)
   - [Prerequisites](#prerequisites-1)
   - [Configuration](#configuration-1)
 - [Usage for VSCode](#usage-for-vscode)
   - [For Wolfram REPL](#for-wolfram-repl)
-  - [Convert Wolfram Script to PDF and Mathematica Notebook](#convert-wolfram-script-to-pdf-and-mathematica-notebook)
+  - [Convert Wolfram Script to Wolfram Mathematica Notebook](#convert-wolfram-script-to-wolfram-mathematica-notebook)
 - [Change Log](#change-log)
+  - [v3.2.8](#v328)
   - [v3.0.0](#v300)
 - [Reference](#reference)
 <!-- markdown-ts-toc-end: -->
@@ -92,7 +93,7 @@ For [Doom Emacs](https://github.com/doomemacs/doomemacs) users (see [this discus
 # Usage for Emacs
 Type `Ctrl-c` in sci-wolfram-mode or `M-x sci-wolfram-` to use all interactive functions.
 
-## For Wolfram Script File
+## For Wolfram Script
 `M-x sci-wolfram-run-region-or-buffer`
 
 Display **images**, **LaTeX** fragments, and Wolfram Player **interactive** files.
@@ -182,7 +183,7 @@ Read [vscode-test-display-image.wl](Test/vscode-test-display-image.wl) for more 
 
 https://github.com/user-attachments/assets/29e36751-2810-4542-a575-bd29eae8b19d
 
-## Convert Wolfram Script to PDF and Mathematica Notebook
+## Convert Wolfram Script to Wolfram Mathematica Notebook
 Steps:
 1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
@@ -195,6 +196,10 @@ Read [vscode-test-convert-to-notebook.wl](Test/vscode-test-convert-to-notebook.w
 https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 
 # Change Log
+## v3.2.8
+- Simplify code
+- Add syntax check
+
 ## v3.0.0
 - Add Wolfram REPL **async session** calc support
 - **Remove** [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency
