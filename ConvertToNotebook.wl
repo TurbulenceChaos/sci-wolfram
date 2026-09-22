@@ -22,6 +22,8 @@ process[expr_] := Module[{input},
     ]
 ];
 
+player = First[FileNames[{"*wolframplayer*", "*WolframNB*"}, $InstallationDirectory, 2], Null];
+
 convert[file_] := Module[
     {fileName, dir, pdf, nb, exprs, cells, notebook}
     ,
@@ -38,10 +40,14 @@ convert[file_] := Module[
         Export[pdf, notebook];
         Export[nb, notebook];
         NotebookClose[notebook];
-        SystemOpen[pdf];
-        SystemOpen[nb]
     ];
     WriteString["stdout", "Convert ", file, " -> ", nb, "\n"];
+    If[StringQ[player],
+        StartProcess[{player, FileNameTake[nb]}, ProcessDirectory -> dir]
+        ,
+        WriteString["stdout", "Wolfram Player or Wolfram Mathematica not found:
+        FileNames[{\"*wolframplayer*\", \"*WolframNB*\"}, $InstallationDirectory, 2]", "\n"]
+    ];
 ];
 
 ConvertToNotebook[file_] := Block[{$Post},

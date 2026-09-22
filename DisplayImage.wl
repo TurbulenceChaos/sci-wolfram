@@ -59,6 +59,8 @@ latex[expr_, ShortLines_] := Module[{},
 
 notebook[expr_] := Notebook[{Cell[BoxData @ ToBoxes @ expr, "Output"]}]
 
+player = First[FileNames[{"*wolframplayer*", "*WolframNB*"}, $InstallationDirectory, 2], Null];
+
 image[expr_, ImageDPI_, PlotPlay_, ShortLines_] := Module[{plot, dir, png, nb},
     plot = notebook[Short[expr, ShortLines]];
     dir = FileNameJoin[{Directory[], "tmp", "wolfram"}];
@@ -78,7 +80,12 @@ image[expr_, ImageDPI_, PlotPlay_, ShortLines_] := Module[{plot, dir, png, nb},
     If[PlotPlay == "yes",
         nb = StringReplace[png, ".png" -> ".nb"];
         Export[nb, plot];
-        UsingFrontEnd @ SystemOpen[nb];
+        If[StringQ[player],
+            StartProcess[{player, FileNameTake[nb]}, ProcessDirectory -> dir]
+            ,
+            WriteString["stdout", "Wolfram Player or Wolfram Mathematica not found:
+            FileNames[{\"*wolframplayer*\", \"*WolframNB*\"}, $InstallationDirectory, 2]", "\n"]
+        ];
     ];
     expr;
 ];
