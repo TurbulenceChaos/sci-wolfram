@@ -210,6 +210,9 @@ The core idea is to use `$Post` function in Wolfram to automatically convert com
 For `sci-wolfram-mode`:
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 - [wolfram-mode](https://github.com/kawabata/wolfram-mode)
+
+For `ob-wolfram`:
+- [ob-mathematica](https://github.com/tririver/ob-mathematica)
 - [wolfram-mode](https://github.com/dalanicolai/wolfram-mode/tree/master)
 
 For `LSPServer`:

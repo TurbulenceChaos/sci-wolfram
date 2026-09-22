@@ -154,7 +154,7 @@ will be automatically converted to:
   "Run Wolfram script region or buffer code."
   (interactive)
   (when-let* ((code (sci-wolfram-get-region-or-buffer-code))
-              (outbuf (get-buffer-create "*Wolfram Run*"))
+              (outbuf (get-buffer-create "*Wolfram Results*"))
               (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
