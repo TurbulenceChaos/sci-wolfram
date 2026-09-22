@@ -1,7 +1,7 @@
 #+Title: Emacs Org-mode Test
 #+Author: PENG
 #+Email: p.peng01@outlook.com
-#+Date: 20260520
+#+Date: 20260922
 
 * For Wolfram Src-block
 Support session or async session running
@@ -57,6 +57,7 @@ Out[1]= To be, or not to be, that is the question:
          The slings and arrows of outrageous fortune,
          Or to take arms against a sea of troubles,
          And by opposing end them?
+
 Out[2]= To be, or not to be, that is the question:
 
          Whether 'tis nobler in the mind to suffer
@@ -75,7 +76,7 @@ due to the default ~filter-prompts~ option in ~org-babel-comint-async-register~ 
 
 Since org-mode version 9.8, a new option [[https://orgmode.org/Changes.html][disable-prompt-filtering]] was introduced to avoid this situation.
 
-#+begin_src wolfram :async no
+#+begin_src wolfram :async no :exports both
 Print["         spaces before a string"]
 #+end_src
 
@@ -84,7 +85,7 @@ Print["         spaces before a string"]
          spaces before a string
 :end:
 
-#+begin_src wolfram :async yes
+#+begin_src wolfram :async yes :exports both
 Print["         spaces before a string"]
 #+end_src
 

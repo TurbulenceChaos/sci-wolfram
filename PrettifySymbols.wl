@@ -1,18 +1,14 @@
 (* Convert Wolfram characters to Emacs prettify symbols *)
 
-dir = Check[
-    If[$Notebooks,
-        NotebookDirectory[]
-        ,
-        Directory[]
-    ]
+dir = If[SameQ[$InputFileName, ""],
+    Directory[]
     ,
-    $InputFileName
+    DirectoryName[$InputFileName]
 ];
 
-(* Remove Unicode Private Use Area (PUA): U+E000 .. U+F8FF => 57344 .. 63743 *)
+(* Remove Unicode Private Use Area: U+E000 .. U+F8FF => 57344 .. 63743 *)
 
-characters = Select[
+chars = Select[
     Table[
         {StringReplace[ToString @ FullForm @ FromCharacterCode[i], {"\\" -> "\\\\"}], FromCharacterCode[i]}
         ,
@@ -22,20 +18,19 @@ characters = Select[
     StringContainsQ[#[[1]], "\\["]&
 ];
 
-characters = StringRiffle[MapApply[StringTemplate["(`1` . \"`2`\")"], characters], "\n"];
+chars = StringRiffle[MapApply[StringTemplate["(`1` . \"`2`\")"], chars], "\n"];
 
 file = "sci-wolfram-prettify-symbols";
 
 elisp = StringTemplate[";;; `1`.el --- Wolfram prettify symbols alist -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
-;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `2`\n
+;; AUTO GENERATED WITH: `2`\n
 ;;; Code:\n
 (defvar `1` '(
 `3`
 ))\n\n
 (provide '`1`)
-;;; `1`.el ends here\n"][file, "ProductKernelName" /. $ProductInformation, characters];
+;;; `1`.el ends here\n"][file, "ProductKernelName" /. $ProductInformation, chars];
 
 Export[FileNameJoin[{dir, file <> ".el"}], elisp, "Text"];
 

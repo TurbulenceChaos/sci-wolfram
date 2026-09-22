@@ -1,13 +1,9 @@
 (* Convert Wolfram LSPServer symbols to Emacs symbols *)
 
-dir = Check[
-    If[$Notebooks,
-        NotebookDirectory[]
-        ,
-        Directory[]
-    ]
+dir = If[SameQ[$InputFileName, ""],
+    Directory[]
     ,
-    $InputFileName
+    DirectoryName[$InputFileName]
 ];
 
 lsp = PacletFind["LSPServer"][[1]];
@@ -26,8 +22,7 @@ wolfram2elisp[wolframFileName_, split_] := Module[
         symbols[[i]] = StringRiffle[symbols[[i]], {"\"", "\"\n\"", "\""}];
         elisp = StringTemplate[";;; `1`.el --- Wolfram LSPServer symbols -*- lexical-binding: t -*-\n
 ;;; Commentary:\n
-;; AUTO GENERATED FILE\n
-;; GENERATED WITH: `2`\n
+;; AUTO GENERATED WITH: `2`\n
 ;;; Code:\n
 (defvar `1` '(
 `3`

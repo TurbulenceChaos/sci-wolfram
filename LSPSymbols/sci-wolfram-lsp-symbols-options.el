@@ -2,9 +2,7 @@
 
 ;;; Commentary:
 
-;; AUTO GENERATED FILE
-
-;; GENERATED WITH: Wolfram Language 15.0.0 Engine
+;; AUTO GENERATED WITH: Wolfram Language 15.0.0 Engine
 
 ;;; Code:
 

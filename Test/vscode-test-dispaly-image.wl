@@ -1,19 +1,18 @@
-(* sciWolframImage.wl
+(* DisplayImage.wl
 
-Display wolfram script image.
+Display Wolfram script images.
 
 Usage:
 
 Default:
-$Post = sciWolframDisplayImage[#] &;
+$Post = DisplayImage[#] &;
 
 All options:
-$Post = sciWolframDisplayImage[#,
-sciWolframFormulaType -> "image" (default) or "latex",
-sciWolframImageDPI    -> 100 (default),
-sciWolframImageName   -> "uuid" (default) or "N" (natural number),
-sciWolframPlay        -> "yes" or "no" (default) to convert plots to Mahtematica interactive file,
-sciWolframShortLines  -> 10 (default): Long expression are displayed using Short[expr, n], where n is the maximum number of lines to show
+$Post = DisplayImage[#,
+ExprType   -> "image" (default) or "latex",
+ImageDPI   -> 150 (default),
+PlotPlay   -> "yes" or "no" (default) to convert dynamic plots to Wolfram Mathematica interactive files,
+ShortLines -> 10 (default): use Short[code, n] to print long expressions less than n lines
 ] &;
 
 Tyep below code to reset $Post:
@@ -23,16 +22,13 @@ $Post = .
 
 (*
 
-SetOptions[\"stdout\", PageWidth -> Infinity];
+Get["/path/to/DisplayImage.wl"];
 
-Get["/path/to/sciWolframDisplayImage.wl"];
-
-$Post = sciWolframDisplayImage[#,
-sciWolframFormulaType -> "image",
-sciWolframImageDPI    -> 100,
-sciWolframImageName   -> "uuid",
-sciWolframPlay        -> "no",
-sciWolframShortLines  -> 10
+$Post = DisplayImage[#,
+ExprType   -> "image",
+ImageDPI   -> 150,
+PlotPlay   -> "no",
+ShortLines -> 10
 ] &;
 
 *)

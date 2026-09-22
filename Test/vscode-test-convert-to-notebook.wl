@@ -1,12 +1,14 @@
-(* sciWolframConvertToNotebook.wl
+(* ConvertToNotebook.wl
 
-Convert wolfram script to PDF and Mathematica notebook.
+Convert Wolfram script to Wolfram Mathematica notebook.
 
 Usage:
 
-Get["/path/to/sciWolframConvertToNotebook.wl"];
+Type below code in REPL:
 
-sciWolframConvertToNotebook["vscode-test-convert-to-notebook.wl"];
+Get["/path/to/ConvertToNotebook.wl"];
+
+ConvertToNotebook["/path/to/file.wl"];
 
 *)
 
