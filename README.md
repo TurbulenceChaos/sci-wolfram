@@ -188,13 +188,18 @@ Steps:
 2. Modify and paste below code into REPL:
 ```wolfram
 Get["/path/to/ConvertToNotebook.wl"];
-sciWolframConvertToNotebook["/path/to/file.wl"];
+ConvertToNotebook["/path/to/file.wl"];
 ```
 Read [vscode-test-convert-to-notebook.wl](Test/vscode-test-convert-to-notebook.wl) for more details.
 
 https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 
 # Change Log
+## v3.2.8
+- Simplify code
+- Fix % or Out[] NULL error
+- Add syntax check
+
 ## v3.0.0
 - Add Wolfram REPL **async session** calc support
 - **Remove** [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency
