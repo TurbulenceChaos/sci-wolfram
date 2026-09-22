@@ -12,7 +12,7 @@ symbols = ToExpression @ StringReplace[Names[{"*Form", "Manipulate*", "Manipulat
 
 symbols = # -> Defer[#]& /@ symbols;
 
-sciWolframExpr[expr_] := Module[{input},
+process[expr_] := Module[{input},
     If[MatchQ[First[expr], TextCell[__]],
         input = First[expr];
         input
@@ -32,7 +32,7 @@ convert[file_] := Module[
     pdf      = FileNameJoin[{dir, StringTemplate["`1`-convert.pdf"][fileName]}];
     nb       = StringReplace[pdf, ".pdf" -> ".nb"];
     exprs    = Import[file, "HeldExpressions"];
-    cells    = Map[sciWolframExpr, exprs];
+    cells    = Map[process, exprs];
     UsingFrontEnd[notebook = CreateDocument[cells];
         NotebookEvaluate[notebook, InsertResults -> True];
         Export[pdf, notebook];

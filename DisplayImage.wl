@@ -69,13 +69,16 @@ image[expr_, ImageDPI_, PlotPlay_, ShortLines_] := Module[{plot, dir, png, nb},
     Export[png, plot, ImageResolution -> ImageDPI];
     Switch[env,
         "emacs",
-            write[StringTemplate[": Out[`1`]= "][n++]]; write[StringTemplate["[[file:`1`]]"][png]]
+            write[StringTemplate[": Out[`1`]= "][n++]];
+            write[StringTemplate["[[file:`1`]]"][png]]
         ,
         "vscode",
             Run[StringTemplate["imgcat `1`"][png]];
     ];
     If[PlotPlay == "yes",
-        nb = StringReplace[png, ".png" -> ".nb"]; Export[nb, plot]; UsingFrontEnd @ SystemOpen[nb];
+        nb = StringReplace[png, ".png" -> ".nb"];
+        Export[nb, plot];
+        UsingFrontEnd @ SystemOpen[nb];
     ];
     expr;
 ];

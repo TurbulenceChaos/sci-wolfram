@@ -81,7 +81,7 @@ will be automatically converted to:
   (ob-wolfram-make-repl)
   (switch-to-buffer-other-window ob-wolfram-session))
 
-;; Wolfram pkg
+;; import pkg
 (defvar sci-wolfram-directory
   (file-name-directory (or load-file-name buffer-file-name)))
 
@@ -176,6 +176,8 @@ will be automatically converted to:
 ;; convert to notebook
 (defun ob-wolfram-syntax-check (body)
   "Check Wolfram script syntax with SyntaxQ[\"code\"] before running code."
+  (ob-wolfram-make-repl)
+  (ob-wolfram-initiate-session)
   (let* ((code (ob-wolfram-remove-empty-lines body))
          (tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
          (syntax (progn (with-temp-file tmp (insert code))
@@ -193,8 +195,6 @@ will be automatically converted to:
               (outbuf (get-buffer-create "*Wolfram Convert*"))
               (n "\n"))
     ;; do syntax check before converting to notebook
-    (ob-wolfram-make-repl)
-    (ob-wolfram-initiate-session)
     (if (not (string-match-p "False" (ob-wolfram-syntax-check code)))
         (with-current-buffer outbuf
           (unless (eq major-mode 'org-mode)
@@ -232,8 +232,6 @@ will be automatically converted to:
     (if env (org-edit-src-code))
     (when-let* ((code (sci-wolfram-get-region-or-buffer-code)))
       ;; do syntax check before formatting code
-      (ob-wolfram-make-repl)
-      (ob-wolfram-initiate-session)
       (if (not (string-match-p "False" (ob-wolfram-syntax-check code)))
           (let* ((tmp (org-babel-temp-file "wolfram-format-" ".wl"))
                  (format (progn (with-temp-file tmp (insert code))

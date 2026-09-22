@@ -195,18 +195,13 @@ Read [vscode-test-convert-to-notebook.wl](Test/vscode-test-convert-to-notebook.w
 https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 
 # Change Log
-## v3.2.8
-- Simplify code
-- Fix % or Out[] NULL error
-- Add syntax check
-
 ## v3.0.0
 - Add Wolfram REPL **async session** calc support
 - **Remove** [emacs-jupyter](https://github.com/emacs-jupyter/jupyter) package dependency
-- Refactor `sciWolframDisplayImage.wl` and `sciWolframConvertToNotebook.wl` package
+- Refactor `DisplayImage.wl` and `ConvertToNotebook.wl` package
 
 # Reference
-For `sciWolframDisplayImage.wl`:
+For `DisplayImage.wl`:
 
 The core idea is to use `$Post` function in Wolfram to automatically convert complex expression or dynamic plot to **images**, **LaTeX** fragments, or Wolfram Mathematica **interactive** files.
 - [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
@@ -222,15 +217,13 @@ For `LSPServer`:
 - [vscode-wolfram](https://github.com/WolframResearch/vscode-wolfram)
 - [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
 
-For `sciWolframConvertToNotebook.wl`:
+For `ConvertToNotebook.wl`:
 - [Converting Wolfram Language Scripts into PDFs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/293543/converting-wolfram-language-scripts-wls-into-pdfs)
 - [How to get Defer to behave with Manipulate/Dynamic from Wolfram Community](https://community.wolfram.com/groups/-/m/t/37054)
 
 For `sci-wolfram-format-region-or-buffer`:
 - [CodeFormatter](https://github.com/WolframResearch/codeformatter)
 
-For `sciWolframPrettifySymbols.wl`:
+For `PrettifySymbols.wl`:
 - [Listing of Named Characters from Wolfram Reference](https://reference.wolfram.com/language/guide/ListingOfNamedCharacters.html)
-- [List all built-in commands and symbols of Mathematica programtically from Wolfram Community](https://community.wolfram.com/groups/-/m/t/2511222)
 - [List of Mathematica glyphs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/7610/list-of-mathematica-glyphs/102079#102079)
-- [Get list of special characters from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/253271/get-list-of-special-characters)
