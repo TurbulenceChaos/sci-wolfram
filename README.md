@@ -38,6 +38,7 @@ Display wolfram script images in [Visual Studio Code](https://code.visualstudio.
 - [x] Display wolfram script as **images**, **LaTeX**, and Wolfram Player **interactive** files
 - [x] Support Wolfram REPL **async session** calc
 - [x] Automatic completion and formatting with LSPServer
+- [x] Check syntax with **CodeInspector**
 - [x] Convert wolfram script to PDF and Mathematica notebook
 - [x] Prettify Mathematica symbols
 
@@ -49,6 +50,7 @@ Display wolfram script images in [Visual Studio Code](https://code.visualstudio.
 ## Prerequisites
 - [Wolfram Engine](https://www.wolfram.com/engine/) (**FREE**, includes `wolframscript` and `wolframplayer`) or [Wolfram Mathematica](https://www.wolfram.com/mathematica/)
 - [LaTeX](https://www.tug.org/texlive/) (optional)
+- [CodeInspector](https://github.com/WolframResearch/codeinspector) (You may need to install this pkg if your Wolfram version < 12.2.)
 
 ## Configuration
 ```lisp
@@ -211,12 +213,13 @@ For `DisplayImage.wl`:
 The core idea is to use `$Post` function in Wolfram to automatically convert complex expression or dynamic plot to **images**, **LaTeX** fragments, or Wolfram Mathematica **interactive** files.
 - [Displaying graphics and images inline on Wolfram Engine from Wolfram Community Discussion](https://community.wolfram.com/groups/-/m/t/2864001)
 - [How to set up a Plot viewer for Wolfram Engine from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/258273/how-to-set-up-a-plot-viewer-for-wolfram-engine)
+- [wolfram-language-notebook](https://github.com/njpipeorgan/wolfram-language-notebook/pull/50)
 
 For `sci-wolfram-mode`:
 - [xah-wolfram-mode](https://github.com/xahlee/xah-wolfram-mode)
 - [wolfram-mode](https://github.com/kawabata/wolfram-mode)
 
-For `ob-wolfram`:
+For `ob-wolfram.el`:
 - [ob-mathematica](https://github.com/tririver/ob-mathematica)
 - [wolfram-mode](https://github.com/dalanicolai/wolfram-mode/tree/master)
 
@@ -224,6 +227,9 @@ For `LSPServer`:
 - [LSPServer](https://github.com/WolframResearch/LSPServer)
 - [vscode-wolfram](https://github.com/WolframResearch/vscode-wolfram)
 - [wolfram-language-mode](https://github.com/transentis/wolfram-language-mode)
+
+For `ob-wolfram-syntax-check`:
+- [CodeInspector](https://github.com/WolframResearch/codeinspector)
 
 For `ConvertToNotebook.wl`:
 - [Converting Wolfram Language Scripts into PDFs from Mathematica Stack Exchange](https://mathematica.stackexchange.com/questions/293543/converting-wolfram-language-scripts-wls-into-pdfs)

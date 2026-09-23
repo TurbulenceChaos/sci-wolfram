@@ -67,13 +67,8 @@ which should be automatically removed before running code!"
 
 ;; return orginal value for % calc in REPL
 ;; https://reference.wolfram.com/language/ref/Out.html
-(defun ob-wolfram-write-string (string &optional raw)
-  (format "WriteString[\"stdout\", %s, \"\\n\"];Out[];\n"
-          (if raw
-              ;; raw=t for code
-              (format "%s" string)
-            ;; else for string
-            (format "%S" string))))
+(defun ob-wolfram-write-string (string)
+  (format "WriteString[\"stdout\", %S, \"\\n\"];Out[];\n" string))
 
 ;; session evaluate
 (defun ob-wolfram--evaluate-session (body)
@@ -89,10 +84,9 @@ which should be automatically removed before running code!"
     ;; for hybrid case, block 1 :async yes and block 2 :async no,
     ;; block 1 result may occur in block 2 when executing `org-babel-execute-buffer' command
     (replace-regexp-in-string
-     "ob_wolfram_async_start_\\(.\\|\n\\)*?ob_wolfram_async_end_.*\n?\n?"
+     "ob_wolfram_async_start_\\(.\\|\n\\)*ob_wolfram_async_end_.*\n\n?"
      ""
-     return)
-    ))
+     return)))
 
 ;; initiate session
 (defun ob-wolfram-initiate-session ()
@@ -103,28 +97,23 @@ which should be automatically removed before running code!"
     (setq ob-wolfram-session-initiated t)))
 
 ;; syntax check
-;; https://github.com/njpipeorgan/wolfram-language-notebook/pull/50
+;; https://github.com/WolframResearch/codeinspector
 (defun ob-wolfram-syntax-check (body)
-  "Check Wolfram script syntax with SyntaxQ[\"code\"] before running code."
+  "Check Wolfram script syntax with
+CodeInspector`CodeInspectSummarize[\"code\"] before running code.
+See https://github.com/WolframResearch/codeinspector for details."
   (ob-wolfram-initiate-session)
   (let* ((code (string-trim-right body))
          (tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
          (syntax (progn
                    (with-temp-file tmp (insert code))
-                   (ob-wolfram--evaluate-session
-                    (ob-wolfram-write-string
+                   (replace-regexp-in-string
+                    "\\(\\\\\\[RawEscape\\]\\[1m\\\\\\[RawEscape\\]\\[31m\\|\\\\\\[RawEscape\\]\\[0m\\)" ""
+                    (ob-wolfram--evaluate-session
                      (concat
-                      "Module[{code, pos, len, line},"
-                      (format "code = Import[%S, \"Text\"];" tmp)
-                      "If[SyntaxQ[code],"
-                      "\"True\","
-                      "pos = SyntaxLength[code];"
-                      "len = StringLength[code];"
-                      "line = Length[StringSplit[StringTake[code, Min[len, pos]], StartOfLine]];"
-                      "StringTemplate[\"Syntax Error:\\n\\n... `1` ...\\n\\nat or before code line `2`\"][StringTake[code, {Max[1, pos - 5], Min[len, pos + 3]}], line]"
-                      "]]")
-                     t)))))
-    (unless (string= "True" syntax)
+                      "Needs[\"CodeInspector`\"];"
+                      (format "WriteString[\"stdout\",ToString[CodeInspector`CodeInspectSummarize[Import[%S,\"Text\"]],CharacterEncoding->None],\"\\n\"];Out[];" tmp)))))))
+    (unless (string-match-p "Text\\[No issues.\\]" syntax)
       (when (and (derived-mode-p 'org-mode)
                  (org-in-src-block-p))
         (org-edit-src-code))
