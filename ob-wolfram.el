@@ -50,7 +50,6 @@
 
 (defvar ob-wolfram-prompt-regexp "^In\\[[0-9]+\\]:= ")
 
-;; session evaluate
 (defun ob-wolfram-make-repl ()
   "Create a new Wolfram REPL if it is not exist."
   (unless (comint-check-proc ob-wolfram-session)
@@ -66,29 +65,73 @@
 which should be automatically removed before running code!"
   (substring-no-properties (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
 
-(defun ob-wolfram-write-string (string)
-  (format "WriteString[\"stdout\", %S, \"\\n\"];" string))
+;; return orginal value for % calc in REPL
+;; https://reference.wolfram.com/language/ref/Out.html
+(defun ob-wolfram-write-string (string &optional raw)
+  (format "WriteString[\"stdout\", %s, \"\\n\"];Out[];\n"
+          (if raw
+              ;; raw=t for code
+              (format "%s" string)
+            ;; else for string
+            (format "%S" string))))
 
-(defun ob-wolfram-evaluate-session (body)
+;; session evaluate
+(defun ob-wolfram--evaluate-session (body)
   "Evaluate Wolfram REPL session."
   (let* ((eoe (format "ob_wolfram_eoe_%s" (org-id-uuid)))
          (code (concat
                 (ob-wolfram-remove-empty-lines body)
-                "\n\n" (ob-wolfram-write-string eoe)
-                ;; return orginal value for % calc in REPL
-                ;; https://reference.wolfram.com/language/ref/Out.html
-                "Out[];\n"))
+                "\n\n" (ob-wolfram-write-string eoe)))
          (result (org-babel-comint-with-output
                      (ob-wolfram-session eoe)
                    (comint-send-string ob-wolfram-session code)))
          (return (string-trim-right (mapconcat #'identity (cl-remove eoe result :test #'string-match-p)))))
-    return))
+    ;; for hybrid case, block 1 :async yes and block 2 :async no,
+    ;; block 1 result may occur in block 2 when executing `org-babel-execute-buffer' command
+    (replace-regexp-in-string
+     "ob_wolfram_async_start_\\(.\\|\n\\)*?ob_wolfram_async_end_.*\n?\n?"
+     ""
+     return)
+    ))
 
+;; initiate session
 (defun ob-wolfram-initiate-session ()
+  (ob-wolfram-make-repl)
   (unless ob-wolfram-session-initiated
-    (ob-wolfram-evaluate-session
+    (ob-wolfram--evaluate-session
      (ob-wolfram-write-string "Wolfram REPL session is initiated."))
     (setq ob-wolfram-session-initiated t)))
+
+;; syntax check
+;; https://github.com/njpipeorgan/wolfram-language-notebook/pull/50
+(defun ob-wolfram-syntax-check (body)
+  "Check Wolfram script syntax with SyntaxQ[\"code\"] before running code."
+  (ob-wolfram-initiate-session)
+  (let* ((code (string-trim-right body))
+         (tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
+         (syntax (progn
+                   (with-temp-file tmp (insert code))
+                   (ob-wolfram--evaluate-session
+                    (ob-wolfram-write-string
+                     (concat
+                      "Module[{code, pos, len, line},"
+                      (format "code = Import[%S, \"Text\"];" tmp)
+                      "If[SyntaxQ[code],"
+                      "\"True\","
+                      "pos = SyntaxLength[code];"
+                      "len = StringLength[code];"
+                      "line = Length[StringSplit[StringTake[code, Min[len, pos]], StartOfLine]];"
+                      "StringTemplate[\"Syntax Error:\\n\\n... `1` ...\\n\\nat or before code line `2`\"][StringTake[code, {Max[1, pos - 2], Min[len, pos + 3]}], line]"
+                      "]]")
+                     t)))))
+    syntax))
+
+;; session evaluate with syntax check
+(defun ob-wolfram-evaluate-session (body)
+  (let ((syntax (ob-wolfram-syntax-check body)))
+    (if (string-match-p "True" syntax)
+        (ob-wolfram--evaluate-session body)
+      syntax)))
 
 ;; display inline images in org babel results
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
@@ -129,7 +172,7 @@ which should be automatically removed before running code!"
                   ;; for session, display images
                   (ob-wolfram-display-inline-images-in-babel-result))))))
 
-;; async session evaluate
+;; async session result process
 (defun ob-wolfram-async-chunk-callback (result)
   "Filter applied to async results before insertion.
 See `org-babel-comint-async-chunk-callback'."
@@ -155,27 +198,25 @@ See `org-babel-comint-async-chunk-callback'."
        nil)
       (setq ob-wolfram-async-registered t))))
 
+;; async session evaluate with syntax check
 (defun ob-wolfram-async-evaluate-session (body)
-  (ob-wolfram-async-register)
-  (let* ((uuid (org-id-uuid))
-         (start (format "ob_wolfram_async_start_%s" uuid))
-         (end   (format "ob_wolfram_async_end_%s" uuid))
-         (code (concat
-                (ob-wolfram-write-string start)
-                "Out[];\n"
-                (ob-wolfram-remove-empty-lines body)
-                "\n\n" (ob-wolfram-write-string end)
-                ;; return orginal value for % calc in REPL
-                ;; https://reference.wolfram.com/language/ref/Out.html
-                "Out[];\n")))
-    (comint-send-string ob-wolfram-session code)
-    uuid))
+  (let ((syntax (ob-wolfram-syntax-check body)))
+    (if (string-match-p "True" syntax)
+        (let* ((uuid (org-id-uuid))
+               (start (format "ob_wolfram_async_start_%s" uuid))
+               (end   (format "ob_wolfram_async_end_%s" uuid))
+               (code (concat
+                      (ob-wolfram-write-string start)
+                      (ob-wolfram-remove-empty-lines body)
+                      "\n\n" (ob-wolfram-write-string end))))
+          (ob-wolfram-async-register)
+          (comint-send-string ob-wolfram-session code)
+          uuid)
+      syntax)))
 
 ;; org babel execute
 ;;;###autoload
 (defun org-babel-execute:wolfram (body params)
-  (ob-wolfram-make-repl)
-  (ob-wolfram-initiate-session)
   (let ((async (cdr (assq :async params))))
     (if (string-match-p "yes" async)
         (ob-wolfram-async-evaluate-session body)
