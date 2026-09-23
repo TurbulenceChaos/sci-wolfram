@@ -150,19 +150,17 @@ will be automatically converted to:
                     ((derived-mode-p 'sci-wolfram-mode)
                      (buffer-substring-no-properties (point-min) (point-max))))))
     (if code
-        (let ((syntax (ob-wolfram-syntax-check code)))
-          (if (string-match-p "True" syntax)
-              (string-trim-right code)
-            (user-error syntax)))
+        (progn (ob-wolfram-syntax-check code)
+               (string-trim-right code))
       (user-error "You must be in either [1] region, [2] `sci-wolfram-mode', or [3] Wolfram src-block!"))))
 
 ;;;###autoload
 (defun sci-wolfram-run-region-or-buffer ()
   "Run Wolfram script region or buffer code."
   (interactive)
-  (when-let* ((code (sci-wolfram-get-region-or-buffer-code))
-              (outbuf (get-buffer-create "*Wolfram Results*"))
-              (n "\n"))
+  (let ((code (sci-wolfram-get-region-or-buffer-code))
+        (outbuf (get-buffer-create "*Wolfram Results*"))
+        (n "\n"))
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
         (org-mode))
@@ -185,11 +183,14 @@ will be automatically converted to:
 (defun sci-wolfram-convert-to-notebook ()
   "Convert Wolfram script to Wolfram Mathematica notebook."
   (interactive)
-  (save-buffer)
-  (when-let* ((code (sci-wolfram-get-region-or-buffer-code))
-              (file (buffer-file-name))
-              (outbuf (get-buffer-create "*Wolfram Convert*"))
-              (n "\n"))
+  (unless (and (buffer-file-name) (derived-mode-p 'sci-wolfram-mode))
+    (user-error "You must be in a Wolfram script file!"))
+  (ob-wolfram-syntax-check
+   (buffer-substring-no-properties (point-min) (point-max)))
+  (let ((file (buffer-file-name))
+        (outbuf (get-buffer-create "*Wolfram Convert*"))
+        (n "\n"))
+    (save-buffer)
     (with-current-buffer outbuf
       (unless (eq major-mode 'org-mode)
         (org-mode))
@@ -223,23 +224,23 @@ will be automatically converted to:
                  "org src block")))
     ;; if in org src block, enter org-src-mode
     (if env (org-edit-src-code))
-    (when-let* ((code (sci-wolfram-get-region-or-buffer-code))
-                (tmp (org-babel-temp-file "wolfram-format-" ".wl"))
-                (format (progn (with-temp-file tmp (insert code))
-                               (concat
-                                "Needs[\"CodeFormatter`\"];"
-                                (format "WriteString[%S," tmp)
-                                (format "CodeFormatter`CodeFormat[File[%S]," tmp)
-                                "\"Airiness\"->-0.75,"
-                                "\"LineWidth\"->120,"
-                                "\"BreakLinesMethod\"->\"LineBreakerV2\","
-                                (format "\"TabWidth\"->%s," sci-wolfram-tab-width)
-                                (format "\"IndentationString\"->%S" sci-wolfram-indent-string)
-                                "]];"
-                                (format "Close[%S];Out[];" tmp))))
-                (result (progn (ob-wolfram-evaluate-session format)
-                               (with-temp-buffer (insert-file-contents tmp)
-                                                 (substring-no-properties (buffer-string))))))
+    (let* ((code (sci-wolfram-get-region-or-buffer-code))
+           (tmp (org-babel-temp-file "wolfram-format-" ".wl"))
+           (format (progn (with-temp-file tmp (insert code))
+                          (concat
+                           "Needs[\"CodeFormatter`\"];"
+                           (format "WriteString[%S," tmp)
+                           (format "CodeFormatter`CodeFormat[File[%S]," tmp)
+                           "\"Airiness\"->-0.75,"
+                           "\"LineWidth\"->120,"
+                           "\"BreakLinesMethod\"->\"LineBreakerV2\","
+                           (format "\"TabWidth\"->%s," sci-wolfram-tab-width)
+                           (format "\"IndentationString\"->%S" sci-wolfram-indent-string)
+                           "]];"
+                           (format "Close[%S];Out[];" tmp))))
+           (result (progn (ob-wolfram-evaluate-session format)
+                          (with-temp-buffer (insert-file-contents tmp)
+                                            (substring-no-properties (buffer-string))))))
       (message "Format Wolfram script")
       (save-excursion
         (if (region-active-p)
@@ -319,7 +320,7 @@ will be automatically converted to:
                                  (when (org-in-src-block-p t)
                                    (let* ((info (org-babel-get-src-block-info))
                                           (lang (nth 0 info)))
-                                     (when (string-match-p lang "wolfram")
+                                     (when (string= lang "wolfram")
                                        (sci-wolfram-completion-at-point)))))
                                nil t)))
 

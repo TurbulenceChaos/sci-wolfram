@@ -121,17 +121,19 @@ which should be automatically removed before running code!"
                       "pos = SyntaxLength[code];"
                       "len = StringLength[code];"
                       "line = Length[StringSplit[StringTake[code, Min[len, pos]], StartOfLine]];"
-                      "StringTemplate[\"Syntax Error:\\n\\n... `1` ...\\n\\nat or before code line `2`\"][StringTake[code, {Max[1, pos - 2], Min[len, pos + 3]}], line]"
+                      "StringTemplate[\"Syntax Error:\\n\\n... `1` ...\\n\\nat or before code line `2`\"][StringTake[code, {Max[1, pos - 5], Min[len, pos + 3]}], line]"
                       "]]")
                      t)))))
-    syntax))
+    (unless (string= "True" syntax)
+      (when (and (derived-mode-p 'org-mode)
+                 (org-in-src-block-p))
+        (org-edit-src-code))
+      (user-error syntax))))
 
 ;; session evaluate with syntax check
 (defun ob-wolfram-evaluate-session (body)
-  (let ((syntax (ob-wolfram-syntax-check body)))
-    (if (string-match-p "True" syntax)
-        (ob-wolfram--evaluate-session body)
-      syntax)))
+  (ob-wolfram-syntax-check body)
+  (ob-wolfram--evaluate-session body))
 
 ;; display inline images in org babel results
 ;; https://github.com/doomemacs/modules/blob/5c89315d5e7138db58e1ef37aaf4c651bb3bcc78/modules/lang/org/config.el#L289
@@ -165,8 +167,8 @@ which should be automatically removed before running code!"
                    (lang (nth 0 info))
                    (params (nth 2 info))
                    (async (cdr (assq :async params))))
-              (when (string-match-p lang "wolfram")
-                (if (string-match-p "yes" async)
+              (when (string= lang "wolfram")
+                (if (string= "yes" async)
                     ;; for async session
                     (setq ob-wolfram-babel-info (cons (current-buffer) (point)))
                   ;; for session, display images
@@ -200,25 +202,23 @@ See `org-babel-comint-async-chunk-callback'."
 
 ;; async session evaluate with syntax check
 (defun ob-wolfram-async-evaluate-session (body)
-  (let ((syntax (ob-wolfram-syntax-check body)))
-    (if (string-match-p "True" syntax)
-        (let* ((uuid (org-id-uuid))
-               (start (format "ob_wolfram_async_start_%s" uuid))
-               (end   (format "ob_wolfram_async_end_%s" uuid))
-               (code (concat
-                      (ob-wolfram-write-string start)
-                      (ob-wolfram-remove-empty-lines body)
-                      "\n\n" (ob-wolfram-write-string end))))
-          (ob-wolfram-async-register)
-          (comint-send-string ob-wolfram-session code)
-          uuid)
-      syntax)))
+  (ob-wolfram-syntax-check body)
+  (let* ((uuid (org-id-uuid))
+         (start (format "ob_wolfram_async_start_%s" uuid))
+         (end   (format "ob_wolfram_async_end_%s" uuid))
+         (code (concat
+                (ob-wolfram-write-string start)
+                (ob-wolfram-remove-empty-lines body)
+                "\n\n" (ob-wolfram-write-string end))))
+    (ob-wolfram-async-register)
+    (comint-send-string ob-wolfram-session code)
+    uuid))
 
 ;; org babel execute
 ;;;###autoload
 (defun org-babel-execute:wolfram (body params)
   (let ((async (cdr (assq :async params))))
-    (if (string-match-p "yes" async)
+    (if (string= "yes" async)
         (ob-wolfram-async-evaluate-session body)
       (ob-wolfram-evaluate-session body))))
 
