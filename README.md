@@ -37,7 +37,7 @@ Display wolfram script images in [Visual Studio Code](https://code.visualstudio.
 # Features for Emacs
 - [x] Display wolfram script as **images**, **LaTeX**, and Wolfram Player **interactive** files
 - [x] Support Wolfram REPL **async session** calc
-- [x] Automatic completion and formatting with LSPServer
+- [x] Automatic completion and formatting with **LSPServer**
 - [x] Check syntax with **CodeInspector**
 - [x] Convert wolfram script to PDF and Mathematica notebook
 - [x] Prettify Mathematica symbols
@@ -132,6 +132,10 @@ Display formula as LaTeX fragments:
 
 https://github.com/user-attachments/assets/1d226657-a3a3-4145-95df-f2a5b7348ecd
 
+CodeInspector syntax check:
+
+https://github.com/user-attachments/assets/f56bfa36-fb54-4455-a447-9c207a9746b4
+
 ## For Wolfram Src-block in Org-mode
 `org-babel-execute:wolfram`
 
@@ -152,6 +156,10 @@ https://github.com/user-attachments/assets/44f5aa76-fed0-413f-b71e-b199f4fd04d7
 Format Wolfram src-block code.
 
 https://github.com/user-attachments/assets/de4a3d06-751e-41fb-8602-0a3a844ac9e9
+
+CodeInspector syntax check:
+
+https://github.com/user-attachments/assets/76faabb4-1c44-4fee-a7db-a77cdd1d8431
 
 Read [emacs-test-org-mode.org](Test/emacs-test-org-mode.org) for more details.
 
