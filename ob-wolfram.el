@@ -103,16 +103,21 @@ which should be automatically removed before running code!"
 CodeInspector`CodeInspectSummarize[\"code\"] before running code.
 See https://github.com/WolframResearch/codeinspector for details."
   (ob-wolfram-initiate-session)
-  (let* ((code (string-trim-right body))
-         (tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
+  (let* ((tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
+         (code (progn
+                 (with-temp-file tmp (insert body))
+                 (concat
+                  "Needs[\"CodeInspector`\"];"
+                  (format "WriteString[%S," tmp)
+                  (format "ToString[CodeInspector`CodeInspectSummarize[Import[%S,\"Text\"]],CharacterEncoding->None],\"\\n\"];" tmp)
+                  (format "Close[%S];Out[];" tmp))))
          (syntax (progn
-                   (with-temp-file tmp (insert code))
-                   (replace-regexp-in-string
-                    "\\(\\\\\\[RawEscape\\]\\[1m\\\\\\[RawEscape\\]\\[31m\\|\\\\\\[RawEscape\\]\\[0m\\)" ""
-                    (ob-wolfram--evaluate-session
-                     (concat
-                      "Needs[\"CodeInspector`\"];"
-                      (format "WriteString[\"stdout\",ToString[CodeInspector`CodeInspectSummarize[Import[%S,\"Text\"]],CharacterEncoding->None],\"\\n\"];Out[];" tmp)))))))
+                   (ob-wolfram--evaluate-session code)
+                   (with-temp-buffer
+                     (insert-file-contents tmp)
+                     (replace-regexp-in-string
+                      "\\(\\\\\\[RawEscape\\]\\[1m\\\\\\[RawEscape\\]\\[31m\\|\\\\\\[RawEscape\\]\\[0m\\)" ""
+                      (substring-no-properties (buffer-string)))))))
     (unless (string-match-p "Text\\[No issues.\\]" syntax)
       (when (and (derived-mode-p 'org-mode)
                  (org-in-src-block-p))

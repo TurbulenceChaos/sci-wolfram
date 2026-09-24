@@ -142,7 +142,6 @@ will be automatically converted to:
       (beginning-of-line)
       (insert (funcall func)))))
 
-
 ;; run region or buffer
 (defun sci-wolfram-get-region-or-buffer-code ()
   (let ((code (cond ((region-active-p)
@@ -158,6 +157,8 @@ will be automatically converted to:
 (defun sci-wolfram-run-region-or-buffer ()
   "Run Wolfram script region or buffer code."
   (interactive)
+  (unless (or (region-active-p) (derived-mode-p 'sci-wolfram-mode))
+    (user-error "You must be in either [1] region, [2] `sci-wolfram-mode'"))
   (let ((code (sci-wolfram-get-region-or-buffer-code))
         (outbuf (get-buffer-create "*Wolfram Results*"))
         (n "\n"))
@@ -220,9 +221,10 @@ will be automatically converted to:
   "Format Wolfram script region or buffer codes."
   (interactive)
   (let ((env (if (and (derived-mode-p 'org-mode)
-                      (org-in-src-block-p))
-                 "org src block")))
-    ;; if in org src block, enter org-src-mode
+                      (org-in-src-block-p)
+                      (string= (nth 0 (org-babel-get-src-block-info)) "wolfram"))
+                 "Wolfram src-block")))
+    ;; if in Wolfram src-block, enter org-src-mode
     (if env (org-edit-src-code))
     (let* ((code (sci-wolfram-get-region-or-buffer-code))
            (tmp (org-babel-temp-file "wolfram-format-" ".wl"))
