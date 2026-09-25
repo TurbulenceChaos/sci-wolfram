@@ -1,12 +1,12 @@
 #+Title: Emacs Org-mode Test
 #+Author: PENG
 #+Email: p.peng01@outlook.com
-#+Date: 20260922
+#+Date: 20260925
 
 * For Wolfram Src-block
 Support Wolfram REPL session or async session running.
 
-** Display inline Images
+** Display Inline Images
 #+name: import-sci-wolfram-image-package
 #+begin_src wolfram
 (* Please run "M-x sci-wolfram-import-package RET display image RET" from this line *)

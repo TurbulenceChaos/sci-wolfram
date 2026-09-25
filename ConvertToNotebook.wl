@@ -25,19 +25,17 @@ process[expr_] := Module[{input},
 player = First[FileNames[{"*wolframplayer*", "*WolframNB*"}, $InstallationDirectory, 2], Null];
 
 convert[file_] := Module[
-    {fileName, dir, pdf, nb, exprs, cells, notebook}
+    {fileName, dir, nb, exprs, cells, notebook}
     ,
     (* https://mathematica.stackexchange.com/a/133058/95308 *)
     SetOptions[First[$Output], FormatType -> StandardForm];
     fileName = FileBaseName[file];
     dir      = DirectoryName[AbsoluteFileName[file]];
-    pdf      = FileNameJoin[{dir, StringTemplate["`1`-convert.pdf"][fileName]}];
-    nb       = StringReplace[pdf, ".pdf" -> ".nb"];
+    nb       = FileNameJoin[{dir, StringTemplate["`1`-convert-to-notebook.nb"][fileName]}];
     exprs    = Import[file, "HeldExpressions"];
     cells    = Map[process, exprs];
     UsingFrontEnd[notebook = CreateDocument[cells];
         NotebookEvaluate[notebook, InsertResults -> True];
-        Export[pdf, notebook];
         Export[nb, notebook];
         NotebookClose[notebook];
     ];

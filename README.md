@@ -32,19 +32,19 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
 # Introduction
 An all-in-one Wolfram Mathematica package for [Emacs](https://www.gnu.org/software/emacs/emacs.html).
 
-Display wolfram script images in [Visual Studio Code](https://code.visualstudio.com/) Terminal.
+Display Wolfram script images in [Visual Studio Code](https://code.visualstudio.com/) Terminal.
 
 # Features for Emacs
-- [x] Display wolfram script as **images**, **LaTeX**, and Wolfram Player **interactive** files
+- [x] Display Wolfram script as **images**, **LaTeX**, and Wolfram Player **interactive** files
 - [x] Support Wolfram REPL **async session** calc
 - [x] Automatic completion and formatting with **LSPServer**
 - [x] Check syntax with **CodeInspector**
-- [x] Convert wolfram script to PDF and Mathematica notebook
+- [x] Convert Wolfram script to Wolfram Mathematica notebook
 - [x] Prettify Mathematica symbols
 
 # Features for VSCode
-- [x] Display wolfram script images in VSCode Terminal using **imgcat**
-- [x] Convert wolfram script to PDF and Mathematica notebook
+- [x] Display Wolfram script images in VSCode Terminal using **imgcat**
+- [x] Convert Wolfram script to Wolfram Mathematica notebook
 
 # Installation for Emacs
 ## Prerequisites
@@ -206,9 +206,9 @@ Read [vscode-test-convert-to-notebook.wl](Test/vscode-test-convert-to-notebook.w
 https://github.com/user-attachments/assets/97fa292f-e74c-4c63-9098-aaddeb05b55a
 
 # Change Log
-## v3.2.8
+## v3.3.0
 - Simplify code
-- Add syntax check
+- Add CodeInspector syntax check
 
 ## v3.0.0
 - Add Wolfram REPL **async session** calc support
