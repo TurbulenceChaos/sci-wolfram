@@ -24,7 +24,7 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
   - [For Wolfram REPL](#for-wolfram-repl)
   - [Convert Wolfram Script to Wolfram Mathematica Notebook](#convert-wolfram-script-to-wolfram-mathematica-notebook)
 - [Change Log](#change-log)
-  - [v3.2.8](#v328)
+  - [v3.3.0](#v330)
   - [v3.0.0](#v300)
 - [Reference](#reference)
 <!-- markdown-ts-toc-end: -->
@@ -50,7 +50,6 @@ Display Wolfram script images in [Visual Studio Code](https://code.visualstudio.
 ## Prerequisites
 - [Wolfram Engine](https://www.wolfram.com/engine/) (**FREE**, includes `wolframscript` and `wolframplayer`) or [Wolfram Mathematica](https://www.wolfram.com/mathematica/)
 - [LaTeX](https://www.tug.org/texlive/) (optional)
-- [CodeInspector](https://github.com/WolframResearch/codeinspector) (You may need to install this pkg if your Wolfram version < 12.2.)
 
 ## Configuration
 ```lisp
