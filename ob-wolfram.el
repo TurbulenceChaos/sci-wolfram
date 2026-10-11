@@ -122,7 +122,7 @@ See https://github.com/WolframResearch/codeinspector for details."
       (when (and (derived-mode-p 'org-mode)
                  (org-in-src-block-p))
         (org-edit-src-code))
-      (user-error syntax))))
+      (user-error "%s" syntax))))
 
 ;; session evaluate with syntax check
 (defun ob-wolfram-evaluate-session (body)
