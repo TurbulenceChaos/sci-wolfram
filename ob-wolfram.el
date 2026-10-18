@@ -4,7 +4,7 @@
 
 ;; Author: PENG <p.peng01@outlook.com>
 ;; Created: 20250520
-;; Version: 20260925
+;; Version: 20261018
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, processes, tools
 ;; Homepage: https://github.com/TurbulenceChaos/sci-wolfram
@@ -32,8 +32,6 @@
 
 ;; Installation and usage:
 ;; Please check README.md.
-
-;; See https://github.com/TurbulenceChaos/sci-wolfram for more information.
 
 ;;; Code:
 
@@ -65,10 +63,8 @@
 which should be automatically removed before running code!"
   (substring-no-properties (replace-regexp-in-string "\n[ \t\n]*\n" "\n" body)))
 
-;; return orginal value for % calc in REPL
-;; https://reference.wolfram.com/language/ref/Out.html
 (defun ob-wolfram-write-string (string)
-  (format "WriteString[\"stdout\", %S, \"\\n\"];Out[];\n" string))
+  (format "WriteString[\"stdout\", %S, \"\\n\"];\n" string))
 
 ;; session evaluate
 (defun ob-wolfram--evaluate-session (body)
@@ -99,24 +95,23 @@ which should be automatically removed before running code!"
 ;; syntax check
 ;; https://github.com/WolframResearch/codeinspector
 (defun ob-wolfram-syntax-check (body)
-  "Check Wolfram script syntax with
-CodeInspector`CodeInspectSummarize[\"code\"] before running code.
-See https://github.com/WolframResearch/codeinspector for details."
+  "Check Wolfram script syntax with CodeInspector."
   (ob-wolfram-initiate-session)
   (let* ((tmp (org-babel-temp-file "wolfram-syntax-" ".wl"))
          (code (progn
                  (with-temp-file tmp (insert body))
-                 (concat
-                  "Needs[\"CodeInspector`\"];"
-                  (format "WriteString[%S," tmp)
-                  (format "ToString[CodeInspector`CodeInspectSummarize[Import[%S,\"Text\"]],CharacterEncoding->None],\"\\n\"];" tmp)
-                  (format "Close[%S];Out[];" tmp))))
+                 (concat "Needs[\"CodeInspector`\"];"
+                         (format "WriteString[%S,ToString[" tmp)
+                         (format "CodeInspector`CodeInspectSummarize[Import[%S,\"Text\"]]," tmp)
+                         "CharacterEncoding->None],\"\\n\"];"
+                         (format "Close[%S];" tmp))))
          (syntax (progn
                    (ob-wolfram--evaluate-session code)
                    (with-temp-buffer
                      (insert-file-contents tmp)
                      (replace-regexp-in-string
-                      "\\(\\\\\\[RawEscape\\]\\[1m\\\\\\[RawEscape\\]\\[31m\\|\\\\\\[RawEscape\\]\\[0m\\)" ""
+                      "\\(\\\\\\[RawEscape\\]\\[1m\\\\\\[RawEscape\\]\\[31m\\|\\\\\\[RawEscape\\]\\[0m\\)"
+                      ""
                       (substring-no-properties (buffer-string)))))))
     (unless (string-match-p "Text\\[No issues.\\]" syntax)
       (when (and (derived-mode-p 'org-mode)
