@@ -6,8 +6,8 @@ Email: [p.peng01@outlook.com](mailto:p.peng01@outlook.com)
 GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wolfram)
 
 # Table of Contents
-<!-- markdown-ts-toc: -->
-<!-- NOTE: markdown-ts-toc generated text section may be overwritten. -->
+- [sci-wolfram](#sci-wolfram)
+- [Table of Contents](#table-of-contents)
 - [Introduction](#introduction)
 - [Features for Emacs](#features-for-emacs)
 - [Features for VSCode](#features-for-vscode)
@@ -22,12 +22,11 @@ GitHub: [TurbulenceChaos/sci-wolfram](https://github.com/TurbulenceChaos/sci-wol
   - [Configuration](#configuration-1)
 - [Usage for VSCode](#usage-for-vscode)
   - [For Wolfram REPL](#for-wolfram-repl)
-  - [Convert Wolfram Script to Wolfram Mathematica Notebook](#convert-wolfram-script-to-wolfram-mathematica-notebook)
+  - [Convert Wolfram Script to Mathematica Notebook](#convert-wolfram-script-to-mathematica-notebook)
 - [Change Log](#change-log)
   - [v3.3.0](#v330)
   - [v3.0.0](#v300)
 - [Reference](#reference)
-<!-- markdown-ts-toc-end: -->
 
 # Introduction
 An all-in-one Wolfram Mathematica package for [Emacs](https://www.gnu.org/software/emacs/emacs.html).
@@ -48,8 +47,10 @@ Display Wolfram script images in [Visual Studio Code](https://code.visualstudio.
 
 # Installation for Emacs
 ## Prerequisites
-- [Wolfram Engine](https://www.wolfram.com/engine/) (**FREE**, includes `wolframscript` and `wolframplayer`) or [Wolfram Mathematica](https://www.wolfram.com/mathematica/)
+- [Wolfram Engine](https://www.wolfram.com/engine/) (**FREE**, includes `wolframscript` and `wolframplayer`)
+or [Wolfram Mathematica](https://www.wolfram.com/mathematica/)
 - [LaTeX](https://www.tug.org/texlive/) (optional)
+- [LSPServer](https://github.com/WolframResearch/LSPServer) (optional, included in Wolfram 13.0 and above)
 
 ## Configuration
 ```lisp
@@ -182,7 +183,7 @@ Read [vscode-test-display-image.wl](Test/vscode-test-display-image.wl) for more 
 
 https://github.com/user-attachments/assets/29e36751-2810-4542-a575-bd29eae8b19d
 
-## Convert Wolfram Script to Wolfram Mathematica Notebook
+## Convert Wolfram Script to Mathematica Notebook
 Steps:
 1. `Ctrl+Shift+p: Wolfram Language: Start Wolfram in Terminal`
 2. Modify and paste below code into REPL:
